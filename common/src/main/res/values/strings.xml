@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="http_unknown_msg">未知错误</string>
+    <string name="http_forbidden_msg">禁止访问</string>
+    <string name="http_timeout_msg">请求超时</string>
+    <string name="http_ssl_error_msg">证书验证失败</string>
+    <string name="http_parse_error_msg">解析失败</string>
+    <string name="http_res_not_found_msg">找不到资源</string>
+    <string name="http_net_error">网络错误</string>
+    <string name="http_connect_failed">连接失败</string>
+    <string name="usb_plugin_out">U盘已拔出</string>
+    <string name="usb_plugin_in">U盘已插入</string>
+</resources>
