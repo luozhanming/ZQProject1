@@ -6,7 +6,7 @@ import android.webkit.WebView
 
 object WebViewUtil {
 
-    fun getWebView(context: Context): WebView {
+    fun getH5WebView(context: Context): WebView {
         val webView = WebView(context)
         webView.settings.apply {
             javaScriptEnabled = true

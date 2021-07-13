@@ -15,8 +15,9 @@ object LuBoSDK {
      * 确定录播服务器时需要调用
      */
     fun init(ip: String, port: String, enableLog: Boolean) {
+        reset()
         if (ip == sIP && port == sPort) return
-        sHost = String.format("http://%s:%s/", ip, port)
+        sHost = "http://${ip}:${port}/"
         sIP = ip
         sPort = port
         sEnableLog = enableLog
@@ -24,12 +25,6 @@ object LuBoSDK {
         Log.e("hahaha", "has init api")
         AVAHttpEngine.startQueryEngine()
     }
-
-
-
-
-
-
     /**
      * 重新选择录播的时候需要调用来清除缓存
      */
@@ -42,10 +37,6 @@ object LuBoSDK {
     fun getHost(): String? {
         return sHost
     }
-
-
-
-
 
     fun setNetErrorListener(listener: NetErrorListener?) {
         mListener = listener
