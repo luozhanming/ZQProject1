@@ -1,7 +1,10 @@
 package cn.com.ava.zqproject.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
 import cn.com.ava.base.ui.BaseActivity
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.ActivityMainBinding
@@ -9,8 +12,14 @@ import cn.com.ava.zqproject.ui.common.LoadingDialog
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
+    companion object{
+        const val REQUEST_CODE_PERMISSION = 1
+    }
+
 
     private val mMainViewModel by viewModels<MainViewModel>()
+
+    private val mLuboViewModel by viewModels<LuBoShareViewModel>()
 
     /**
      *  加载对话框
@@ -18,7 +27,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private val mLoadingDialog by lazy {
         val dialog = LoadingDialog()
         dialog.setDismissCallback {
-            mMainViewModel.getShowLoading().postValue(false)
+            mMainViewModel.isShowLoading.postValue(false)
         }
         dialog
     }
@@ -30,7 +39,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mMainViewModel.getShowLoading().observe(this) { show ->
+        mMainViewModel.isShowLoading.observe(this) { show ->
             if (show) {
                 if (!mLoadingDialog.isVisible) {
                     mLoadingDialog.show(supportFragmentManager, "loading")
@@ -39,5 +48,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 mLoadingDialog.dismiss()
             }
         }
+
     }
+
+
+
 }

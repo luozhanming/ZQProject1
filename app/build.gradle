@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'androidx.navigation.safeargs'
 }
 
 android {
@@ -50,12 +51,14 @@ dependencies {
     implementation deps.navigation_fragment
     implementation deps.navigation_ui
     implementation project(path: ':avartspviewer')
+    implementation deps.xcrash
     generalImplementation.each {
         implementation "$it"
     }
     lifecycleLibs.each {
         api "$it"
     }
+    debugImplementation deps.leakcanary
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

@@ -52,7 +52,7 @@ dependencies {
     api deps.okhttp3_logging
     api deps.retrofit_adapter_rxjava2
     api deps.retrofit_converter_gson
-    implementation deps.logger
+    api deps.logger
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

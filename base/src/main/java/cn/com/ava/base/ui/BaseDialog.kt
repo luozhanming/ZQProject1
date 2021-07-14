@@ -21,11 +21,12 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
         val windowOptions: WindowOptions = getWindowOptions()
         dialog.window.setLayout(windowOptions.width, windowOptions.height)
         dialog.window.setGravity(windowOptions.gravity)
+        dialog.setCanceledOnTouchOutside(windowOptions.canTouchOutsideCancel)
         return dialog
     }
 
     protected fun onDialogCreated(dialog: Dialog) {
-       // dialog.setCanceledOnTouchOutside(false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,5 +76,5 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
     abstract fun getLayoutId(): Int
 
 
-    data class WindowOptions(val width: Int, val height: Int, val gravity: Int)
+    data class WindowOptions(val width: Int, val height: Int, val gravity: Int,val canTouchOutsideCancel:Boolean)
 }

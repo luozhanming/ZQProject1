@@ -15,7 +15,7 @@ import java.security.spec.InvalidKeySpecException
 class LoginSPQuery(
     val username: String,
     val password: String,
-    val isEx: Boolean = false,
+    val isEx: Boolean = true,
     override var onResult: (QueryResult) -> Unit,
     val rsaKey: RSAKey? = null,
     override var onError: ((Throwable) -> Unit)? = null

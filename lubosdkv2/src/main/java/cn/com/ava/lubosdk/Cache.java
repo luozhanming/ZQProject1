@@ -74,6 +74,7 @@ public class Cache {
 
     public void clear() {
         windowsCache.clear();
+        luBoInfo = null;
     }
 
 
