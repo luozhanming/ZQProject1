@@ -12,7 +12,7 @@ import cn.com.ava.zqproject.ui.MainViewModel
 class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private val mSplashViewModel by viewModels<SplashViewModel>()
-
+    // activity内共享
     private val mMainViewModel by activityViewModels<MainViewModel>()
 
     override fun getLayoutId(): Int {
@@ -25,6 +25,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         mBinding.button.setOnClickListener {
             mMainViewModel.getShowLoading().postValue(true)
         }
+
 
 
     }
