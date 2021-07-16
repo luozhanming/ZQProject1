@@ -1,6 +1,10 @@
 package cn.com.ava.zqproject.vo
 
-interface StatefulView {
-    var isSelected:Boolean
-    var isChecked:Boolean
+/**
+ * 为对象添加状态
+ */
+class StatefulView<T>(val obj: T) {
+
+    var isSelected: Boolean = false
+    var isChecked: Boolean = false
 }

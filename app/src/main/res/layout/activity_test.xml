@@ -19,10 +19,16 @@
             android:orientation="horizontal"
             android:layout_height="wrap_content">
 
-            <cn.com.ava.td.terminal.avartspviewer.RtspView
-                android:id="@+id/rtspView"
-                android:layout_width="600dp"
-                android:layout_height="100dp"/>
+            <FrameLayout
+                android:layout_width="1280dp"
+                android:layout_height="180dp">
+                <cn.com.ava.td.terminal.avartspviewer.RtspView
+                    android:id="@+id/rtspView"
+                    android:layout_width="1600dp"
+                    android:layout_height="180dp"/>
+            </FrameLayout>
+
+
         </LinearLayout>
 
     </HorizontalScrollView>

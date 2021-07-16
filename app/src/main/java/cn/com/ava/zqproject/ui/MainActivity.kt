@@ -16,7 +16,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         const val REQUEST_CODE_PERMISSION = 1
     }
 
-
     private val mMainViewModel by viewModels<MainViewModel>()
 
     private val mLuboViewModel by viewModels<LuBoShareViewModel>()

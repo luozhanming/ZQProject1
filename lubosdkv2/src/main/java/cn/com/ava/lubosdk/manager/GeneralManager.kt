@@ -10,6 +10,7 @@ import cn.com.ava.lubosdk.spquery.IPv4NetConfigurationQuery
 import io.reactivex.Observable
 import io.reactivex.functions.Function
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -52,7 +53,7 @@ object GeneralManager {
     fun getLuboInfo(): Observable<LuBoInfo> {
         return Observable.create { emitter ->
             runBlocking {
-                val info = suspendCoroutine<LuBoInfo> {
+                val info = suspendCancellableCoroutine<LuBoInfo> {
                     AVAHttpEngine.addQueryCommand(LuboInfoQuery(
                             onResult = { queryResult ->
                                 it.resumeWith(Result.success(queryResult as LuBoInfo))

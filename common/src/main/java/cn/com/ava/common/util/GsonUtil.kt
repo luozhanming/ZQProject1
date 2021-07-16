@@ -1,11 +1,12 @@
-package cn.com.ava.lubosdk.util
+package cn.com.ava.common.util
 
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.gson.GsonBuilder
 import java.lang.reflect.Type
 
 object GsonUtil {
-
     private val mGson: Gson = Gson()
 
     fun <T> fromJson(json: String, clazz: Class<T>):T {
@@ -20,6 +21,4 @@ object GsonUtil {
     fun <T> toJson(src:T):String{
         return mGson.toJson(src)
     }
-
-
 }

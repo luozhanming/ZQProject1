@@ -6,7 +6,6 @@ import com.blankj.utilcode.util.CloseUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.blankj.utilcode.util.Utils;
 
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -18,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import androidx.documentfile.provider.DocumentFile;
+import cn.com.ava.common.util.LoggerUtilKt;
 import cn.com.ava.zqproject.vo.RecordFilesInfo;
 
 
@@ -93,8 +93,7 @@ public class UDiskDownloadTask extends AsyncTask<Object, Integer, Boolean> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
-        EventBus.getDefault().post(new RecordFileDLStateEvent(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_DOWNLOADING, values[0]));
-
+        UsbHelper.getHelper().notifyDownloadStateChanged(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_DOWNLOADING, values[0]);
     }
 
     public void deleteFile() {
@@ -107,11 +106,11 @@ public class UDiskDownloadTask extends AsyncTask<Object, Integer, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         isCompleted = true;
         if (aBoolean) {
-            EventBus.getDefault().post(new RecordFileDLStateEvent(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_SUCCESS, 100));
+            UsbHelper.getHelper().notifyDownloadStateChanged(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_SUCCESS, 100);
             ToastUtils.showShort(dstFile.getName() + "已下载完成");
             UsbHelper.getHelper().notifyNextDownload();
         } else {
-            EventBus.getDefault().post(new RecordFileDLStateEvent(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_FAILED, 0));
+            UsbHelper.getHelper().notifyDownloadStateChanged(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_FAILED, 0);
         }
     }
 
@@ -119,7 +118,7 @@ public class UDiskDownloadTask extends AsyncTask<Object, Integer, Boolean> {
     protected void onCancelled() {
         super.onCancelled();
         isCompleted = true;
-        EventBus.getDefault().post(new RecordFileDLStateEvent(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_FAILED, 0));
+        UsbHelper.getHelper().notifyDownloadStateChanged(file, "/" + UsbHelper.DIRECTORY_DOWNLOAD + "/" + dstFile.getName(), RecordFileDLStateEvent.STATE_FAILED, 0);
         UsbHelper.getHelper().notifyNextDownload();
     }
 

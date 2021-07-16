@@ -10,6 +10,7 @@ import cn.com.ava.lubosdk.LuBoSDK
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.common.CommonPreference
 import com.blankj.utilcode.util.RegexUtils
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
@@ -82,6 +83,15 @@ class SplashViewModel : BaseViewModel() {
         }
 
 
+    }
+
+    fun startTimeout() {
+        mDisposables.add(Observable.timer(2,TimeUnit.MILLISECONDS)
+            .subscribe({
+                goWhere.postValue(WHERE_LUBO_SETTING)
+            },{
+
+            }))
     }
 
 

@@ -2,7 +2,10 @@ package cn.com.ava.zqproject
 
 import android.app.Application
 import cn.com.ava.common.util.LoggerUtil
+import cn.com.ava.common.util.logd
+import cn.com.ava.zqproject.common.CommonPreference
 import com.blankj.utilcode.util.AppUtils
+import com.tencent.mmkv.MMKV
 import xcrash.XCrash
 
 class MyApp : Application() {
@@ -31,6 +34,7 @@ class MyApp : Application() {
             setLogDir(AppConfig.CRASH_LOG_DIR)
             setLogFileMaintainDelayMs(1000)
         })
+        MMKV.initialize(this, AppConfig.MMKV_PATH)
 
     }
 }

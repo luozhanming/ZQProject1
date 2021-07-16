@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import cn.com.ava.common.extension.bindExtras
 import cn.com.ava.common.util.ScreenCompatUtil
 
 abstract class BaseActivity<B : ViewDataBinding> : AppCompatActivity() {
@@ -24,6 +25,7 @@ abstract class BaseActivity<B : ViewDataBinding> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         ScreenCompatUtil.initScreenCompat(this, application, true, 360)
         mBinding.lifecycleOwner = this
+        bindExtras()
     }
 
     override fun onStart() {

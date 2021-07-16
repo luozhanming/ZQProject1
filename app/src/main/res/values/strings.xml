@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">政企录播</string>
+    <string name="toast_lubo_login_failed">录播连接失败</string>
+    <string name="toast_lubo_login_success">录播连接成功</string>
+    <string name="toast_input_correct_lubo_info">请输入正确录播信息</string>
+    <string name="toast_input_account_psw">请输入录播账号密码</string>
+    
 </resources>

@@ -76,5 +76,5 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
     abstract fun getLayoutId(): Int
 
 
-    data class WindowOptions(val width: Int, val height: Int, val gravity: Int,val canTouchOutsideCancel:Boolean)
+    data class WindowOptions(val width: Int, val height: Int, val gravity: Int,val canTouchOutsideCancel:Boolean=true)
 }

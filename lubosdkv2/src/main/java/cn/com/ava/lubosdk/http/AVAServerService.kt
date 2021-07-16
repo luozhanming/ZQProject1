@@ -2,6 +2,7 @@ package cn.com.ava.lubosdk.http
 
 import cn.com.ava.lubosdk.entity.MeetingUser
 import cn.com.ava.lubosdk.entity.Pager
+import io.reactivex.Observable
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -26,6 +27,9 @@ interface AVAServerService {
 
     @POST("/cgi-bin/getuserbook.cgi")
     fun getRemoteAddress(@QueryMap params: Map<String, String>): Call<Pager<MeetingUser>> //获取远程通讯录
+
+    @GET("cgi-bin/getFilesInfo.cgi")
+    fun getFileInfoCommand(@QueryMap queryMap: Map<String, String>): Call<ResponseBody>
 
 
     @POST("/cgi-bin/uploadpointfile.cgi")

@@ -38,6 +38,14 @@ object LuBoSDK {
         return sHost
     }
 
+    fun getIp():String?{
+        return sIP
+    }
+
+    fun getPort():String?{
+        return sPort
+    }
+
     fun setNetErrorListener(listener: NetErrorListener?) {
         mListener = listener
         AVAHttpEngine.setNetErrorListener(listener)

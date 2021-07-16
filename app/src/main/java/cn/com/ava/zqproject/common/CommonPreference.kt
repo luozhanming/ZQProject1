@@ -1,7 +1,9 @@
 package cn.com.ava.zqproject.common
 
 import android.content.Context
+import cn.com.ava.zqproject.AppConfig
 import com.blankj.utilcode.util.Utils
+import com.tencent.mmkv.MMKV
 import kotlin.reflect.KProperty
 
 class CommonPreference<T>(private val keyName: String, private val default: T) {
@@ -19,35 +21,37 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
         const val KEY_LUBO_PASSWORD = "Lubo_Password"
         //平台地址
         const val KEY_PLATFORM_ADDR = "Platform_Address"
+        //已选择的按键
+        const val KEY_SELECTED_COMMAND_KEY = "Selected_Key"
 
 
-        val pref = Utils.getApp().getSharedPreferences(SP_COMMON_NAME, Context.MODE_PRIVATE)
+        val pref = MMKV.mmkvWithID(SP_COMMON_NAME,MMKV.SINGLE_PROCESS_MODE,AppConfig.MMKV_CRYPT_KEY)
 
 
         //内存缓存
         val cache = hashMapOf<String, Any?>()
 
         fun <T> putElement(keyName: String, value: T) {
-            pref.edit().apply {
+            pref.apply {
                 when (value) {
-                    is String -> putString(keyName, value)
-                    is Boolean -> putBoolean(keyName, value)
-                    is Int -> putInt(keyName, value)
-                    is Long -> putLong(keyName, value)
-                    is Float -> putFloat(keyName, value)
+                    is String -> encode(keyName, value)
+                    is Boolean -> encode(keyName, value)
+                    is Int -> encode(keyName, value)
+                    is Long -> encode(keyName, value)
+                    is Float -> encode(keyName, value)
                     else -> throw java.lang.IllegalArgumentException("")
                 }
                 cache[keyName] = value
-            }.apply()
+            }
         }
 
         fun <T> getElement(keyName: String, default: T): T = with(pref) {
             val res = when (default) {
-                is String -> getString(keyName, default)
-                is Boolean -> getBoolean(keyName, default)
-                is Int -> getInt(keyName, default)
-                is Long -> getLong(keyName, default)
-                is Float -> getFloat(keyName, default)
+                is String -> decodeString(keyName, default)
+                is Boolean -> decodeBool(keyName, default)
+                is Int -> decodeInt(keyName, default)
+                is Long -> decodeLong(keyName, default)
+                is Float -> decodeFloat(keyName, default)
                 else -> throw IllegalArgumentException("Type Error, cannot be saved!")
             }
             return res as T
