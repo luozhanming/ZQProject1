@@ -8,7 +8,7 @@ import cn.com.ava.zqproject.R
 
 class LoadingDialog:BaseDialog() {
     override fun getWindowOptions(): WindowOptions {
-        return WindowOptions(SizeUtils.dp2px(300),200,Gravity.CENTER)
+        return WindowOptions(SizeUtils.dp2px(300),200,Gravity.CENTER, true)
     }
 
     override fun initView(root: View) {
