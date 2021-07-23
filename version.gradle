@@ -123,13 +123,18 @@ ext {
             eventbus                      : "org.greenrobot:eventbus:3.2.0",
             luban                         : 'top.zibin:Luban:1.1.8',
 
+            //数据保存
+            mmkv                          : "com.tencent:mmkv-static:1.2.10",
+
 
             koin                          : "io.insert-koin:koin-core:$koin_version",
             koin_android                  : "io.insert-koin:koin-android:$koin_version",
 
             //Kotlin协程
-            kotlin_coroutines_core     : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version",
+            kotlin_coroutines_core        : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version",
             kotlin_coroutines_android     : "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version",
+
+            auto_size                     : "me.jessyan:autosize:1.2.1"
 
     ]
 

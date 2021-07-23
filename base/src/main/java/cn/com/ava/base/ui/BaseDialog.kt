@@ -15,8 +15,10 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(activity, style)
-        dialog.setContentView(getLayoutId())
-        initView(dialog.window.decorView)
+        val view = layoutInflater.inflate(getLayoutId(),null)
+        dialog.setContentView(view)
+        initView(view)
+
         onDialogCreated(dialog)
         val windowOptions: WindowOptions = getWindowOptions()
         dialog.window.setLayout(windowOptions.width, windowOptions.height)
@@ -29,9 +31,9 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
+  
+
+
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
@@ -76,5 +78,5 @@ abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFr
     abstract fun getLayoutId(): Int
 
 
-    data class WindowOptions(val width: Int, val height: Int, val gravity: Int,val canTouchOutsideCancel:Boolean)
+    data class WindowOptions(val width: Int, val height: Int, val gravity: Int,val canTouchOutsideCancel:Boolean=true)
 }

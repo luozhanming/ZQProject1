@@ -1,6 +1,7 @@
 package cn.com.ava.base.ui
 
 import androidx.lifecycle.ViewModel
+import cn.com.ava.common.util.logd
 import io.reactivex.disposables.CompositeDisposable
 
 open class BaseViewModel: ViewModel() {
@@ -10,6 +11,7 @@ open class BaseViewModel: ViewModel() {
     }
 
     override fun onCleared() {
+        logd("onCleared()")
         super.onCleared()
         mDisposables.dispose()
     }

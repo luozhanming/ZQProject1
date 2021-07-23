@@ -167,6 +167,35 @@ object AVAHttpEngine {
         }
     }
 
+    fun requestRecordFile(query: ISPQuery<*>, resultOnMain: Boolean = true){
+        checkInit()
+        GlobalScope.launch(Dispatchers.IO) {
+            Log.d(TAG, "begin requestSPQuery: ${Thread.currentThread().name}")
+            val call = mService.getFileInfoCommand(query.getQueryParams())
+            var response: Response<ResponseBody>? = null
+            try {
+                response = call.execute()
+                if (response.isSuccessful) {
+                    var build: QueryResult? = null
+                    build = query.build(response.body()?.string()?.trim() ?: "")
+                    resultOnMain(resultOnMain) {
+                        query.onResult(build!!)
+                    }
+                } else {
+                    resultOnMain(resultOnMain) {
+                        query.onError?.invoke(HttpException(response))
+                    }
+                }
+            } catch (e: Exception) {
+                resultOnMain(resultOnMain) {
+                    query.onError?.invoke(e)
+                }
+                return@launch
+            }
+
+        }
+    }
+
     /**
      * 下载文件
      * */

@@ -36,7 +36,7 @@ class AutoClearedValue<T> {
         return _value
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
         _value = value
     }
 

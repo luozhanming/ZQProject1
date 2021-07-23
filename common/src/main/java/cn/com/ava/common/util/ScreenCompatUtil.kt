@@ -41,6 +41,7 @@ object ScreenCompatUtil {
     val targetDensity = (if(isBaseWidth)appDisplayMetrics.widthPixels else appDisplayMetrics.heightPixels).toFloat() / baseLength
     val targetScaledDensity = targetDensity * (sNonCompatScaledDensity / sNonCompatDensity)
     val targetDensityDpi = (160 * targetDensity).toInt()
+    logd("targetDensity:${targetDensity}")
 
     appDisplayMetrics.densityDpi = targetDensityDpi
     appDisplayMetrics.density = targetDensity

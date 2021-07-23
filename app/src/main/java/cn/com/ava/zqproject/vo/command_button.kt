@@ -12,7 +12,7 @@ const val TYPE_PRE_STAGE = 4
 annotation class CommandButtonType
 
 
-interface CommandButton : StatefulView {
+interface CommandButton  {
 
     @CommandButtonType
     val type: Int
@@ -26,47 +26,20 @@ data class CompositeButton(
 ) : CommandButton {
     override val type: Int
         get() = TYPE_COMPOSITE
-    override var isSelected: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
-    override var isChecked: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
+
 }
 
 data class LayoutButton(val layoutIndex: Int) : CommandButton {
     override val type: Int
         get() = TYPE_VIDEO_LAYOUT
-    override var isSelected: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
-    override var isChecked: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
+
 }
 
 
 data class VideoWindowButton(val windowIndex: Int) : CommandButton {
     override val type: Int
         get() = TYPE_VIDEO
-    override var isSelected: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
-    override var isChecked: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
+
 }
 
 data class VideoPresetButton(
@@ -75,16 +48,7 @@ data class VideoPresetButton(
 ) :CommandButton{
     override val type: Int
         get() = TYPE_PRE_STAGE
-    override var isSelected: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
-    override var isChecked: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
+
 }
 
 

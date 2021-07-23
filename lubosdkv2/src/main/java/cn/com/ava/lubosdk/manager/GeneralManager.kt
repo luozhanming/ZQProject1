@@ -7,9 +7,12 @@ import cn.com.ava.lubosdk.control.*
 import cn.com.ava.lubosdk.entity.*
 import cn.com.ava.lubosdk.query.*
 import cn.com.ava.lubosdk.spquery.IPv4NetConfigurationQuery
+import cn.com.ava.lubosdk.spquery.RecordFilesQuery
 import io.reactivex.Observable
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -52,7 +55,7 @@ object GeneralManager {
     fun getLuboInfo(): Observable<LuBoInfo> {
         return Observable.create { emitter ->
             runBlocking {
-                val info = suspendCoroutine<LuBoInfo> {
+                val info = suspendCancellableCoroutine<LuBoInfo> {
                     AVAHttpEngine.addQueryCommand(LuboInfoQuery(
                             onResult = { queryResult ->
                                 it.resumeWith(Result.success(queryResult as LuBoInfo))
@@ -484,6 +487,29 @@ object GeneralManager {
                     ),isEncode = true)
                 }
                 emitter.onNext(result)
+            }
+        }
+    }
+
+    /**
+     * 获取录像文件
+     */
+    fun loadRecordFiles():Observable<List<RecordFilesInfo.RecordFile>>{
+     return   Observable.create<List<RecordFilesInfo.RecordFile>> { e ->
+            runBlocking {
+                val result =
+                    suspendCoroutine<List<RecordFilesInfo.RecordFile>> { continuation ->
+                        AVAHttpEngine.requestRecordFile(RecordFilesQuery(
+                            {
+                                if (it is RecordFilesInfo) {
+                                    continuation.resumeWith(Result.success(it.files))
+                                }
+                            }, {
+                                continuation.resumeWithException(it)
+                            }
+                        ), true)
+                    }
+                e.onNext(result)
             }
         }
     }
