@@ -1,11 +1,18 @@
 package cn.com.ava.zqproject.net
 
 import cn.com.ava.common.http.BaseHttpApi
+import cn.com.ava.zqproject.common.CommonPreference
 import io.reactivex.functions.Function
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
 object PlatformApi : BaseHttpApi() {
+
+
+    private var platformAddr by CommonPreference(CommonPreference.KEY_PLATFORM_ADDR, "")
+
+    //平台token
+    private var token by CommonPreference(CommonPreference.KEY_PLATFORM_TOKEN, "")
 
 
     override fun configOkHttpClient(builder: OkHttpClient.Builder) {
@@ -30,5 +37,14 @@ object PlatformApi : BaseHttpApi() {
 //            }
 //            response
 //        }
+    }
+
+    fun getService(baseurl: String? = null): PlatformService {
+        return createService(getRetrofit(baseurl ?: platformAddr), PlatformService::class.java)
+    }
+
+
+    fun isCanLinkPlatform(): Boolean {
+        return PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null
     }
 }

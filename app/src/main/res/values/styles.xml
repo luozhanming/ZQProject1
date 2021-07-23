@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextButtonStyle">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+    </style>
+
+    <style name="EditTextStyle">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColorHint">@color/color_999999</item>
+    </style>
+
+
+    <style name="ButtonStyle">
+        <item name="android:padding">0dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/bg_button_1</item>
+    </style>
+
+
+
+    <style name="TitleTextStyle">
+        <item name="android:textSize">21sp</item>
+        <item name="android:textColor">@color/color_222222</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+</resources>

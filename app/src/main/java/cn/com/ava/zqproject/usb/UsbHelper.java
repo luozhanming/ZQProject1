@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 import cn.com.ava.common.util.LoggerUtilKt;
-import cn.com.ava.zqproject.vo.RecordFilesInfo;
+import cn.com.ava.lubosdk.entity.RecordFilesInfo;
 
 public class UsbHelper {
 
@@ -34,8 +34,8 @@ public class UsbHelper {
 
     private static UsbHelper sInstance;
 
-    private Map<RecordFilesInfo.RecordFile, UDiskDownloadTask> mTasks = new LinkedHashMap<>();
-    private ArrayBlockingQueue<RecordFilesInfo.RecordFile> mDownloadQueue = new ArrayBlockingQueue<>(MAX_QUEUE_COUNT);
+    private Map<DownloadObject< RecordFilesInfo.RecordFile>, UDiskDownloadTask> mTasks = new LinkedHashMap<>();
+    private ArrayBlockingQueue<DownloadObject< RecordFilesInfo.RecordFile>> mDownloadQueue = new ArrayBlockingQueue<>(MAX_QUEUE_COUNT);
     private Executor mExecutor;
     private Uri mUSBUri;
     private List<FileDownloadCallback> mDLCallbackList = new ArrayList<>();  //注意释放
@@ -158,15 +158,16 @@ public class UsbHelper {
      * @param name 创建的文件名
      */
     public void downloadFile2UDisk(@NonNull RecordFilesInfo.RecordFile src, String name) {
-        final Set<Map.Entry<RecordFilesInfo.RecordFile, UDiskDownloadTask>> entries = mTasks.entrySet();
+        final Set<Map.Entry<DownloadObject<RecordFilesInfo.RecordFile>, UDiskDownloadTask>> entries = mTasks.entrySet();
         //同一时间只能有一个下载任务
-        for (Map.Entry<RecordFilesInfo.RecordFile, UDiskDownloadTask> entry : entries) {
-            if (!entry.getValue().isCompleted()) {
+        for (Map.Entry<DownloadObject< RecordFilesInfo.RecordFile>, UDiskDownloadTask> entry : entries) {
+            if (!entry.getValue().isCompleted()) {   //如果有一个正在下载的任务
                 if (mDownloadQueue.size() < MAX_QUEUE_COUNT) {
-                    ToastUtils.showShort(entry.getKey().getDownloadFileName() + "已加入下载队列");
-                    mDownloadQueue.add(src);
+                    ToastUtils.showShort(entry.getKey().getObj().getDownloadFileName() + "已加入下载队列");
+                    DownloadObject<RecordFilesInfo.RecordFile> download = new DownloadObject<>(src);
+                    mDownloadQueue.add(download);
                     //进入队列
-                    notifyDownloadStateChanged(src, "", RecordFileDLStateEvent.STATE_IN_QUEUEN, 0);
+                    notifyDownloadStateChanged(download, "", DownloadObject.IN_QUEUE, 0);
                     return;
                 } else {
                     ToastUtils.showShort("下载队列已满");
@@ -192,29 +193,31 @@ public class UsbHelper {
             if (mExecutor == null) {
                 mExecutor = Executors.newSingleThreadExecutor();
             }
-            UDiskDownloadTask task = new UDiskDownloadTask(src, file);
+            DownloadObject<RecordFilesInfo.RecordFile> download = new DownloadObject<>(src);
+
+            UDiskDownloadTask task = new UDiskDownloadTask(download, file);
             task.executeOnExecutor(mExecutor, "");
-            mTasks.put(src, task);
+            mTasks.put(download, task);
         }
     }
 
-    void notifyDownloadStateChanged(RecordFilesInfo.RecordFile file,
+    void notifyDownloadStateChanged(DownloadObject<RecordFilesInfo.RecordFile> download,
                                             String dstPath,
-                                            @RecordFileDLStateEvent.State int state,
+                                            @DownloadObject.DownloadState int state,
                                             int progress) {
-        file.setState(state);
+        download.setState(state);
         for (int i = 0, size = mDLCallbackList.size(); i < size; i++) {
             final FileDownloadCallback callback = mDLCallbackList.get(i);
-            callback.onDownloadStateChanged(file, dstPath, state, progress);
+            callback.onDownloadStateChanged(download, dstPath, state, progress);
         }
-        if(state==RecordFileDLStateEvent.STATE_IN_QUEUEN){
-            LoggerUtilKt.logd(this,String.format("%s加入下载队列",file.getDownloadFileName()));
-        }else if(state==RecordFileDLStateEvent.STATE_DOWNLOADING){
-            LoggerUtilKt.logd(this,String.format("%s下载中，进度%d%",file.getDownloadFileName(),progress));
-        }else if(state==RecordFileDLStateEvent.STATE_SUCCESS){
-            LoggerUtilKt.logd(this,String.format("%s下载成功，保存至%s",file.getDownloadFileName(),dstPath));
-        }else if(state==RecordFileDLStateEvent.STATE_FAILED){
-            LoggerUtilKt.logd(this,String.format("%s下载失败",file.getDownloadFileName()));
+        if(state==DownloadObject.IN_QUEUE){
+            LoggerUtilKt.logd(this,String.format("%s加入下载队列",download.getObj().getDownloadFileName()));
+        }else if(state==DownloadObject.DOWNLOADING){
+            LoggerUtilKt.logd(this,String.format("%s下载中，进度%d%",download.getObj().getDownloadFileName(),progress));
+        }else if(state==DownloadObject.SUCCESS){
+            LoggerUtilKt.logd(this,String.format("%s下载成功，保存至%s",download.getObj().getDownloadFileName(),dstPath));
+        }else if(state==DownloadObject.FAILED){
+            LoggerUtilKt.logd(this,String.format("%s下载失败",download.getObj().getDownloadFileName()));
         }
     }
 
@@ -223,8 +226,8 @@ public class UsbHelper {
      */
     public void notifyNextDownload() {
         if (mDownloadQueue.size() > 0) {
-            final RecordFilesInfo.RecordFile next = mDownloadQueue.poll();
-            downloadFile2UDisk(next, next.getDownloadFileName());
+            final DownloadObject<RecordFilesInfo.RecordFile> next = mDownloadQueue.poll();
+            downloadFile2UDisk(next.getObj(), next.getObj().getDownloadFileName());
         }
     }
 
@@ -232,21 +235,21 @@ public class UsbHelper {
      * 取消下载任务并删除正在下载的任务文件
      */
     public void cancelAllTask() {
-        final Set<Map.Entry<RecordFilesInfo.RecordFile, UDiskDownloadTask>> entries = mTasks.entrySet();
-        mTasks.clear();
-        mDownloadQueue.clear();
+        final Set<Map.Entry<DownloadObject<RecordFilesInfo.RecordFile>, UDiskDownloadTask>> entries = mTasks.entrySet();
         if (mTasks.size() == 0) return;
-        for (Map.Entry<RecordFilesInfo.RecordFile, UDiskDownloadTask> entry : entries) {
+        for (Map.Entry<DownloadObject<RecordFilesInfo.RecordFile>, UDiskDownloadTask> entry : entries) {
             final UDiskDownloadTask task = entry.getValue();
             if (!task.isCompleted()) {
                 task.cancel(true);
                 task.deleteFile();
             }
         }
+        mTasks.clear();
+        mDownloadQueue.clear();
 
     }
 
-    public Queue<RecordFilesInfo.RecordFile> getDownloadQueue() {
+    public Queue<DownloadObject<RecordFilesInfo.RecordFile>> getDownloadQueue() {
         return mDownloadQueue;
     }
 
@@ -266,7 +269,7 @@ public class UsbHelper {
 
     public interface FileDownloadCallback {
 
-        void onDownloadStateChanged(RecordFilesInfo.RecordFile file,
+        void onDownloadStateChanged(DownloadObject<RecordFilesInfo.RecordFile> file,
                                     String dstPath,
                                     @RecordFileDLStateEvent.State int state,
                                     int progress);

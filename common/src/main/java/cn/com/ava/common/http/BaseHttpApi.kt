@@ -72,13 +72,12 @@ abstract class BaseHttpApi {
 
     protected abstract fun <T> getApiErrorHandler(): Function<T, T>
 
-    fun <T> applySchedulers(observer: Observer<T>): ObservableTransformer<T, T> {
+    fun <T> applySchedulers(): ObservableTransformer<T, T> {
         return ObservableTransformer { upstream: Observable<T> ->
             val observable = upstream.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+//                .observeOn(AndroidSchedulers.mainThread())
                 .map(getApiErrorHandler())
                 .onErrorResumeNext(HttpErrorHandler<T>())
-            observable.subscribe(observer)
             return@ObservableTransformer observable
         }
     }

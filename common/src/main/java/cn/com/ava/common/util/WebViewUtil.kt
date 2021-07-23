@@ -27,19 +27,21 @@ object WebViewUtil {
             javaScriptEnabled = true
             useWideViewPort = true
             loadWithOverviewMode = true
-            builtInZoomControls = false
-            setSupportZoom(false)
-            displayZoomControls = false
+            setSupportZoom(true)
+            loadWithOverviewMode = true
+            displayZoomControls = true
             layoutAlgorithm = WebSettings.LayoutAlgorithm.SINGLE_COLUMN
             javaScriptCanOpenWindowsAutomatically = false
             domStorageEnabled = true
-            cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+            cacheMode = WebSettings.LOAD_NO_CACHE
         }
+        webView.setInitialScale(50)
         webView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 view?.loadUrl(url)
                 return true
             }
+
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun shouldInterceptRequest(
@@ -48,7 +50,6 @@ object WebViewUtil {
             ): WebResourceResponse? {
                 val url = request?.url?.path?:""
                 val lastSlash  = url.lastIndexOf("/")
-                loge("拦截到了${url}")
                 if(lastSlash!=-1){
                     val lastPath = url.substring(lastSlash+1)
                     var mimeType:String = ""
@@ -77,8 +78,6 @@ object WebViewUtil {
             parent.removeView(webView)
         }
         webView.stopLoading()
-        webView.settings.javaScriptEnabled = false
-        webView.visibility = View.GONE
         webView.removeAllViews()
         webView.destroy()
     }

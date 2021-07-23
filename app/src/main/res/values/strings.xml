@@ -4,5 +4,36 @@
     <string name="toast_lubo_login_success">录播连接成功</string>
     <string name="toast_input_correct_lubo_info">请输入正确录播信息</string>
     <string name="toast_input_account_psw">请输入录播账号密码</string>
+    <string name="toast_platform_link_failed">平台连接失败</string>
+    <string name="toast_platform_link_success">平台连接成功</string>
     
+    
+    <string name="link_lubo">连接录播</string>
+    <string name="link_platform">连接平台</string>
+    <string name="lubo_ip">设备IP</string>
+    <string name="lubo_port">设备端口</string>
+    <string name="lubo_account">设备账号</string>
+    <string name="lubo_psw">设备密码</string>
+    <string name="link">连接</string>
+    <string name="platform_addr">平台地址</string>
+    <string name="please_input">请输入</string>
+    <string name="input_lubo_ip">请输入设备IP</string>
+    <string name="input_lubo_port">请输入设备端口</string>
+    <string name="input_lubo_username">请输入设备账号</string>
+    <string name="input_lubo_psw">请输入设备密码</string>
+    <string name="input_platform_addr">请输入设备平台地址</string>
+
+
+    <string name="create_meeting">创建会议</string>
+    <string name="recent_call">最近呼叫</string>
+    <string name="contract_book">通讯录</string>
+    <string name="contract_group">通讯群组</string>
+    <string name="selected_contract">已选用户：</string>
+    <string name="call">呼叫</string>
+
+
+
+    <string name="tip">提示</string>
+    <string name="cancel">取消</string>
+    <string name="sure">确定</string>
 </resources>

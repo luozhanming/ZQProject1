@@ -18,7 +18,7 @@ abstract class BaseViewHolder<DATA, DB : ViewDataBinding>(val binding: DB) :
      */
     protected abstract fun setDataToBinding(binding: DB, data: DATA)
 
-    protected fun setListenerToBinding(binding: DB){
+    protected open fun setListenerToBinding(binding: DB){
 
     }
 }

@@ -36,5 +36,6 @@ class MyApp : Application() {
         })
         MMKV.initialize(this, AppConfig.MMKV_PATH)
 
+
     }
 }

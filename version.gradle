@@ -134,6 +134,8 @@ ext {
             kotlin_coroutines_core        : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version",
             kotlin_coroutines_android     : "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version",
 
+            auto_size                     : "me.jessyan:autosize:1.2.1"
+
     ]
 
 }

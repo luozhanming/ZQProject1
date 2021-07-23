@@ -5,15 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import cn.com.ava.common.extension.bindExtras
+import cn.com.ava.common.util.ScreenCompatUtil
 import cn.com.ava.common.util.logd
 
-abstract class BaseFragment<B : ViewDataBinding> : Fragment() {
+abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
     protected lateinit var mBinding: B
+
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,11 +28,18 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment() {
         logd("onCreateView")
         mBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false)
         mBinding.lifecycleOwner = this
-        onBindViewModel2Layout(mBinding)
         return mBinding.root
     }
 
-    open fun onBindViewModel2Layout(binding: B) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onBindViewModel2Layout(mBinding)
+        initView()
+        observeVM()
+
+    }
+
+    override fun onBindViewModel2Layout(binding: B) {
 
     }
 
@@ -42,15 +54,20 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logd("onCreate")
-        observeVM()
+        ScreenCompatUtil.initScreenCompat(requireActivity() as AppCompatActivity,requireActivity().application,true,1280)
         bindExtra()
+
+    }
+
+    open fun initView() {
+
     }
 
     private fun bindExtra() {
         bindExtras()
     }
 
-    protected open fun observeVM() {
+    override fun observeVM() {
 
     }
 
@@ -73,5 +90,9 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         logd("onDestroyView")
+    }
+
+    open fun onBackPressed(): Boolean {
+        return false
     }
 }

@@ -17,25 +17,26 @@ class RecordFilesQuery(
         get() = "RecordFiles"
 
     override fun getQueryParams(): LinkedHashMap<String, String> {
-        return java.util.LinkedHashMap<String,String>().apply{
-            this["key"] = LoginManager.getLogin()?.key?:""
+        return java.util.LinkedHashMap<String, String>().apply {
+            this["key"] = LoginManager.getLogin()?.key ?: ""
         }
     }
 
     override fun build(response: String): RecordFilesInfo {
         val split = response.split("|")
         val info = RecordFilesInfo()
-        if (split[0] == "0") return info
+        if (split[0] == "0" || split[0] == "-1") return info
 
         info.files = arrayListOf()
-        for(i in 0 until 8){
+        for (i in 0 until 8) {
             val file = RecordFilesInfo.RecordFile()
             val split1 = split[i].split("-").toTypedArray()
             if (split1.size == 1) continue
-            file.downloadUrl = "http://${LuBoSDK.getIp()}:${LuBoSDK.getPort()}/cgi-bin/plat.cgi?action=12&key=${LoginManager.getLogin()?.key?:""}&filename=${split1[1]}"
-            file.rtspUrl ="rtsp://${LuBoSDK.getIp()}:554/playback/${split1[1]}"
+            file.downloadUrl =
+                "http://${LuBoSDK.getIp()}:${LuBoSDK.getPort()}/cgi-bin/plat.cgi?action=12&key=${LoginManager.getLogin()?.key ?: ""}&filename=${split1[1]}"
+            file.rtspUrl = "rtsp://${LuBoSDK.getIp()}:554/playback/${split1[1]}"
             val fileSize = split1[0].toLongOrNull()
-            file.rawFileSize = fileSize?:0
+            file.rawFileSize = fileSize ?: 0
             var tempFileSize = file.rawFileSize.toDouble()
             var fileSizeStr = ""
             if (file.rawFileSize < 1024) {
@@ -86,8 +87,8 @@ class RecordFilesQuery(
             val split5 = time.split("_").toTypedArray()
             val begin = split5[0]
             file.recordRawBeginTime = begin
-            val analyseTime:(String)->String =lit@{time->
-                if (time.length == 1){
+            val analyseTime: (String) -> String = lit@{ time ->
+                if (time.length == 1) {
                     return@lit "0000/00/00 00:00:00"
                 }
                 val buffer = StringBuffer()
@@ -111,7 +112,7 @@ class RecordFilesQuery(
                 return@lit buffer.toString()
             }
 
-            val fillZero:(Int,Int)->String=lit@{digit,size->
+            val fillZero: (Int, Int) -> String = lit@{ digit, size ->
                 val s = digit.toString()
                 val length = s.length
                 return@lit if (size > length) {

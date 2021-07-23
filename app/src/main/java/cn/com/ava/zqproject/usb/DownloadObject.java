@@ -14,6 +14,9 @@ public class DownloadObject<T> {
     public @interface DownloadState{}
 
 
+    public DownloadObject(T obj) {
+        this.obj = obj;
+    }
 
     private T obj;
     private int state;

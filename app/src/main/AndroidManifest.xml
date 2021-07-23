@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/network_config"
         android:theme="@style/MyAppTheme">
-        <activity android:name=".ui.MainActivity">
+
+        <activity android:name=".ui.MainActivity" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

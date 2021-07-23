@@ -23,6 +23,8 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
         const val KEY_PLATFORM_ADDR = "Platform_Address"
         //已选择的按键
         const val KEY_SELECTED_COMMAND_KEY = "Selected_Key"
+        //平台登录后使用的token
+        const val KEY_PLATFORM_TOKEN = "Platform_Token"
 
 
         val pref = MMKV.mmkvWithID(SP_COMMON_NAME,MMKV.SINGLE_PROCESS_MODE,AppConfig.MMKV_CRYPT_KEY)

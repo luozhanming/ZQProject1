@@ -5,6 +5,9 @@ import com.blankj.utilcode.util.Utils
 
 object AppConfig {
 
+
+
+
     const val SP_COMMON_NAME = "common"
 
     //APP外部存储目录
@@ -23,6 +26,13 @@ object AppConfig {
     val MMKV_PATH = "${Utils.getApp().filesDir.absolutePath}/mmkv"
     //MMKV密钥
     const val MMKV_CRYPT_KEY = "AVA_ZQ"
+
+    const val WIDTH_APP_DESIGN = 400
+
+    //平台加密密钥
+    val PLATFORM_KEY by lazy {
+
+    }
 
 
 }

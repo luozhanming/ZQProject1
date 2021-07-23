@@ -54,15 +54,8 @@ public class RecordFilesInfo implements QueryResult {
         private String audioCodecMode;
 
 //        //下载信息
-//        private @RecordFileDLStateEvent.State
-//        int state;
-//        private int progress;
-//
-//        private boolean isSelected;
         private String downloadFileName;
 
-//        @DownloadState
-//        private int downloadState = STATE_IDLE;
 
 
         public String getRtspUrl() {

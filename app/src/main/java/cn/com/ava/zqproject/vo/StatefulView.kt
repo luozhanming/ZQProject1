@@ -1,7 +1,7 @@
 package cn.com.ava.zqproject.vo
 
 /**
- * 为对象添加状态
+ * 为对象添加按钮状态
  */
 class StatefulView<T>(val obj: T) {
 
