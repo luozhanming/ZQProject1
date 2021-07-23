@@ -2,6 +2,7 @@ package cn.com.ava.zqproject.ui.splash
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -47,7 +48,9 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.button1.setOnClickListener {
-
+//            var intent = Intent(activity, VideoResourceActivity::class.java)
+//            startActivity(intent)
+            findNavController().navigate(SplashFragmentDirections.actionSplashFragmentToVideoFragment())
         }
     }
 

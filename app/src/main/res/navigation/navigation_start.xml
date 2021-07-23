@@ -33,6 +33,14 @@
             app:launchSingleTop="true"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_videoFragment"
+            app:enterAnim="@anim/enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:exitAnim="@anim/exist"
+            app:popEnterAnim="@anim/pop_enter"
+            app:destination="@id/videoFragment"
+            app:launchSingleTop="true"/>
     </fragment>
     <fragment
         android:id="@+id/luBoSettingFragment"
@@ -68,6 +76,12 @@
         tools:layout="@layout/fragment_home"
         android:name="cn.com.ava.zqproject.ui.home.HomeFragment"
         android:label="HomeFragment" />
+
+    <fragment android:id="@+id/videoFragment"
+        tools:layout="@layout/fragment_video_manage"
+        android:name="cn.com.ava.zqproject.ui.videoResource.VideoManageFragment">
+
+    </fragment>
 
 
 </navigation>
