@@ -10,12 +10,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import cn.com.ava.base.ui.BaseFragment
-import cn.com.ava.common.util.logd
+import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentSplashBinding
 import cn.com.ava.zqproject.extension.getMainHandler
 import cn.com.ava.zqproject.ui.MainViewModel
+import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.setting.LuBoSettingFragment
+import com.blankj.utilcode.util.Utils
 
 /**
  * 欢迎界面
@@ -37,6 +39,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
 
     private val mMainViewModel by activityViewModels<MainViewModel>()
+
+    private var mWakeUpConfirmDialog by autoCleared<ConfirmDialog>()
 
 
     override fun getLayoutId(): Int {
@@ -67,7 +71,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         ) {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 isPermissionsGrant = it.all { it.value }
-                //步骤1
+                mSplashViewModel.login()
             }.launch(
                 arrayOf(
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -78,11 +82,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             isPermissionsGrant = true
         }
         return isPermissionsGrant
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 
     override fun observeVM() {
@@ -112,10 +111,41 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             } else {
                 go()
             }
+        }
 
-
+        mSplashViewModel.isShowWakeUp.observe(viewLifecycleOwner) {
+            if (it != 0) {
+                if (mWakeUpConfirmDialog == null) {
+                    mWakeUpConfirmDialog =
+                        ConfirmDialog(Utils.getApp().getString(R.string.tips_lubo_need_wake_up),
+                            false,
+                            { dialog ->
+                                dialog?.dismiss()
+                                //1.弹出60秒对话框唤醒设备
+                                //2.再次调用登录
+                               mSplashViewModel.wakeupMachine()
+                            }, { dialog ->
+                                dialog?.dismiss()
+                                findNavController().navigate(R.id.action_splashFragment_to_luBoSettingFragment)
+                            })
+                }
+                mWakeUpConfirmDialog?.show(childFragmentManager,"wakeup")
+            }
+        }
+        mSplashViewModel.isShowLoading.observe(viewLifecycleOwner) {
+            mMainViewModel.isShowLoading.postValue(it)
         }
     }
+
+
+    override fun onStart() {
+        super.onStart()
+        mSplashViewModel.isShowLoading.observe(viewLifecycleOwner) {
+            mMainViewModel.isShowLoading.postValue(it)
+        }
+    }
+
+
 
 
 }

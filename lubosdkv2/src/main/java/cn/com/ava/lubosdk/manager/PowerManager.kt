@@ -72,7 +72,7 @@ object PowerManager {
     /**
      * 唤醒机器
      */
-    fun wakeupMachine(): Observable<Boolean?>? {
+    fun wakeupMachine(): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {

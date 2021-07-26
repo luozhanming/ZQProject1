@@ -6,7 +6,11 @@
     <string name="toast_input_account_psw">请输入录播账号密码</string>
     <string name="toast_platform_link_failed">平台连接失败</string>
     <string name="toast_platform_link_success">平台连接成功</string>
-    
+    <string name="login_success">登录成功</string>
+    <string name="login_failed">登录失败</string>
+    <string name="tips_lubo_need_wake_up">录播设备已休眠，是否唤醒？</string>
+    <string name="wakeup_success">唤醒成功</string>
+    <string name="wakeup_failed">唤醒失败</string>
     
     <string name="link_lubo">连接录播</string>
     <string name="link_platform">连接平台</string>

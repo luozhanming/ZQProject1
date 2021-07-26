@@ -17,7 +17,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
 
-    private var mComfirmDialog by autoCleared<ConfirmDialog>()
 
     private val mFragments: List<Fragment> by lazy {
         val fragments = arrayListOf<Fragment>()
@@ -58,7 +57,6 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
             offscreenPageLimit = 3
         }
 
-
         mTabLayoutMediator =
             TabLayoutMediator(mBinding.tabLayout, mBinding.viewPager) { tab, position ->
                 val textView = TextView(requireView().context)
@@ -84,12 +82,7 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         }
 
         mBinding.ivAddGroup.setOnClickListener {
-            if(mComfirmDialog==null){
-                mComfirmDialog = ConfirmDialog("我是伞兵"){
-                    ToastUtils.showLong("sdfsdf")
-                }
-            }
-            mComfirmDialog?.show(childFragmentManager,"")
+
         }
 
         mBinding.ivBack.setOnClickListener {

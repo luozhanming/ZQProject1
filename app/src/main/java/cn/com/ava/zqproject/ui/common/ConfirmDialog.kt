@@ -1,5 +1,6 @@
 package cn.com.ava.zqproject.ui.common
 
+import android.content.DialogInterface
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,9 @@ import kotlin.math.log
  * 确认对话框
  *
  */
-class ConfirmDialog(val message:String,val onSure:(()->Unit)?=null):BaseDialog() {
+class ConfirmDialog(val message:String,val cancelOutside:Boolean =true,
+                    val onSure:((DialogInterface?)->Unit)?=null,
+                    val onCancel:((DialogInterface?)->Unit)?):BaseDialog() {
 
     private lateinit var tvMessage:TextView
     private lateinit var btnCancel:TextView
@@ -22,7 +25,7 @@ class ConfirmDialog(val message:String,val onSure:(()->Unit)?=null):BaseDialog()
 
 
     override fun getWindowOptions(): WindowOptions {
-       return WindowOptions(SizeUtils.dp2px(480),ViewGroup.LayoutParams.WRAP_CONTENT,Gravity.CENTER,true)
+       return WindowOptions(SizeUtils.dp2px(480),ViewGroup.LayoutParams.WRAP_CONTENT,Gravity.CENTER,cancelOutside)
     }
 
     override fun initView(root: View) {
@@ -35,7 +38,7 @@ class ConfirmDialog(val message:String,val onSure:(()->Unit)?=null):BaseDialog()
             dismiss()
         }
         btnSure.setOnClickListener {
-            onSure?.invoke()
+            onSure?.invoke(dialog)
         }
     }
 

@@ -1,7 +1,10 @@
 package cn.com.ava.zqproject.net
 
 import cn.com.ava.common.http.BaseHttpApi
+import cn.com.ava.common.http.ServerException
 import cn.com.ava.zqproject.common.CommonPreference
+import cn.com.ava.zqproject.vo.PlatformLogin
+import cn.com.ava.zqproject.vo.PlatformResponse
 import io.reactivex.functions.Function
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -14,8 +17,11 @@ object PlatformApi : BaseHttpApi() {
     //平台token
     private var token by CommonPreference(CommonPreference.KEY_PLATFORM_TOKEN, "")
 
+    private var platformLogin: PlatformLogin? = null
+
 
     override fun configOkHttpClient(builder: OkHttpClient.Builder) {
+
 
     }
 
@@ -25,18 +31,12 @@ object PlatformApi : BaseHttpApi() {
 
     override fun <T> getApiErrorHandler(): Function<T, T> {
         return Function { it ->
+            if (it is PlatformResponse<*> && !it.success) {
+                val exception = ServerException(it.code, it.message)
+                throw exception
+            }
             it
         }
-//        return Function { response -> //response中code码不会0 出现错误
-//            if (response is TecentBaseResponse && (response as TecentBaseResponse).showapiResCode !== 0) {
-//                val exception: ExceptionHandle.ServerException = ServerException()
-//                exception.code = (response as TecentBaseResponse).showapiResCode
-//                exception.message =
-//                    if ((response as TecentBaseResponse).showapiResError != null) (response as TecentBaseResponse).showapiResError else ""
-//                throw exception
-//            }
-//            response
-//        }
     }
 
     fun getService(baseurl: String? = null): PlatformService {
@@ -46,5 +46,14 @@ object PlatformApi : BaseHttpApi() {
 
     fun isCanLinkPlatform(): Boolean {
         return PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null
+    }
+
+
+    fun login(login: PlatformLogin) {
+        platformLogin = login
+    }
+
+    fun logout(){
+        platformLogin = null
     }
 }

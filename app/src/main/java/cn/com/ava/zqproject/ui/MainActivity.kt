@@ -38,7 +38,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         mMainViewModel.isShowLoading.observe(this) { show ->
             if (show) {
                 if (!mLoadingDialog.isVisible) {
-                    mLoadingDialog.show(supportFragmentManager, "loading")
+                    mLoadingDialog.show(supportFragmentManager, "loading1")
                 }
             } else {
                 mLoadingDialog.dismiss()

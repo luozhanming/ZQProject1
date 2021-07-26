@@ -7,13 +7,19 @@ import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.LuBoSDK
 import cn.com.ava.lubosdk.manager.LoginManager
+import cn.com.ava.lubosdk.manager.PowerManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.extension.toServerException
 import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.net.PlatformApiManager
+import cn.com.ava.zqproject.ui.splash.SplashViewModel
 import com.blankj.utilcode.util.RegexUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class LuBoSettingViewModel : BaseViewModel() {
 
@@ -56,7 +62,7 @@ class LuBoSettingViewModel : BaseViewModel() {
     }
 
     //展示唤醒对话框
-    val isShowWakeUp: MutableLiveData<Boolean> by lazy {
+    val isShowWakeUp: MutableLiveData<Int> by lazy {
         MutableLiveData()
     }
 
@@ -80,6 +86,9 @@ class LuBoSettingViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+    val canBackShow: MutableLiveData<Boolean> by lazy {
+        MutableLiveData()
+    }
 
 
     fun loadInitData() {
@@ -116,14 +125,13 @@ class LuBoSettingViewModel : BaseViewModel() {
             showLoading.postValue(true)
             mDisposables.add(
                 LoginManager.newLogin(username.value ?: "", password.value ?: "")
-
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
                         showLoading.postValue(false)
                         if (login.isLoginSuccess) {
                             if (login.isSleep) {  // 休眠弹出唤醒窗口
                                 logd("录播休眠中..")
-                                isShowWakeUp.postValue(true)
+                                isShowWakeUp.postValue(isShowWakeUp.value?.plus(1))
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
                                 toastMsg.postValue(
@@ -170,13 +178,14 @@ class LuBoSettingViewModel : BaseViewModel() {
             "http://${addr}"
         }
 
-
+        showLoading.postValue(true)
         mDisposables.add(
             PlatformApi.getService(addr).getInterface()
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     showLoading.postValue(false)
+                    checkCanBackShow()
                     toastMsg.postValue(
                         Utils.getApp().getString(R.string.toast_platform_link_success)
                     )
@@ -184,6 +193,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                         CommonPreference.KEY_PLATFORM_ADDR,
                         addr
                     )
+                    PlatformApiManager.setApiPath(it.data)
                 }, {
                     showLoading.postValue(false)
                     logPrint2File(it)
@@ -196,10 +206,40 @@ class LuBoSettingViewModel : BaseViewModel() {
         )
     }
 
+
+    private fun checkCanBackShow() {
+        if (LoginManager.isLogin() && PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null) {
+            canBackShow.postValue(true)
+        } else {
+            canBackShow.postValue(false)
+        }
+    }
+
     private fun saveLuboAccount() {
         CommonPreference.putElement(CommonPreference.KEY_LUBO_IP, ip.value)
         CommonPreference.putElement(CommonPreference.KEY_LUBO_PORT, port.value)
         CommonPreference.putElement(CommonPreference.KEY_LUBO_USERNAME, username.value)
         CommonPreference.putElement(CommonPreference.KEY_LUBO_PASSWORD, password.value)
+    }
+
+
+    fun wakeupMachine() {
+        showLoading.postValue(true)
+        mDisposables.add(
+            PowerManager.wakeupMachine()
+            .flatMap {
+                Observable.timer(75, TimeUnit.SECONDS)
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                //唤醒完登录
+                showLoading.postValue(false)
+                login()
+            }, {
+                showLoading.postValue(false)
+                logPrint2File(it)
+                ToastUtils.showShort(Utils.getApp().getString(R.string.wakeup_failed))
+            })
+        )
     }
 }
