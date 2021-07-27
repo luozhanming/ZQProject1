@@ -15,6 +15,7 @@
             android:layout_height="40dp"
             android:layout_marginLeft="28dp"
             android:layout_marginTop="12dp"
+            android:visibility="@{luboViewModel.canBackShow?View.VISIBLE:View.GONE}"
             android:background="@drawable/bg_text_button_1"
             android:src="@mipmap/ic_back"
             app:layout_constraintStart_toStartOf="parent"

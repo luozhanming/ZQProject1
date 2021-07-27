@@ -32,6 +32,7 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        logd("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         onBindViewModel2Layout(mBinding)
         initView()

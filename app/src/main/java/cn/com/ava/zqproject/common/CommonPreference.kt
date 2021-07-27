@@ -30,8 +30,7 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
         val pref = MMKV.mmkvWithID(SP_COMMON_NAME,MMKV.SINGLE_PROCESS_MODE,AppConfig.MMKV_CRYPT_KEY)
 
 
-        //内存缓存
-        val cache = hashMapOf<String, Any?>()
+
 
         fun <T> putElement(keyName: String, value: T) {
             pref.apply {
@@ -41,9 +40,8 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
                     is Int -> encode(keyName, value)
                     is Long -> encode(keyName, value)
                     is Float -> encode(keyName, value)
-                    else -> throw java.lang.IllegalArgumentException("")
+                    else -> throw java.lang.IllegalArgumentException("Type Error, cannot be saved!")
                 }
-                cache[keyName] = value
             }
         }
 

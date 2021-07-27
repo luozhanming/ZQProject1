@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 abstract class BaseViewHolder<DATA, DB : ViewDataBinding>(val binding: DB) :
     RecyclerView.ViewHolder(binding.root) {
 
-    private var mData: DATA? = null
+    protected var mData: DATA? = null
 
     fun bind(data: DATA) {
         setDataToBinding(binding,data)
@@ -18,6 +18,9 @@ abstract class BaseViewHolder<DATA, DB : ViewDataBinding>(val binding: DB) :
      */
     protected abstract fun setDataToBinding(binding: DB, data: DATA)
 
+    /**
+     * 给相关控件设置监听器
+     */
     protected open fun setListenerToBinding(binding: DB){
 
     }

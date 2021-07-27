@@ -6,6 +6,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import cn.com.ava.base.ui.BaseFragment
+import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.Extra
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.manager.LoginManager
@@ -13,7 +14,9 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentLuboSettingBinding
 import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.ui.MainViewModel
+import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.Utils
 
 /**
  * 录播平台设置界面
@@ -41,6 +44,8 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
 
     override fun getLayoutId(): Int = R.layout.fragment_lubo_setting
 
+    private var mWakeupMachineDialog by autoCleared<ConfirmDialog>()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,6 +66,19 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
         mLuboSettingViewModel.showLoading.observe(viewLifecycleOwner) {
             mMainViewModel.isShowLoading.postValue(it)
         }
+        mLuboSettingViewModel.isShowWakeUp.observe(viewLifecycleOwner){
+            if(it!=0){
+                if(mWakeupMachineDialog==null){
+                    mWakeupMachineDialog = ConfirmDialog(Utils.getApp().getString(R.string.tips_lubo_need_wake_up),false,
+                        {dialog->
+                            dialog?.dismiss()
+                            mLuboSettingViewModel.wakeupMachine()
+                        },{dialog->
+                            dialog?.dismiss()
+                        })
+                }
+            }
+        }
 
     }
 
@@ -78,9 +96,9 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
             mLuboSettingViewModel.loadPlatformInterface()
         }
         if (LoginManager.isLogin() && PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null) {
-            mBinding.ivBack.visibility = View.VISIBLE
+            mLuboSettingViewModel.canBackShow.postValue(true)
         } else {
-            mBinding.ivBack.visibility = View.GONE
+            mLuboSettingViewModel.canBackShow.postValue(false)
         }
         mBinding.ivBack.setOnClickListener {
             onBackPressed()
@@ -96,7 +114,6 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
             }
         }
         return true
-
     }
 
 }

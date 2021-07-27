@@ -90,9 +90,13 @@
                 android:id="@+id/tabLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="0dp"
-                android:layout_height="64dp"/>
+                android:layout_height="64dp"
+                android:layout_marginStart="26dp"
+                app:tabGravity="start"
+                app:tabIndicatorFullWidth="false"
+                app:tabSelectedTextColor="@color/color_318EF8"
+                app:tabTextColor="@color/color_222222"/>
 
             <View
                 android:id="@+id/view2"

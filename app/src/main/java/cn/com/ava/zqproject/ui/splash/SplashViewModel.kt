@@ -7,8 +7,15 @@ import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.LuBoSDK
 import cn.com.ava.lubosdk.manager.LoginManager
+import cn.com.ava.lubosdk.manager.PowerManager
+import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
+import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.net.PlatformApiManager
 import com.blankj.utilcode.util.RegexUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.Utils
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
@@ -28,14 +35,22 @@ class SplashViewModel : BaseViewModel() {
         get() = field
 
     //是否弹出唤醒
-    val isShowWakeUp: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+    val isShowWakeUp: MutableLiveData<Int> by lazy {
+        val livedata = MutableLiveData<Int>()
+        livedata.value = 0
+        livedata
+
     }
 
     //跳去那里
     val goWhere: MutableLiveData<Int> by lazy {
         val livedata = MutableLiveData<Int>()
         livedata.postValue(WHERE_NONE)
+        livedata
+    }
+
+    val isShowLoading: MutableLiveData<Boolean> by lazy {
+        val livedata = MutableLiveData<Boolean>()
         livedata
     }
 
@@ -64,23 +79,18 @@ class SplashViewModel : BaseViewModel() {
         } else {  //尝试登录
             mDisposables.add(
                 LoginManager.newLogin(username, password)
-                    .timeout(2000, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
                         if (login.isLoginSuccess) {
                             if (login.isSleep) {  // 休眠弹出唤醒窗口
                                 logd("录播休眠中..")
-                                isShowWakeUp.postValue(true)
+                                isShowWakeUp.postValue(isShowWakeUp.value?.plus(1))
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
                                 if (TextUtils.isEmpty(platformAddr)) {
                                     goWhere.postValue(WHERE_PLATFORM_SETTING)
                                 } else {
-                                    if (TextUtils.isEmpty(mPlatformToken)) {
-                                        goWhere.postValue(WHERE_PLATFORM_LOGIN)
-                                    } else {
-                                        loadCanEnterHome()
-                                    }
+                                    loadCanEnterHome()
                                 }
                             }
                         } else {// 失败弹出提示并跳到录播设置页面
@@ -100,17 +110,52 @@ class SplashViewModel : BaseViewModel() {
     /**
      * 根据保存的token看是否能够直接进入主界面
      */
-    fun loadCanEnterHome() {
+    private fun loadCanEnterHome() {
         logd("loadCanEnterHome")
         val token = CommonPreference.getElement(CommonPreference.KEY_PLATFORM_TOKEN, "")
+        val platformUrl = CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")
         if (!TextUtils.isEmpty(token)) {
             //TODO 调用刷新接口按钮
         } else {
-            //TODO 1.调用平台接口页面看是否能够连接平台
-            //TODO 2.如果能够连接跳到平台登录，如果不能跳到平台设置页面
+            //1.调用平台接口页面看是否能够连接平台
+            //2.如果能够连接跳到平台登录，如果不能跳到平台设置页面
+            mDisposables.add(
+                PlatformApi.getService(platformUrl)
+                    .getInterface().compose(PlatformApi.applySchedulers())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ response ->
+                        PlatformApiManager.setApiPath(response.data)
+                        goWhere.postValue(WHERE_PLATFORM_LOGIN)
+                    }, {
+                        logd("平台连接失败..")
+                        ToastUtils.showShort(
+                            Utils.getApp().getString(R.string.toast_platform_link_failed)
+                        )
+                        logPrint2File(it)
+                        goWhere.postValue(WHERE_PLATFORM_SETTING)
+                    })
+            )
         }
     }
 
+    fun wakeupMachine() {
+        isShowLoading.postValue(true)
+        mDisposables.add(PowerManager.wakeupMachine()
+            .flatMap {
+                Observable.timer(70, TimeUnit.SECONDS)
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                //唤醒完登录
+                isShowLoading.postValue(false)
+                login()
+            }, {
+                isShowLoading.postValue(false)
+                logPrint2File(it)
+                goWhere.postValue(WHERE_LUBO_SETTING)
+            })
+        )
+    }
 
 
 }

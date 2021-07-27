@@ -21,8 +21,8 @@ object WebViewUtil {
     }
 
 
-    fun getH5WebView(): WebView {
-        val webView = WebView(Utils.getApp())
+    fun getH5WebView(context: Context?=null): WebView {
+        val webView = WebView(context?:Utils.getApp())
         webView.settings.apply {
             javaScriptEnabled = true
             useWideViewPort = true
