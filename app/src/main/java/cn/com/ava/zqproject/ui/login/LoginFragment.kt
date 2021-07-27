@@ -17,6 +17,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     private val mLoginViewModel by viewModels<LoginViewModel>()
 
+    private var mLastHtmlUrl: String? = null
+
 
     private val mWebView by lazy {
         val webView = WebViewUtil.getH5WebView()
@@ -40,9 +42,13 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         val html = "${CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")}" +
                 "${PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN)}"
         logd("Webview load ${html}")
-        mWebView.loadUrl(
-           html
-        )
+        if (html != mLastHtmlUrl) {
+            mWebView.loadUrl(
+                html
+            )
+            mLastHtmlUrl = html
+        }
+
 
 
         mBinding.ivSetting.setOnClickListener {
@@ -56,9 +62,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     }
 
     override fun observeVM() {
-        mLoginViewModel.goHome.observe(viewLifecycleOwner){it->
-            if(it!=0){
-                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+        mLoginViewModel.goHome.observe(viewLifecycleOwner) { it ->
+            if (it != 0) {
+                findNavController().navigate(R.id.action_loginFragment_to_createMeetingFragment)
             }
 
         }
@@ -67,7 +73,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     override fun onDestroyView() {
         super.onDestroyView()
         mWebView.parent?.apply {
-            if(this is ViewGroup){
+            if (this is ViewGroup) {
                 this.removeAllViews()
             }
         }

@@ -12,21 +12,25 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * Base RecyclerView Adapter class for DataBinding feature.
  */
-abstract class BaseAdapter<DATA>:RecyclerView.Adapter<BaseViewHolder<DATA,ViewDataBinding>>() {
+abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, ViewDataBinding>>() {
 
     val mDatas: MutableList<DATA> by lazy {
         arrayListOf()
     }
 
-    private val mDiffCallback:AdapterDiffCallback<DATA> by lazy {
+    private val mDiffCallback: AdapterDiffCallback<DATA> by lazy {
         createDiffCallback()
     }
 
-    abstract fun createDiffCallback():AdapterDiffCallback<DATA>
+    abstract fun createDiffCallback(): AdapterDiffCallback<DATA>
 
-    @LayoutRes abstract fun getLayoutId(viewType:Int):Int
+    @LayoutRes
+    abstract fun getLayoutId(viewType: Int): Int
 
-    abstract fun getViewHolder(viewType: Int,binding: ViewDataBinding): BaseViewHolder<DATA, ViewDataBinding>
+    abstract fun getViewHolder(
+        viewType: Int,
+        binding: ViewDataBinding
+    ): BaseViewHolder<DATA, ViewDataBinding>
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -36,7 +40,7 @@ abstract class BaseAdapter<DATA>:RecyclerView.Adapter<BaseViewHolder<DATA,ViewDa
             LayoutInflater.from(parent.context),
             getLayoutId(viewType), parent, false
         )
-        return getViewHolder(viewType,binding)
+        return getViewHolder(viewType, binding)
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<DATA, ViewDataBinding>, position: Int) {
@@ -48,15 +52,46 @@ abstract class BaseAdapter<DATA>:RecyclerView.Adapter<BaseViewHolder<DATA,ViewDa
         return mDatas.size
     }
 
-    fun setDatas(newData:List<DATA>){
-        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas,newData))
-        mDatas.clear()
-        mDatas.addAll(newData)
-        diffResult.dispatchUpdatesTo(this)
+    fun getDatas(): List<DATA> {
+        return mDatas
     }
 
 
-    private fun updateDiffCallback(oldDatas: List<DATA>, newDatas: List<DATA>): AdapterDiffCallback<DATA>{
+    fun refresh() {
+        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, mDatas))
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun setDatas(newData: List<DATA>) {
+        //垃圾
+        //    val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, newData))
+        mDatas.clear()
+        mDatas.addAll(newData)
+        notifyDataSetChanged()
+        //  diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun addDatas(datas: List<DATA>) {
+        val length = mDatas.size
+        mDatas.addAll(datas)
+        notifyItemRangeInserted(length, datas.size)
+    }
+
+    /**
+     * 改变某项状态，通常用于选中之类状态，必须是同一个实例
+     */
+    fun changeData(data: DATA) {
+        val indexOf = mDatas.indexOf(data)
+        if (indexOf >= 0) {
+            notifyItemChanged(indexOf)
+        }
+    }
+
+
+    private fun updateDiffCallback(
+        oldDatas: List<DATA>,
+        newDatas: List<DATA>
+    ): AdapterDiffCallback<DATA> {
         return mDiffCallback.apply {
             oldList.clear()
             oldList.addAll(oldDatas)
@@ -65,13 +100,13 @@ abstract class BaseAdapter<DATA>:RecyclerView.Adapter<BaseViewHolder<DATA,ViewDa
         }
     }
 
-    abstract class AdapterDiffCallback<DATA>():DiffUtil.Callback(){
+    abstract class AdapterDiffCallback<DATA>() : DiffUtil.Callback() {
 
-        val oldList:MutableList<DATA> by lazy {
+        val oldList: MutableList<DATA> by lazy {
             arrayListOf()
         }
 
-        val newList:MutableList<DATA> by lazy {
+        val newList: MutableList<DATA> by lazy {
             arrayListOf()
         }
 

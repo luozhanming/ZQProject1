@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <data>
+        <variable
+            name="user"
+            type="cn.com.ava.zqproject.vo.ContractUser" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="64dp">
@@ -12,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="41dp"
-            android:text="张数丽"
+            android:text="@{user.userName}"
             android:textColor="@color/color_222222"
             android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -25,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="152dp"
             android:ellipsize="end"
-            android:text="汉东省公安厅厅长汉东省公安厅厅长..."
+            android:text="@{user.professionTitleName}"
             android:textColor="@color/color_999999"
             android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView4"

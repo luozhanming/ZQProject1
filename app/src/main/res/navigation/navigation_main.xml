@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/createMeetingFragment">
+    app:startDestination="@id/splashFragment">
 
 
     <!--退出登录action-->
@@ -65,6 +65,9 @@
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_createMeetingFragment"
+            app:destination="@id/createMeetingFragment" />
 
     </fragment>
     <fragment

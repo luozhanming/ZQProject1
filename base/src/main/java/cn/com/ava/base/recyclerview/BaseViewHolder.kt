@@ -9,7 +9,9 @@ abstract class BaseViewHolder<DATA, DB : ViewDataBinding>(val binding: DB) :
     protected var mData: DATA? = null
 
     fun bind(data: DATA) {
+        mData = data
         setDataToBinding(binding,data)
+        setListenerToBinding(binding)
         binding.executePendingBindings()
     }
 

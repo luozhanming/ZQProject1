@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="64dp">
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="41dp"
-            android:text="张数丽"
-            android:textColor="@color/color_222222"
-            android:textSize="19sp"
+        <ImageView
+            android:id="@+id/btn_cancel"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="28dp"
+            android:background="@drawable/bg_text_button_1"
+            android:padding="10dp"
+            android:selected="@{user.selected}"
+            android:src="@drawable/checkbox_1"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -25,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="152dp"
             android:ellipsize="end"
-            android:text="汉东省公安厅厅长汉东省公安厅厅长..."
+            android:text="@{user.obj.professionTitleName}"
             android:textColor="@color/color_999999"
             android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView4"
@@ -35,15 +36,16 @@
             app:layout_constraintTop_toTopOf="@+id/textView4" />
 
 
-        <CheckBox
-            android:id="@+id/btn_cancel"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginRight="38dp"
-            android:background="@drawable/bg_text_button_1"
-            android:src="@mipmap/ic_item_close"
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="41dp"
+            android:text="@{user.obj.userName}"
+            android:textColor="@color/color_222222"
+            android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <View
@@ -58,5 +60,13 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <data>
+
+        <variable
+            name="user"
+            type="cn.com.ava.zqproject.vo.StatefulView&lt;cn.com.ava.zqproject.vo.ContractUser>" />
+    </data>
 
 </layout>

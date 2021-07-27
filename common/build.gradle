@@ -57,6 +57,7 @@ dependencies {
     api deps.mvplibrary
     api deps.navigation_ui
     api deps.navigation_fragment
+    api deps.smartrefreshlayout
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
