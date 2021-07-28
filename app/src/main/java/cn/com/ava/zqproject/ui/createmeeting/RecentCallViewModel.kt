@@ -11,16 +11,15 @@ import cn.com.ava.zqproject.vo.StatefulView
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
-class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
+class RecentCallViewModel : BaseViewModel(),CanRefresh,SelectedUser {
 
 
-    val contractUsers: MutableLiveData<List<StatefulView<ContractUser>>> by lazy {
+    val recentContract: MutableLiveData<List<StatefulView<ContractUser>>> by lazy {
         val data = arrayListOf<StatefulView<ContractUser>>()
         val livedata = MutableLiveData<List<StatefulView<ContractUser>>>()
         livedata.value = data
         livedata
     }
-
 
     override val refreshState: MutableLiveData<RefreshState> by lazy {
         MutableLiveData()
@@ -31,8 +30,11 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
     }
 
 
-    fun getContractUserList() {
-        mDisposables.add(PlatformApi.getService().getContractUsers()
+
+
+
+    fun getRecentContracts() {
+        mDisposables.add(PlatformApi.getService().getRecentCall()
             .compose(PlatformApi.applySchedulers())
             .map {
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
@@ -46,7 +48,7 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
             .subscribeOn(Schedulers.io())
             .subscribe({
                 refreshState.postValue(RefreshState(true, false))
-                contractUsers.postValue(it)
+                recentContract.postValue(it)
             }, {
                 logPrint2File(it)
                 refreshState.postValue(RefreshState(true, true))
@@ -54,29 +56,26 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
         )
     }
 
-
-    fun setSelectedUsers(users: List<ContractUser>) {
+    fun setSelectedUsers(users: MutableList<ContractUser>) {
         mSelectedUsers.clear()
         mSelectedUsers.addAll(users)
         //更新现有的状态，算法仍待考虑
         mDisposables.add(
             Observable.create<Boolean> { emitter ->
-                val filter = contractUsers.value
+                val filter = recentContract.value
                 filter?.forEach {
                     it.isSelected = mSelectedUsers.contains(it.obj)
                 }
-                val value = contractUsers.value
-                contractUsers.postValue(contractUsers.value)
+                recentContract.postValue(recentContract.value)
                 emitter.onNext(true)
-
             }
                 .subscribeOn(Schedulers.computation())
                 .subscribe({
-
-
                 },{
                     logPrint2File(it)
                 })
         )
     }
+
+
 }

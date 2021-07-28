@@ -2,6 +2,7 @@ package cn.com.ava.zqproject.ui.createmeeting
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.zqproject.vo.ContractGroup
 import cn.com.ava.zqproject.vo.ContractUser
 
 class CreateMeetingViewModel : BaseViewModel() {
@@ -22,6 +23,7 @@ class CreateMeetingViewModel : BaseViewModel() {
         val list = selectedUser.value
         if (list?.contains(user) == true) {
             list.remove(user)
+            selectedUser.value = list
             return true
         } else {
             if (list?.size ?: 0 < MAX_SELECTED_USER) {
@@ -33,7 +35,37 @@ class CreateMeetingViewModel : BaseViewModel() {
             }
 
         }
+    }
 
+    fun addOrDelGroup(group: ContractGroup): Boolean {
+        val userIdList = group.userIdList
+        val selectedUsers = selectedUser.value
+        //1.判断所有人是否在已选
+        val allInSelected = userIdList.all {
+            selectedUsers?.contains(it) ?: false
+        }
+        if (allInSelected) {   //移除选择
+            userIdList?.forEach {
+                selectedUsers?.remove(it)
+            }
+            selectedUser.value = selectedUsers
+            return true
+        } else {   //有部分没有添加
+            val unAddedUsers = arrayListOf<ContractUser>()
+            userIdList?.forEach {
+                if (selectedUsers?.contains(it) == false) {
+                    unAddedUsers.add(it)
+                }
+            }
+            if (selectedUsers?.size ?: 0 + unAddedUsers.size < MAX_SELECTED_USER) {
+                selectedUsers?.addAll(unAddedUsers)
+                selectedUser.value = selectedUsers
+                return true
+            } else {  //满人了
+                return false
+            }
+
+        }
 
     }
 

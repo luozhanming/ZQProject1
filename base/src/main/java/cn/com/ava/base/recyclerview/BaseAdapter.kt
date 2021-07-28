@@ -71,6 +71,16 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
         //  diffResult.dispatchUpdatesTo(this)
     }
 
+
+    fun setDatasWithDiff(newData: List<DATA>) {
+        //垃圾
+        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, newData))
+        mDatas.clear()
+        mDatas.addAll(newData)
+        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     fun addDatas(datas: List<DATA>) {
         val length = mDatas.size
         mDatas.addAll(datas)

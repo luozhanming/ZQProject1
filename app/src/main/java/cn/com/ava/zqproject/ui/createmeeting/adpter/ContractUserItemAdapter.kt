@@ -46,7 +46,7 @@ class ContractUserItemAdapter(val mContractCallback: ContractUserCallback? = nul
 
 
     interface ContractUserCallback {
-        fun onSelectedUser(user: StatefulView<ContractUser>?, isSelected: Boolean)
+        fun onSelectedUser(user: StatefulView<ContractUser>, isSelected: Boolean)
     }
 
 
