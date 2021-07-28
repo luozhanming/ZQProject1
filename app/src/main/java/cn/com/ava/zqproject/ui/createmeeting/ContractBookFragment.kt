@@ -32,26 +32,28 @@ class ContractBookFragment : BaseFragment<FragmentContractBookBinding>() {
             mContractBookViewModel.getContractUserList()
         }
         mBinding.refreshLayout.autoRefresh()
-        mContractUserItemAdapter =
-            ContractUserItemAdapter(object : ContractUserItemAdapter.ContractUserCallback {
-                override fun onSelectedUser(
-                    user: StatefulView<ContractUser>?,
-                    isSelected: Boolean
-                ) {
-                    user?.apply {
-                        if(mCreateMeetingViewModel.addOrDelSelectedUser(obj)){      //成功添加
-                            user.isSelected = isSelected
-                            mContractUserItemAdapter?.changeData(user)
-                        }else{   //添加失败
+        if (mContractUserItemAdapter == null) {
+            mContractUserItemAdapter =
+                ContractUserItemAdapter(object : ContractUserItemAdapter.ContractUserCallback {
+                    override fun onSelectedUser(
+                        user: StatefulView<ContractUser>,
+                        isSelected: Boolean
+                    ) {
+                        user.apply {
+                            if (mCreateMeetingViewModel.addOrDelSelectedUser(obj)) {      //成功添加
+                                user.isSelected = isSelected
+                                mContractUserItemAdapter?.changeData(user)
+                            } else {   //添加失败
 
+                            }
                         }
-
                     }
-                }
-            })
+                })
+        }
+        mBinding.rvContractUser.adapter = mContractUserItemAdapter
+
         mBinding.rvContractUser.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        mBinding.rvContractUser.adapter = mContractUserItemAdapter
     }
 
 
@@ -68,5 +70,10 @@ class ContractBookFragment : BaseFragment<FragmentContractBookBinding>() {
             mContractBookViewModel.setSelectedUsers(it)
         }
 
+    }
+
+    override fun onDestroy() {
+        mBinding.rvContractUser.adapter = null
+        super.onDestroy()
     }
 }

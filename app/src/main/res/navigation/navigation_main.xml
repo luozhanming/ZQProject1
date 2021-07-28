@@ -88,7 +88,15 @@
     <fragment
         android:id="@+id/createMeetingFragment"
         android:name="cn.com.ava.zqproject.ui.createmeeting.CreateMeetingFragment"
-        android:label="CreateMeetingFragment" />
+        android:label="CreateMeetingFragment" >
+        <action
+            android:id="@+id/action_createMeetingFragment_to_createGroupFragment"
+            app:destination="@id/createGroupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createGroupFragment"
+        android:name="cn.com.ava.zqproject.ui.createmeeting.CreateGroupFragment"
+        android:label="CreateGroupFragment" />
 
 
     <fragment android:id="@+id/videoResourceFragment"

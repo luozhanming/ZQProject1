@@ -43,7 +43,7 @@ class SelectedContractItemAdapter(private var mCallback: SelectedContractCallbac
      * 定义一个操作回调
      */
     interface SelectedContractCallback {
-        fun onCancel(data: ContractUser?)
+        fun onCancel(data: ContractUser)
     }
 
 
@@ -60,7 +60,7 @@ class SelectedContractItemAdapter(private var mCallback: SelectedContractCallbac
 
         override fun setListenerToBinding(binding: ItemSelectedContractBinding) {
             binding.btnCancel.setOnClickListener {
-                callback?.onCancel(mData)
+                callback?.onCancel(mData!!)
             }
         }
 

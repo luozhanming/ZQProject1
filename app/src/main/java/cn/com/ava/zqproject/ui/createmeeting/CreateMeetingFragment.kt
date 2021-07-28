@@ -5,13 +5,16 @@ import android.graphics.Typeface
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentCreateMeetingBinding
-import cn.com.ava.zqproject.ui.common.ConfirmDialog
+import cn.com.ava.zqproject.ui.createmeeting.adpter.SelectedContractItemAdapter
+import cn.com.ava.zqproject.ui.createmeeting.dialog.CreateMeetingDialog
+import cn.com.ava.zqproject.vo.ContractUser
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -21,6 +24,8 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
 
 
     private val mCreateMeetingViewModel by viewModels<CreateMeetingViewModel>()
+
+    private var mSelectedUserAdapter by autoCleared<SelectedContractItemAdapter>()
 
 
     private val mFragments: List<Fragment> by lazy {
@@ -42,9 +47,12 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
     private var mTabLayoutMediator by autoCleared<TabLayoutMediator>()
 
 
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_create_meeting
+    }
+
+    override fun onBindViewModel2Layout(binding: FragmentCreateMeetingBinding) {
+        binding.createMeetingViewModel = mCreateMeetingViewModel
     }
 
 
@@ -84,17 +92,44 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
             }
         mTabLayoutMediator?.attach()
         mBinding.btnCall.setOnClickListener {
-
+            val dialog = CreateMeetingDialog{theme,nickname,waiting->
+ToastUtils.showShort("${theme},${nickname},${waiting}")
+            }
+            dialog.show(childFragmentManager,"")
         }
 
         mBinding.ivAddGroup.setOnClickListener {
-
+            findNavController().navigate(R.id.action_createMeetingFragment_to_createGroupFragment)
         }
 
         mBinding.ivBack.setOnClickListener {
 
         }
 
-        mBinding.rvSelectedUser.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+        mBinding.rvSelectedUser.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        if (mSelectedUserAdapter == null) {
+            mSelectedUserAdapter = SelectedContractItemAdapter(object :
+                SelectedContractItemAdapter.SelectedContractCallback {
+                override fun onCancel(data: ContractUser) {
+                    mCreateMeetingViewModel.addOrDelSelectedUser(data)
+                }
+            })
+        }
+        mBinding.rvSelectedUser.adapter = mSelectedUserAdapter
+    }
+
+
+    override fun observeVM() {
+        mCreateMeetingViewModel.selectedUser.observe(viewLifecycleOwner) { data ->
+            mSelectedUserAdapter?.setDatasWithDiff(data)
+        }
+    }
+
+    override fun onDestroy() {
+        mBinding.rvSelectedUser.adapter = null
+        mBinding.viewPager.adapter = null
+        super.onDestroy()
+
     }
 }

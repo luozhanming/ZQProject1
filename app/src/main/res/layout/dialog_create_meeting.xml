@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="590dp"
+    android:background="@drawable/bg_dialog"
+    android:layout_height="wrap_content">
+
+
+    <EditText
+        android:id="@+id/et_meeting_theme"
+        android:layout_width="426dp"
+        android:layout_height="52dp"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp"
+        android:singleLine="true"
+        android:hint="@string/input_meeting_theme"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/bg_edittext_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView12"
+        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/meeting_theme"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:textColor="@color/color_222222"
+        android:textSize="19sp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/et_meeting_theme"
+        app:layout_constraintEnd_toStartOf="@+id/et_meeting_theme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/et_meeting_theme" />
+
+
+    <EditText
+        android:id="@+id/et_meeting_nickname"
+        android:layout_width="426dp"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_edittext_1"
+        android:hint="@string/input_meeting_user_nickname"
+        android:paddingLeft="22dp"
+        android:layout_marginTop="20dp"
+        android:paddingRight="22dp"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="@+id/et_meeting_theme"
+        app:layout_constraintStart_toStartOf="@+id/et_meeting_theme"
+        app:layout_constraintTop_toBottomOf="@+id/et_meeting_theme" />
+
+    <TextView
+        android:id="@+id/te13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/meeting_user_nickname"
+        android:textColor="@color/color_222222"
+        android:textSize="19sp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/et_meeting_nickname"
+        app:layout_constraintEnd_toEndOf="@+id/textView12"
+        app:layout_constraintTop_toTopOf="@+id/et_meeting_nickname" />
+
+    <TextView
+        android:id="@+id/textView13"
+        style="@style/DialogTitleStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:text="@string/create_meeting"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/textView17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:text="@string/waiting_room"
+        android:textColor="@color/color_222222"
+        android:textSize="19sp"
+        app:layout_constraintEnd_toEndOf="@+id/te13"
+        app:layout_constraintTop_toBottomOf="@+id/te13" />
+
+    <Switch
+        android:id="@+id/switch_waiting_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/textView17"
+        app:layout_constraintStart_toStartOf="@+id/et_meeting_nickname"
+        app:layout_constraintTop_toTopOf="@+id/textView17" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/color_E2E2E2"
+        app:layout_constraintBottom_toTopOf="@+id/btn_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@color/color_E2E2E2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btn_sure"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_cancel" />
+
+
+    <TextView
+        android:id="@+id/btn_cancel"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:background="@drawable/bg_text_button_1"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:layout_marginTop="65dp"
+        android:textColor="@color/color_999999"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_sure"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView17" />
+
+    <TextView
+        android:id="@+id/btn_sure"
+        android:layout_width="0dp"
+        android:layout_height="54dp"
+        android:text="@string/call"
+        android:background="@drawable/bg_text_button_1"
+        android:gravity="center"
+        android:textColor="@drawable/selecter_text_color_2"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btn_cancel"
+        app:layout_constraintTop_toTopOf="@+id/btn_cancel" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

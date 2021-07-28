@@ -20,6 +20,8 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
 
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -85,7 +87,26 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
     override fun onDestroy() {
         super.onDestroy()
+        mBinding.unbind()
+        //反射释放
+        releaseBinding()
         logd("onDestroy")
+    }
+
+    private fun releaseBinding() {
+        try {
+          //  val fields = this::class.java.declaredFields  //错误的用法，父类的属性不能通过反射获取
+            val fields = BaseFragment::class.java.declaredFields
+            val mBinding = fields.firstOrNull {
+                it.name == "mBinding"
+            }
+            mBinding?.isAccessible = true
+            mBinding?.set(this,null)
+            logd("releaseBinding")
+        }catch (e:NoSuchFieldException){
+
+        }
+
     }
 
     override fun onDestroyView() {
