@@ -98,6 +98,18 @@
                 app:tabSelectedTextColor="@color/color_318EF8"
                 app:tabTextColor="@color/color_222222"/>
 
+            <TextView
+                android:id="@+id/btn_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tabLayout"
+                app:layout_constraintBottom_toBottomOf="@+id/tabLayout"
+                android:text="@string/delete_all_record"
+                android:textColor="@color/color_666666"
+                android:textSize="18sp" />
+
             <View
                 android:id="@+id/view2"
                 android:layout_width="0dp"

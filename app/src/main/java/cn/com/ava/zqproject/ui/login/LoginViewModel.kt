@@ -43,7 +43,7 @@ class LoginViewModel : ViewModel() {
             "lubo_ip":"${ip}",
             "lubo_port":"${port}",
             "lubo_username":"${username}",
-            "lubo_psw":"${psw}",
+            "lubo_psw":"${psw}"
             }"""
         logd(luboInfo)
         return luboInfo

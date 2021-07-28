@@ -26,7 +26,14 @@ object PlatformApi : BaseHttpApi() {
     }
 
     override fun getInterceptors(): List<Interceptor>? {
-        return null
+        val interceptors = arrayListOf<Interceptor>()
+        interceptors.add(Interceptor { chain ->
+            val request =
+                chain.request().newBuilder().addHeader("token", platformLogin?.token ?: "").build()
+            chain.proceed(request)
+
+        })
+        return interceptors
     }
 
     override fun <T> getApiErrorHandler(): Function<T, T> {

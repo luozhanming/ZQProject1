@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
@@ -16,6 +18,9 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 
 class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
+
+
+    private val mCreateMeetingViewModel by viewModels<CreateMeetingViewModel>()
 
 
     private val mFragments: List<Fragment> by lazy {
@@ -36,6 +41,8 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
 
     private var mTabLayoutMediator by autoCleared<TabLayoutMediator>()
 
+
+
     override fun getLayoutId(): Int {
         return R.layout.fragment_create_meeting
     }
@@ -52,7 +59,6 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
                 override fun createFragment(position: Int): Fragment {
                     return mFragments[position]
                 }
-
             }
             offscreenPageLimit = 3
         }
@@ -88,5 +94,7 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         mBinding.ivBack.setOnClickListener {
 
         }
+
+        mBinding.rvSelectedUser.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
     }
 }

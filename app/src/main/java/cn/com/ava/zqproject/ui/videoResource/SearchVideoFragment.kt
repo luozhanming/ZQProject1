@@ -1,25 +1,19 @@
 package cn.com.ava.zqproject.ui.videoResource
 
 import android.util.Log
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.R
-import cn.com.ava.zqproject.databinding.FragmentVideoResourceListBinding
+import cn.com.ava.zqproject.databinding.FragmentSearchVideoBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
 import cn.com.ava.zqproject.vo.VideoResource
-import com.blankj.utilcode.util.Utils
 
-class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>() {
-
-    private val TAG = "VideoResourceListFragme"
+class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
 
     private var mVideoResourceListItemAdapter by autoCleared<VideoResourceListItemAdapter>()
-
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_video_resource_list
-    }
 
     private val mVideoResources: List<VideoResource> by lazy {
         val datasource = arrayListOf<VideoResource>()
@@ -28,20 +22,32 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
         datasource
     }
 
+    override fun getLayoutId(): Int {
+        return R.layout.fragment_search_video
+    }
+
     override fun initView() {
         super.initView()
 
+        mBinding.btnCancel.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        mBinding.btnClear.setOnClickListener {
+            mBinding.etSearch.setText("")
+        }
+
         mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
             override fun onDidClickedItem(data: VideoResource?) {
-                Log.d(TAG, "onDidClickedItem: 查看")
+                logd("查看")
             }
 
             override fun onDownload(data: VideoResource?) {
-                Log.d(TAG, "onDownload: 下载")
+                logd("下载")
             }
 
             override fun onUpload(data: VideoResource?) {
-                Log.d(TAG, "onDownload: 上传")
+                logd("上传")
             }
         })
         mVideoResourceListItemAdapter?.setDatas(mVideoResources)
@@ -49,4 +55,5 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
         mBinding.rvResourceList.adapter = mVideoResourceListItemAdapter
         mBinding.rvResourceList.layoutManager = LinearLayoutManager(requireContext())
     }
+
 }

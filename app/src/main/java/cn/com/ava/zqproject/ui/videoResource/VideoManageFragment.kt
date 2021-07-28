@@ -77,7 +77,7 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 搜索
         mBinding.ivSearch.setOnClickListener {
-
+            findNavController().navigate(R.id.action_videoFragment_to_searchFragment)
         }
         // 排序
         mBinding.ivSort.setOnClickListener {
@@ -85,7 +85,7 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 批量管理
         mBinding.ivManage.setOnClickListener {
-
+            findNavController().navigate(R.id.action_videoFragment_to_manageFragment)
         }
     }
 
