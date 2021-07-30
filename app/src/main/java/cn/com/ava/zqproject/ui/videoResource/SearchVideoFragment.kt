@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentSearchVideoBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
@@ -38,19 +39,23 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
         }
 
         mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
-            override fun onDidClickedItem(data: VideoResource?) {
+            override fun onDidClickedItem(data: RecordFilesInfo.RecordFile?) {
                 logd("查看")
             }
 
-            override fun onDownload(data: VideoResource?) {
+            override fun onDownload(data: RecordFilesInfo.RecordFile?) {
                 logd("下载")
             }
 
-            override fun onUpload(data: VideoResource?) {
+            override fun onUpload(data: RecordFilesInfo.RecordFile?) {
                 logd("上传")
             }
+
+            override fun onDelete(data: RecordFilesInfo.RecordFile?) {
+                logd("删除")
+            }
         })
-        mVideoResourceListItemAdapter?.setDatas(mVideoResources)
+//        mVideoResourceListItemAdapter?.setDatas(mVideoResources)
 
         mBinding.rvResourceList.adapter = mVideoResourceListItemAdapter
         mBinding.rvResourceList.layoutManager = LinearLayoutManager(requireContext())

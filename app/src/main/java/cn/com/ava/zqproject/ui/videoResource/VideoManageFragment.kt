@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
@@ -14,8 +15,12 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoManageBinding
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
+
+    private val mVideoManageViewModel by viewModels<VideoManageViewModel>()
+
     private val mFragments: List<Fragment> by lazy {
         val fragments = arrayListOf<Fragment>()
         fragments.add(VideoResourceListFragment())
@@ -81,7 +86,7 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 排序
         mBinding.ivSort.setOnClickListener {
-
+            findNavController().navigate(R.id.action_videoResourceFragment_to_videoPlayFragment)
         }
         // 批量管理
         mBinding.ivManage.setOnClickListener {

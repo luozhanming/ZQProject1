@@ -28,7 +28,7 @@ class RecordFilesQuery(
         if (split[0] == "0" || split[0] == "-1") return info
 
         info.files = arrayListOf()
-        for (i in 0 until 8) {
+        for (i in 8 until split.size) {
             val file = RecordFilesInfo.RecordFile()
             val split1 = split[i].split("-").toTypedArray()
             if (split1.size == 1) continue
