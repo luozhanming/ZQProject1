@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">政企录播</string>
+
     <string name="toast_lubo_login_failed">录播连接失败</string>
     <string name="toast_lubo_login_success">录播连接成功</string>
     <string name="toast_input_correct_lubo_info">请输入正确录播信息</string>
@@ -11,7 +12,7 @@
     <string name="tips_lubo_need_wake_up">录播设备已休眠，是否唤醒？</string>
     <string name="wakeup_success">唤醒成功</string>
     <string name="wakeup_failed">唤醒失败</string>
-    
+
     <string name="link_lubo">连接录播</string>
     <string name="link_platform">连接平台</string>
     <string name="lubo_ip">设备IP</string>
@@ -35,6 +36,15 @@
     <string name="selected_contract">已选用户：</string>
     <string name="call">呼叫</string>
 
+
+    <string name="video_resource_title">视频资源</string>
+    <string name="manage_resource_title">管理资源</string>
+    <string name="resource_list">资源列表</string>
+    <string name="transmission_list">传输列表</string>
+    <string name="delete_all_record">清除全部记录</string>
+    <string name="delete">删除</string>
+    <string name="download">下载</string>
+    <string name="select_all">全选</string>
 
 
     <string name="tip">提示</string>
@@ -72,7 +82,6 @@
     <string name="tract_mode">导播模式</string>
     <string name="key_setting">按键设置</string>
     <string name="volume">音量</string>
-
 
 
 </resources>

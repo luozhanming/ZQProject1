@@ -34,6 +34,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
         mMainViewModel.isShowLoading.observe(this) { show ->
             if (show) {

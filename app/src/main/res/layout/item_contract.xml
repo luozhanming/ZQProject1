@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="user"
+            type="cn.com.ava.zqproject.vo.StatefulView&lt;cn.com.ava.zqproject.vo.ContractUser>" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="64dp">
@@ -58,15 +64,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <data>
-
-        <variable
-            name="user"
-            type="cn.com.ava.zqproject.vo.StatefulView&lt;cn.com.ava.zqproject.vo.ContractUser>" />
-    </data>
 
 </layout>

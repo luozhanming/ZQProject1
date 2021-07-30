@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/splashFragment">
+    app:startDestination="@id/videoResourceFragment">
 
 
     <!--退出登录action-->
@@ -98,4 +98,37 @@
         android:label="CreateGroupFragment" />
 
 
+    <fragment android:id="@+id/videoResourceFragment"
+        tools:layout="@layout/fragment_video_manage"
+        android:name="cn.com.ava.zqproject.ui.videoResource.VideoManageFragment">
+
+        <action
+            android:id="@+id/action_videoFragment_to_manageFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/manageResourceFragment"
+            app:launchSingleTop="true"/>
+        <action
+            android:id="@+id/action_videoFragment_to_searchFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/searchVideoFragment"
+            app:launchSingleTop="true"/>
+    </fragment>
+
+    <fragment android:id="@+id/manageResourceFragment"
+        tools:layout="@layout/fragment_manage_resources"
+        android:name="cn.com.ava.zqproject.ui.videoResource.ManageResourcesFragment">
+
+    </fragment>
+
+    <fragment android:id="@+id/searchVideoFragment"
+        tools:layout="@layout/fragment_search_video"
+        android:name="cn.com.ava.zqproject.ui.videoResource.SearchVideoFragment">
+
+    </fragment>
 </navigation>

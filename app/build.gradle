@@ -50,6 +50,11 @@ dependencies {
     implementation project(path: ':avartspviewer')
     implementation project(path: ':player')
     implementation deps.xcrash
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     generalImplementation.each {
         implementation "$it"
     }
