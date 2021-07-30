@@ -95,7 +95,7 @@ class CreateGroupViewModel : BaseViewModel() {
             if (!TextUtils.isEmpty(searchKey.value)) {   //过滤的
                 val stateView1 = filter?.firstOrNull { it.obj == user }
                 stateView1?.isSelected = false
-                filterUser.value = filterUser.value
+                filterUser.postValue(filterUser.value)
             }
             return true
         } else {

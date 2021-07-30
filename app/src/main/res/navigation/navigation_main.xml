@@ -9,8 +9,7 @@
     <!--退出登录action-->
     <action
         android:id="@+id/action_back_to_login"
-        app:destination="@id/loginFragment"
-         />
+        app:destination="@id/loginFragment" />
 
 
 
@@ -65,9 +64,6 @@
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left"
             app:destination="@id/homeFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_createMeetingFragment"
-            app:destination="@id/createMeetingFragment" />
 
     </fragment>
     <fragment
@@ -79,6 +75,9 @@
             android:id="@+id/action_homeFragment_to_recordFragment"
             app:destination="@id/recordFragment"
             app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_createMeetingFragment"
+            app:destination="@id/createMeetingFragment" />
     </fragment>
     <fragment
         android:id="@+id/recordFragment"

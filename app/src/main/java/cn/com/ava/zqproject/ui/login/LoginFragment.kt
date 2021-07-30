@@ -64,7 +64,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     override fun observeVM() {
         mLoginViewModel.goHome.observe(viewLifecycleOwner) { it ->
             if (it != 0) {
-                findNavController().navigate(R.id.action_loginFragment_to_createMeetingFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
             }
 
         }

@@ -92,10 +92,10 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
             }
         mTabLayoutMediator?.attach()
         mBinding.btnCall.setOnClickListener {
-            val dialog = CreateMeetingDialog{theme,nickname,waiting->
-ToastUtils.showShort("${theme},${nickname},${waiting}")
+            val dialog = CreateMeetingDialog { theme, nickname, waiting ->
+                ToastUtils.showShort("${theme},${nickname},${waiting}")
             }
-            dialog.show(childFragmentManager,"")
+            dialog.show(childFragmentManager, "")
         }
 
         mBinding.ivAddGroup.setOnClickListener {
@@ -103,7 +103,7 @@ ToastUtils.showShort("${theme},${nickname},${waiting}")
         }
 
         mBinding.ivBack.setOnClickListener {
-
+            findNavController().popBackStack()
         }
 
         mBinding.rvSelectedUser.layoutManager =

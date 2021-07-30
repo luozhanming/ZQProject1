@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':base')
     implementation project(path: ':lubosdkv2')
     implementation project(path: ':avartspviewer')
+    implementation project(path: ':player')
     implementation deps.xcrash
     generalImplementation.each {
         implementation "$it"

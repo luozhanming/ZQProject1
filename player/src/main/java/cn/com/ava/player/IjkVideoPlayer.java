@@ -39,7 +39,7 @@ public class IjkVideoPlayer implements VideoPlayer {
 
 
     public IjkVideoPlayer() {
-        this.mPlayer = new IjkMediaPlayer(null);
+        this.mPlayer = new IjkMediaPlayer();
     }
 
     @Override

@@ -55,6 +55,10 @@ object PlatformApi : BaseHttpApi() {
         return PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null
     }
 
+    fun getPlatformLogin():PlatformLogin?{
+        return platformLogin
+    }
+
 
     fun login(login: PlatformLogin) {
         platformLogin = login

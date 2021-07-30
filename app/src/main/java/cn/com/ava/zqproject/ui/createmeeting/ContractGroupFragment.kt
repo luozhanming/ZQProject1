@@ -10,6 +10,7 @@ import cn.com.ava.zqproject.databinding.FragmentContractGroupBinding
 import cn.com.ava.zqproject.ui.createmeeting.adpter.ContractGroupItemAdapter
 import cn.com.ava.zqproject.vo.ContractGroup
 import cn.com.ava.zqproject.vo.StatefulView
+import com.blankj.utilcode.util.ToastUtils
 
 class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
 
@@ -46,6 +47,8 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
                         if (mCreateMeetingViewModel.addOrDelGroup(user.obj)) {
                             user.isSelected = isSelected
                             mContractGroupAdapter?.changeData(user)
+                        }else{
+                            ToastUtils.showShort(getString(R.string.toast_create_meeting_max_count))
                         }
                     }
                 })
@@ -61,6 +64,8 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
                         if (mCreateMeetingViewModel.addOrDelGroup(user.obj)) {
                             user.isSelected = isSelected
                             mContractGroupAdapter?.changeData(user)
+                        }else{
+                            ToastUtils.showShort(getString(R.string.toast_create_meeting_max_count))
                         }
                     }
                 })
@@ -101,6 +106,10 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
     override fun onDestroy() {
         mBinding.rvGroup.adapter = null
         super.onDestroy()
+    }
+
+    override fun onBindViewModel2Layout(binding: FragmentContractGroupBinding) {
+        binding.contractGroupViewModel = mContractGroupViewModel
     }
 
 
