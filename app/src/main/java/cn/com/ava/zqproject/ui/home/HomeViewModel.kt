@@ -6,6 +6,8 @@ import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.manager.GeneralManager
+import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.vo.PlatformLogin
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
@@ -20,11 +22,19 @@ import java.util.concurrent.TimeUnit
 class HomeViewModel : BaseViewModel() {
 
 
-    private val luboInfo: MutableLiveData<LuBoInfo> by lazy {
+    val luboInfo: MutableLiveData<LuBoInfo> by lazy {
         MutableLiveData()
     }
 
+    val platformLogin:MutableLiveData<PlatformLogin> by lazy {
+        MutableLiveData<PlatformLogin>().apply {
+            value = PlatformApi.getPlatformLogin()
+        }
+    }
+
     private var mLoadLuboInfoDisposable: Disposable? = null
+
+
 
     fun startloadLuboInfo() {
         mLoadLuboInfoDisposable = Flowable.interval(1000, TimeUnit.MILLISECONDS)
@@ -41,6 +51,7 @@ class HomeViewModel : BaseViewModel() {
 
     fun stopLoadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
+        mLoadLuboInfoDisposable = null
     }
 
 

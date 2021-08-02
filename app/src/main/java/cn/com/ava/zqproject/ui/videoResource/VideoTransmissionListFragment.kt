@@ -13,7 +13,7 @@ import cn.com.ava.zqproject.vo.VideoResource
 
 class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionListBinding>() {
 
-    private val mVideoManageViewModel by viewModels<VideoManageViewModel>()
+    private val mVideoManageViewModel by viewModels<VideoManageViewModel>({ requireParentFragment() })
 
     private var mVideoTransmissionListItemAdapter by autoCleared<VideoTransmissionListItemAdapter>()
 

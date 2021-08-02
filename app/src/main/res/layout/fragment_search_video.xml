@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="searchVideoViewModel"
+            type="cn.com.ava.zqproject.ui.videoResource.SearchVideoViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -51,6 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
+                android:text="@={searchVideoViewModel.searchKey}"
                 android:hint="请输入视频名称"
                 android:textSize="20sp"
                 android:textColor="@color/color_222222"

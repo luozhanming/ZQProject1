@@ -1,5 +1,7 @@
 package cn.com.ava.zqproject.ui.createmeeting
 
+import android.text.TextUtils
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.util.logPrint2File
@@ -28,6 +30,28 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
 
     override val mSelectedUsers: MutableList<ContractUser> by lazy {
         arrayListOf()
+    }
+
+
+    val searchKey: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val filterUser: MutableLiveData<List<StatefulView<ContractUser>>> by lazy {
+        MediatorLiveData<List<StatefulView<ContractUser>>>().apply {
+            value = arrayListOf()
+            addSource(searchKey) { key ->
+                val list = contractUsers.value
+                val filter = list?.filter {
+                    val user = it.obj
+                    return@filter (!TextUtils.isEmpty(user.userName) && user.userName.contains(key)) ||
+                            (!TextUtils.isEmpty(user.professionTitleName) && user.professionTitleName.contains(
+                                key
+                            ))
+                }
+                postValue(filter)
+            }
+        }
     }
 
 
@@ -68,7 +92,13 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
                 val value = contractUsers.value
                 contractUsers.postValue(contractUsers.value)
                 emitter.onNext(true)
-
+                if (!TextUtils.isEmpty(searchKey.value)) {   //过滤的
+                    val filterUsers = filterUser.value
+                    filterUsers?.forEach {
+                        it.isSelected = mSelectedUsers.contains(it.obj)
+                    }
+                    filterUser.postValue(filterUser.value)
+                }
             }
                 .subscribeOn(Schedulers.computation())
                 .subscribe({

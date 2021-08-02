@@ -1,5 +1,6 @@
 package cn.com.ava.zqproject.ui.videoResource
 
+import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
@@ -13,12 +14,13 @@ import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoResourceListBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
+import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
 import cn.com.ava.zqproject.vo.VideoResource
 import com.blankj.utilcode.util.Utils
 
 class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>() {
 
-    private val mVideoManageViewModel by viewModels<VideoManageViewModel>()
+    private val mVideoManageViewModel by viewModels<VideoManageViewModel>({ requireParentFragment() })
 
     private var mVideoResourceListItemAdapter by autoCleared<VideoResourceListItemAdapter>()
 
@@ -46,7 +48,12 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
             mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
                 override fun onDidClickedItem(data: RecordFilesInfo.RecordFile?) {
                     logd("查看")
-                    findNavController().navigate(R.id.action_videoResourceFragment_to_videoPlayFragment)
+
+                    findNavController().navigate(R.id.action_videoResourceFragment_to_videoPlayFragment,
+                    Bundle().apply {
+                        putString("rtspUrl", data?.rtspUrl)
+                        putString("downloadFileName", data?.downloadFileName)
+                    })
                 }
 
                 override fun onDownload(data: RecordFilesInfo.RecordFile?) {
@@ -58,6 +65,10 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
 
                 override fun onUpload(data: RecordFilesInfo.RecordFile?) {
                     logd("上传")
+                    val dialog = UploadVideoDialog({
+                        logd("视频信息： $it")
+                    })
+                    dialog.show(childFragmentManager, "")
                 }
 
                 override fun onDelete(data: RecordFilesInfo.RecordFile?) {

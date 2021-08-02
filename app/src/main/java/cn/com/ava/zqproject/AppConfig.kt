@@ -29,6 +29,8 @@ object AppConfig {
 
     const val WIDTH_APP_DESIGN = 400
 
+    const val MAX_CREATE_MEETING_COUNT = 9
+
     //平台加密密钥
     val PLATFORM_KEY by lazy {
 

@@ -39,6 +39,7 @@ class ContractGroupViewModel : BaseViewModel(), CanRefresh, SelectedUser {
         MediatorLiveData<List<StatefulView<ContractGroup>>>().apply {
             value = arrayListOf()
             addSource(searchKey) { key ->
+                //关键词过滤规则
                 val list = contractGroups.value
                 val filter = list?.filter {
                     val group = it.obj

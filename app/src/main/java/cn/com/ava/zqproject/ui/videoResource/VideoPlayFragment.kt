@@ -28,42 +28,63 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
     override fun initView() {
         super.initView()
 
+        val rtspUrl: String = arguments?.get("rtspUrl").toString()
+        val downloadFileName = arguments?.get("downloadFileName").toString()
+
         mBinding.ivBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
-//        mBinding.surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
-//            override fun surfaceCreated(p0: SurfaceHolder?) {
-//                surface = p0?.surface
-////                player.setSurface(surface)
-////                player.startPlay("rtsp://192.168.21.204:554/playback/63613135613863302d73747265616d302dbeabc6b7bfceb3ccc2bcd6c65fc1d6c0cfcaa62d3139323078313038305f33306670735f313230676f705f343039366b6270735f7662725f6176632d3332306b5f3136626974735f73746572656f5f34386b687a5f6161632d32303230313231313134323530345f32303230313231313134323530385f332e6d7034",
-////                    object : PlayerCallback {
-////                        override fun onStart() {
-////                            logd("onStart")
-////                        }
-////
-////                        override fun onCompleted() {
-////                            logd("onCompleted")
-////                        }
-////
-////                        override fun onError(error: Int) {
-////                            logd("onError")
-////                        }
-////
-////                        override fun notifyRemoteStop() {
-////                            logd("notifyRemoteStop")
-////                        }
-////                    })
+        mBinding.btnPlayStop.setOnClickListener {
+//            if (isPlaying == true) {
+//                player.pause()
+//                isPlaying = false
+//            } else {
+//                player.resume()
+//                isPlaying = true
 //            }
-//
-//            override fun surfaceChanged(p0: SurfaceHolder?, p1: Int, p2: Int, p3: Int) {
-//
-//            }
-//
-//            override fun surfaceDestroyed(p0: SurfaceHolder?) {
-//
-//            }
-//
-//        })
+
+            if (player.isPlaying == true) {
+                player.pause()
+            } else {
+                player.resume()
+            }
+        }
+
+        mBinding.tvFileName.setText(downloadFileName)
+
+        mBinding.surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceCreated(p0: SurfaceHolder?) {
+                surface = p0?.surface
+                player.setSurface(surface)
+                player.startPlay(rtspUrl,
+                    object : PlayerCallback {
+                        override fun onStart() {
+                            logd("onStart")
+                        }
+
+                        override fun onCompleted() {
+                            logd("onCompleted")
+                        }
+
+                        override fun onError(error: Int) {
+                            logd("onError")
+                        }
+
+                        override fun notifyRemoteStop() {
+                            logd("notifyRemoteStop")
+                        }
+                    })
+            }
+
+            override fun surfaceChanged(p0: SurfaceHolder?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun surfaceDestroyed(p0: SurfaceHolder?) {
+
+            }
+
+        })
     }
 }

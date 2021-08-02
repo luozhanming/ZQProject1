@@ -38,11 +38,11 @@ inline fun Any.loge(message:String){
 }
 
 inline fun Any.logw(message:String){
-    Logger.t(this.javaClass.simpleName).e(message)
+    Logger.t(this.javaClass.simpleName).w(message)
 }
 
 inline fun Any.logi(message: String){
-    Logger.t(this.javaClass.simpleName).e(message)
+    Logger.t(this.javaClass.simpleName).i(message)
 }
 
 inline fun Any.logPrint2File(throwable: Throwable){

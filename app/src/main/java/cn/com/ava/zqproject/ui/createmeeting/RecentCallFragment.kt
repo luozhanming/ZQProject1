@@ -9,6 +9,7 @@ import cn.com.ava.zqproject.databinding.FragmentRecentCallBinding
 import cn.com.ava.zqproject.ui.createmeeting.adpter.ContractUserItemAdapter
 import cn.com.ava.zqproject.vo.ContractUser
 import cn.com.ava.zqproject.vo.StatefulView
+import com.blankj.utilcode.util.ToastUtils
 
 class RecentCallFragment : BaseFragment<FragmentRecentCallBinding>() {
 
@@ -41,7 +42,7 @@ class RecentCallFragment : BaseFragment<FragmentRecentCallBinding>() {
                                 user.isSelected = isSelected
                                 mContractUserItemAdapter?.changeData(user)
                             } else {   //添加失败
-
+                                ToastUtils.showShort(getString(R.string.toast_create_meeting_max_count))
                             }
                         }
                     }

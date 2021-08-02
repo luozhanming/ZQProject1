@@ -11,10 +11,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
+import cn.com.ava.common.util.GsonUtil
+import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoManageBinding
+import cn.com.ava.zqproject.ui.splash.SplashFragment
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
@@ -82,7 +86,17 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 搜索
         mBinding.ivSearch.setOnClickListener {
-            findNavController().navigate(R.id.action_videoFragment_to_searchFragment)
+//            findNavController().navigate(
+//                R.id.action_videoFragment_to_searchFragment,
+//                Bundle().apply {
+////                    putString("videos", GsonUtil.toJson(mVideoManageViewModel.videoResources))
+//                }
+//            )
+//            logd(GsonUtil.toJson(mVideoManageViewModel.videoResources))
+
+//            logd(Gson().toJson(mVideoManageViewModel.videoResources.value))
+
+            findNavController().navigate(VideoManageFragmentDirections.actionVideoFragmentToSearchFragment(GsonUtil.toJson(mVideoManageViewModel.videoResources.value)))
         }
         // 排序
         mBinding.ivSort.setOnClickListener {

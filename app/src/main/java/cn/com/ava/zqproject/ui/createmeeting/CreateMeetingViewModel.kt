@@ -8,7 +8,7 @@ import cn.com.ava.zqproject.vo.ContractUser
 class CreateMeetingViewModel : BaseViewModel() {
 
     companion object {
-        const val MAX_SELECTED_USER = 10
+        const val MAX_SELECTED_USER = 9
     }
 
     val selectedUser: MutableLiveData<MutableList<ContractUser>> by lazy {
@@ -57,7 +57,8 @@ class CreateMeetingViewModel : BaseViewModel() {
                     unAddedUsers.add(it)
                 }
             }
-            if (selectedUsers?.size ?: 0 + unAddedUsers.size < MAX_SELECTED_USER) {
+            val preCount = (selectedUsers?.size ?: 0) + unAddedUsers.size
+            if (preCount< MAX_SELECTED_USER) {
                 selectedUsers?.addAll(unAddedUsers)
                 selectedUser.value = selectedUsers
                 return true
