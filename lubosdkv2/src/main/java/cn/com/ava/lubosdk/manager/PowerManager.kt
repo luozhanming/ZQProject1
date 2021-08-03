@@ -53,7 +53,7 @@ object PowerManager {
     /**
      * 关机
      */
-    fun turnOffMachine(): Observable<Boolean?>? {
+    fun turnOffMachine(): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {

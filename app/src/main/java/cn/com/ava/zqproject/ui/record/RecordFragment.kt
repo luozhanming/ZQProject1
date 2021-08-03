@@ -1,7 +1,9 @@
 package cn.com.ava.zqproject.ui.record
 
+import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import androidx.fragment.app.activityViewModels
@@ -10,13 +12,14 @@ import androidx.navigation.fragment.findNavController
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.listener.SimpleAnimationListener
+import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.common.CommandKeyHelper
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentRecordBinding
-import cn.com.ava.zqproject.extension.getMainHandler
 import cn.com.ava.zqproject.ui.MainViewModel
 
 /**
@@ -36,9 +39,12 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
 
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
 
-    override fun onBindViewModel2Layout(binding: FragmentRecordBinding) {
-        binding.recordViewModel = mRecordViewModel
-    }
+    private var mRecordInfoDialog by autoCleared<RecordInfoDialog>()
+
+    private var mComputerMenu by autoCleared<ComputerModePopupWindow>()
+
+    private var mVolumeWindow by autoCleared<VolumePopupWindow>()
+
 
     //控制台动画相关
     private var topVisibleAnim by autoCleared<Animation>()
@@ -49,16 +55,24 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
 
     private var bottomGoneAnim by autoCleared<Animation>()
 
+    private var breatheAnim by autoCleared<Animation>()
+
+    private var mTrackModeWindow by autoCleared<TrackModeWindow>()
+
 
     override fun initView() {
         initAnim()
         mVideoPlayer = IjkVideoPlayer()
-        mBinding.videoView.holder.addCallback(object : SurfaceHolder.Callback{
+        mBinding.videoView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 mVideoPlayer?.setSurface(holder.surface)
                 mVideoPlayer?.startPlay(
-                    "rtsp://${CommonPreference.getElement(CommonPreference.KEY_LUBO_IP,"")}/stream/4?config.login=web"
-                ,object : PlayerCallback {
+                    "rtsp://${
+                        CommonPreference.getElement(
+                            CommonPreference.KEY_LUBO_IP,
+                            ""
+                        )
+                    }/stream/4?config.login=web", object : PlayerCallback {
                         override fun onStart() {
                             logd("Video player onStart()")
                         }
@@ -94,7 +108,6 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
 
         })
 
-        mRecordViewModel.startLoadRecordInfo()
         mBinding.llRecord.setOnClickListener {
             mRecordViewModel.toggleRecord()
         }
@@ -105,30 +118,75 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
             mRecordViewModel.toggleLive()
         }
         mBinding.llComputer.setOnClickListener {
-
+            mRecordViewModel.toggleComputer()
         }
         mBinding.ivComputerMenu.setOnClickListener {
-
+            if (mComputerMenu == null) {
+                mComputerMenu = ComputerModePopupWindow(requireContext()) {
+                    //如果当前正在接入电脑并切换模式，画面也会切换
+                    mRecordViewModel.changeComputer()
+                }
+            }
+            val xoff = (mComputerMenu!!.width - mBinding.ivComputerMenu.width) / 2
+            mComputerMenu?.showAsDropDown(
+                mBinding.ivComputerMenu,
+                -xoff,
+                -SizeUtils.dp2px(26),
+                Gravity.TOP
+            )
         }
         mBinding.llTrack.setOnClickListener {
-
+            showTrackModeWindow()
         }
         mBinding.llKeySet.setOnClickListener {
+            if (CommandKeyHelper.getSelectedCommandKeys().isEmpty()) {
+                val dialog = KeySettingDialog()
+                dialog?.show(childFragmentManager, "key_setting")
+            } else {
+                val dialog = KeyControlDialog()
+                dialog?.show(childFragmentManager, "key_control")
+            }
 
         }
         mBinding.llVolume.setOnClickListener {
-
+            mRecordViewModel.getVolumeInfo()
+        }
+        mBinding.ivRecordInfo.setOnClickListener {
+            mRecordInfoDialog = RecordInfoDialog()
+            if (mRecordInfoDialog?.isAdded == false) {
+                mRecordInfoDialog?.show(childFragmentManager, "record_info")
+            }
         }
         mBinding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
         mBinding.rootView.setOnClickListener {
+            //如果有弹出菜单，不隐藏
+            if (mTrackModeWindow?.isShowing == true) {
+                return@setOnClickListener
+            }
             mRecordViewModel.isControlVisible.value = mRecordViewModel.isControlVisible.value?.not()
         }
-        mBinding.topBar.setOnClickListener {  }
-        mBinding.bottomBar.setOnClickListener {  }
+        mBinding.topBar.setOnClickListener {
+
+        }
+        mBinding.bottomBar.setOnClickListener {
+
+        }
 
 
+        mRecordViewModel.startLoadRecordInfo()
+
+    }
+
+    private fun showTrackModeWindow() {
+        if (mTrackModeWindow == null) {
+            mTrackModeWindow = TrackModeWindow(requireContext()) { mode ->
+                mRecordViewModel.setTrackMode(mode)
+            }
+        }
+        val xoff = (mTrackModeWindow!!.width - mBinding.llTrack.width) / 2
+        mTrackModeWindow?.showAsDropDown(mBinding.llTrack, -xoff, -SizeUtils.dp2px(18), Gravity.TOP)
     }
 
     private fun initAnim() {
@@ -174,12 +232,21 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
                         }
                     })
                 }
+
+            breatheAnim = AlphaAnimation(1f, 0f).apply {
+                duration = 1000
+                repeatCount = Animation.INFINITE
+                repeatMode = Animation.REVERSE
+            }
         }
 
 
-
-
     }
+
+    override fun onBindViewModel2Layout(binding: FragmentRecordBinding) {
+        binding.recordViewModel = mRecordViewModel
+    }
+
 
     override fun observeVM() {
         mRecordViewModel.isShowLoading.observe(viewLifecycleOwner) {
@@ -190,13 +257,40 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
                 if (visible) {   //显示
                     mBinding.topBar.startAnimation(topVisibleAnim)
                     mBinding.bottomBar.startAnimation(bottomVisibleAnim)
-                }else{
+                } else {
                     mBinding.topBar.startAnimation(topGoneAnim)
                     mBinding.bottomBar.startAnimation(bottomGoneAnim)
                 }
             }
+        }
+        mRecordViewModel.recordInfo.observe(viewLifecycleOwner) { info ->
+            mTrackModeWindow?.setTrackMode(info.trackMode)
 
         }
+        mRecordViewModel.isRecording.observe(viewLifecycleOwner) {
+            breatheAnim?.apply {
+                if (it) {
+                    mBinding.ivDot.startAnimation(breatheAnim)
+                } else {
+                    breatheAnim?.cancel()
+                    mBinding.ivDot.clearAnimation()
+                }
+            }
+        }
+        mRecordViewModel.masterVolume.observe(viewLifecycleOwner){volume->
+            mVolumeWindow = mVolumeWindow?: VolumePopupWindow(requireContext()){
+                mRecordViewModel.changeVolume(it)
+            }
+            mVolumeWindow?.setVolume(volume.volumnLevel)
+            val xoff = (mVolumeWindow!!.width - mBinding.llVolume.width) / 2
+            mVolumeWindow?.showAsDropDown(
+                mBinding.llVolume,
+                -xoff,
+                -SizeUtils.dp2px(26),
+                Gravity.TOP
+            )
+        }
+
     }
 
     override fun onDestroyView() {
@@ -207,11 +301,8 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
     private fun cancelAnim() {
         mBinding.topBar.clearAnimation()
         mBinding.bottomBar.clearAnimation()
+        mBinding.ivDot.clearAnimation()
 
-        topGoneAnim = null
-        topVisibleAnim = null
-        bottomVisibleAnim = null
-        bottomGoneAnim = null
     }
 
 

@@ -6,11 +6,14 @@ import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.manager.GeneralManager
+import cn.com.ava.lubosdk.manager.WindowLayoutManager
+import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.PlatformLogin
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 
@@ -34,8 +37,6 @@ class HomeViewModel : BaseViewModel() {
 
     private var mLoadLuboInfoDisposable: Disposable? = null
 
-
-
     fun startloadLuboInfo() {
         mLoadLuboInfoDisposable = Flowable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
@@ -52,6 +53,24 @@ class HomeViewModel : BaseViewModel() {
     fun stopLoadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
         mLoadLuboInfoDisposable = null
+    }
+
+    fun preloadWindowAndLayout(){
+        WindowLayoutManager.getPreviewWindowInfo()
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+                logPrint2File(it)
+            })
+        WindowLayoutManager.getLayoutButtonInfo()
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+                logPrint2File(it)
+            })
+        ComputerModeManager.getComputerIndex()
     }
 
 

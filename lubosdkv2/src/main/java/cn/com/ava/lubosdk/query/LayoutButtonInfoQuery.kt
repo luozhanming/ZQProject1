@@ -1,6 +1,7 @@
 package cn.com.ava.lubosdk.query
 
 import cn.com.ava.lubosdk.AVATable
+import cn.com.ava.lubosdk.Cache
 import cn.com.ava.lubosdk.IQuery
 import cn.com.ava.lubosdk.entity.LayoutButtonInfo
 import cn.com.ava.lubosdk.entity.ListWrapper
@@ -34,6 +35,7 @@ class LayoutButtonInfoQuery(
             info.isCurLayout = split2[1] == curLayout
             cmds.add(info)
         }
+        Cache.getCache().saveLayoutInfos(cmds);
         return ListWrapper(cmds)
     }
 

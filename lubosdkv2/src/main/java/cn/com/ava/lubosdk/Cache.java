@@ -3,6 +3,7 @@ package cn.com.ava.lubosdk;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.com.ava.lubosdk.entity.LayoutButtonInfo;
 import cn.com.ava.lubosdk.entity.LuBoInfo;
 import cn.com.ava.lubosdk.entity.PreviewVideoWindow;
 
@@ -21,8 +22,11 @@ public class Cache {
      * */
     private long systemTime = 0L;
 
+    private List<LayoutButtonInfo> layoutInfoCaches;
+
     private Cache() {
         windowsCache = new ArrayList<>();
+        layoutInfoCaches= new ArrayList<>();
     }
 
 
@@ -49,6 +53,15 @@ public class Cache {
     public PreviewVideoWindow getWindowsByIndex(int index) {
         if (index > windowsCache.size()) return null;
         return windowsCache.get(index - 1);
+    }
+
+    public void saveLayoutInfos(List<LayoutButtonInfo> infos){
+        layoutInfoCaches.clear();
+        layoutInfoCaches.addAll(infos);
+    }
+
+    public List<LayoutButtonInfo> getLayoutInfosCache(){
+        return layoutInfoCaches;
     }
 
     public List<PreviewVideoWindow> getWindowsCache() {

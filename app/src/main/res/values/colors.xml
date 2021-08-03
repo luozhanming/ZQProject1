@@ -18,6 +18,12 @@
     <color name="color_white">#FFFFFF</color>
     <color name="color_318EF8_60">#99318EF8</color>
     <color name="color_white_50">#80FFFFFF</color>
+    <color name="color_E4E9F0">#E4E9F0</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_FF4646">#FF4646</color>
+    <color name="color_C6D0DE">#C6D0DE</color>
 
+    <color name="color_333333">#333333</color>
     <color name="color_black_50">#80000000</color>
+
 </resources>
