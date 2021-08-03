@@ -1,9 +1,13 @@
 package cn.com.ava.base.ui
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.PopupWindow
 import androidx.annotation.LayoutRes
+
 
 abstract class BasePopupWindow(val context: Context) : PopupWindow(context) {
 
@@ -14,13 +18,15 @@ abstract class BasePopupWindow(val context: Context) : PopupWindow(context) {
         width = options.width
         height = options.height
         isOutsideTouchable = options.canTouchOutsideCancel
-        initView()
+        val dw = ColorDrawable(Color.TRANSPARENT)
+        setBackgroundDrawable(dw)
+        initView(root)
 
     }
 
     abstract fun getWindowOptions(): WindowOptions
 
-    fun initView() {
+    open fun initView(root:View) {
 
     }
 

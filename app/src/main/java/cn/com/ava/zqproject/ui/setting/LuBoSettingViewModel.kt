@@ -134,6 +134,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                                 isShowWakeUp.postValue(isShowWakeUp.value?.plus(1))
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
+                                checkCanBackShow()
                                 toastMsg.postValue(
                                     Utils.getApp().getString(R.string.toast_lubo_login_success)
                                 )

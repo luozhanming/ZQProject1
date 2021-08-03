@@ -1,8 +1,10 @@
 package cn.com.ava.base.ui
 
+import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.com.ava.common.util.logd
+import com.blankj.utilcode.util.Utils
 import io.reactivex.disposables.CompositeDisposable
 
 open class BaseViewModel: ViewModel() {
@@ -17,6 +19,11 @@ open class BaseViewModel: ViewModel() {
         logd("onCleared()")
         super.onCleared()
         mDisposables.dispose()
+    }
+
+
+    fun getResources():Resources{
+        return Utils.getApp().resources
     }
 
 

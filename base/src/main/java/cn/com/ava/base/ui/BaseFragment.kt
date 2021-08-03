@@ -17,11 +17,6 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
     protected lateinit var mBinding: B
 
-
-
-
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

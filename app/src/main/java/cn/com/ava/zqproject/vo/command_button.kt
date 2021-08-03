@@ -12,7 +12,7 @@ const val TYPE_PRE_STAGE = 4
 annotation class CommandButtonType
 
 
-interface CommandButton  {
+interface CommandButton {
 
     @CommandButtonType
     val type: Int
@@ -29,14 +29,25 @@ data class CompositeButton(
 
 }
 
-data class LayoutButton(val layoutIndex: Int) : CommandButton {
+data class LayoutButton(val layoutIndex: Int,var layoutDrawable:Int = -1,var layoutCmd:String = "") : CommandButton {
     override val type: Int
         get() = TYPE_VIDEO_LAYOUT
+
+    fun isCustom():Boolean = layoutCmd.contains("VC")
+
+    fun customIndex():Int{
+        if(isCustom()){
+           return layoutCmd.replace("VC","").toInt()
+        }else{
+            return 0
+        }
+    }
 
 }
 
 
-data class VideoWindowButton(val windowIndex: Int) : CommandButton {
+data class VideoWindowButton(val windowIndex: Int,var windowName:String = "视频${windowIndex+1}") : CommandButton {
+
     override val type: Int
         get() = TYPE_VIDEO
 
@@ -45,7 +56,7 @@ data class VideoWindowButton(val windowIndex: Int) : CommandButton {
 data class VideoPresetButton(
     val videoWindowIndex: Int,
     val presetIndex: Int
-) :CommandButton{
+) : CommandButton {
     override val type: Int
         get() = TYPE_PRE_STAGE
 
