@@ -50,7 +50,7 @@
             android:enabled="@{createGroupViewModel.selectedUser.size()>0}"
             android:background="@drawable/bg_text_button_1"
             android:text="@{String.format(@string/complete_format,createGroupViewModel.selectedUser.size() )}"
-            android:textColor="@drawable/selecter_text_color_2"
+            android:textColor="@drawable/selector_text_color_2"
             android:textSize="19sp"
             app:layout_constraintBottom_toTopOf="@+id/view5"
             app:layout_constraintEnd_toEndOf="parent"

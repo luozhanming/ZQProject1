@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="20dp"
+    android:layout_height="180dp">
+    
+    <SeekBar
+        android:id="@+id/sb_volume"
+        android:layout_width="180dp"
+        android:rotation="-90"
+        android:layout_gravity="center"
+        android:progressDrawable="@drawable/poseekbar"
+        android:splitTrack="false"
+        android:thumb="@null"
+        android:max="5"
+        android:thumbOffset="0dp"
+        android:layout_height="20dp"/>
+
+</FrameLayout>

@@ -6,7 +6,11 @@ import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.common.CommonPreference
 import com.blankj.utilcode.util.AppUtils
 import com.tencent.mmkv.MMKV
+import io.reactivex.exceptions.UndeliverableException
+import io.reactivex.functions.Consumer
+import io.reactivex.plugins.RxJavaPlugins
 import xcrash.XCrash
+import java.io.IOException
 
 class MyApp : Application() {
 
@@ -35,7 +39,31 @@ class MyApp : Application() {
             setLogFileMaintainDelayMs(1000)
         })
         MMKV.initialize(this, AppConfig.MMKV_PATH)
-
+        RxJavaPlugins.setErrorHandler(Consumer { e ->
+            var e = e
+            if (e is UndeliverableException) {
+                e = e.cause
+            }
+            if (e is IOException) {
+                // fine, irrelevant network problem or API that throws on cancellation
+                return@Consumer
+            }
+            if (e is InterruptedException) {
+                // fine, some blocking code was interrupted by a dispose call
+                return@Consumer
+            }
+            if (e is NullPointerException || e is IllegalArgumentException) {
+                // that's likely a bug in the application
+                //      Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+                return@Consumer
+            }
+            if (e is IllegalStateException) {
+                // that's a bug in RxJava or in a custom operator
+                // Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+                return@Consumer
+            }
+            //     Logger.l("Undeliverable exception");
+        })
 
     }
 }

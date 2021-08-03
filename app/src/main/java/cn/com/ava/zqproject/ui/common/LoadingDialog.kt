@@ -11,7 +11,7 @@ class LoadingDialog():BaseDialog() {
 
 
     override fun getWindowOptions(): WindowOptions {
-        return WindowOptions(SizeUtils.dp2px(400),SizeUtils.dp2px(200),Gravity.CENTER)
+        return WindowOptions(SizeUtils.dp2px(400),SizeUtils.dp2px(200),Gravity.CENTER,false)
     }
 
     override fun initView(root: View) {

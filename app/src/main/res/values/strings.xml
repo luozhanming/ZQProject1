@@ -83,5 +83,36 @@
     <string name="key_setting">按键设置</string>
     <string name="volume">音量</string>
 
+    <string name="auto_track">全自动</string>
+    <string name="mid_track">半自动</string>
+    <string name="hand_track">手动</string>
+    <string name="record_info">录制信息</string>
+    <string name="theme_mao">主题：</string>
+    <string name="teacher_format">主讲人：%s</string>
+    <string name="has_record_foramt">已录制：%s</string>
+    <string name="record_param">录制参数：%s</string>
+    <string name="file_space">文件空间：%s</string>
+    <string name="cpu_temperature">CPU温度：%s</string>
 
+    <string name="modify_theme_failed">修改失败</string>
+
+    <string name="video_window">视频窗口</string>
+    <string name="video_layout">视频布局</string>
+    <string name="preset_location">预置位</string>
+    <string name="custom_layout_format">自定义布局%d</string>
+    <string name="preset_position_format">预置位%d</string>
+    <string name="toast_max_button_add">当前最大添加按钮为9个</string>
+    <string name="preset_video_format">摄像头%d预置位%d</string>
+    <string name="reset">重置</string>
+
+    <string name="computer_scene">电脑画面</string>
+    <string name="live_scene">现场画面</string>
+
+    <string name="power_setting">录播设备电源选项</string>
+    <string name="power_setting_msg">（注：选择"关机"后，启动录播须手动开启录播设备电源）</string>
+    <string name="turnoff_machine">关机</string>
+    <string name="sleep_machine">休眠</string>
+    <string name="reload_machine">重启</string>
+    <string name="success">成功</string>
+    <string name="failed">失败</string>
 </resources>

@@ -8,23 +8,27 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
 import cn.com.ava.common.R
-
+import cn.com.ava.common.util.logd
+/**
+ * MVVM模式的dialog
+ *
+ * */
 abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.CommonDialogStyle) :
     DialogFragment(), MVVMView<B> {
 
 
-    protected val mBinding: B by lazy {
-        val binding = DataBindingUtil.inflate<B>(layoutInflater,getLayoutId(),null,false)
-        binding
-    }
+    protected lateinit var mBinding:B
 
     private var mDismissCallback: ((DialogInterface) -> Unit)? = null
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        logd("onCreateDialog")
         val dialog = Dialog(activity, style)
+        mBinding = DataBindingUtil.inflate(layoutInflater,getLayoutId(),null,false)
         mBinding.lifecycleOwner = this
-        initView(dialog.window.decorView)
+        dialog.setContentView(mBinding.root)
+        initView(mBinding.root)
         onDialogCreated(dialog)
         val windowOptions: WindowOptions = getWindowOptions()
         dialog.window.setLayout(windowOptions.width, windowOptions.height)
@@ -33,22 +37,25 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
         return dialog
     }
 
-    fun onDialogCreated(dialog: Dialog) {
+    open fun onDialogCreated(dialog: Dialog) {
         onBindViewModel2Layout(mBinding)
-        observeVM()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        logd("onViewCreated")
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        logd("onDissmiss")
         mDismissCallback?.invoke(dialog)
     }
 
     override fun onStart() {
         super.onStart()
+        observeVM()
         setWindowImmersive(true)
     }
 
@@ -71,6 +78,28 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
                     setUI()
                 }
             }
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releaseBinding()
+    }
+
+    private fun releaseBinding() {
+        mBinding.unbind()
+        try {
+            //  val fields = this::class.java.declaredFields  //错误的用法，父类的属性不能通过反射获取
+            val fields = BaseDialogV2::class.java.declaredFields
+            val mBinding = fields.firstOrNull {
+                it.name == "mBinding"
+            }
+            mBinding?.isAccessible = true
+            mBinding?.set(this,null)
+            logd("releaseBinding")
+        }catch (e:NoSuchFieldException){
+
         }
 
     }

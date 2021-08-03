@@ -3,13 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/videoResourceFragment">
+    app:startDestination="@id/splashFragment">
 
 
     <!--退出登录action-->
     <action
         android:id="@+id/action_back_to_login"
+        app:popUpTo="@navigation/navigation_main"
+        app:popUpToInclusive="true"
         app:destination="@id/loginFragment" />
+
+    <!--退出登录action-->
+    <action
+        android:id="@+id/action_back_to_lubo_setting"
+        app:popUpTo="@navigation/navigation_main"
+        app:popUpToInclusive="true"
+        app:destination="@id/luBoSettingFragment" />
 
 
 
@@ -78,6 +87,9 @@
         <action
             android:id="@+id/action_homeFragment_to_createMeetingFragment"
             app:destination="@id/createMeetingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_videoResourceFragment"
+            app:destination="@id/videoResourceFragment" />
     </fragment>
     <fragment
         android:id="@+id/recordFragment"

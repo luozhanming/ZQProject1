@@ -7,6 +7,10 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import cn.com.ava.common.R
 
+/**
+ * MVC模式的dialog
+ *
+ */
 abstract class BaseDialog(val style: Int = R.style.CommonDialogStyle) : DialogFragment() {
 
 
