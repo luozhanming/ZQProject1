@@ -36,14 +36,6 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
         }
 
         mBinding.btnPlayStop.setOnClickListener {
-//            if (isPlaying == true) {
-//                player.pause()
-//                isPlaying = false
-//            } else {
-//                player.resume()
-//                isPlaying = true
-//            }
-
             if (player.isPlaying == true) {
                 player.pause()
             } else {

@@ -1,7 +1,11 @@
 package cn.com.ava.zqproject.ui.videoResource
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -14,9 +18,14 @@ import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoResourceListBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
+import cn.com.ava.zqproject.ui.videoResource.dialog.DeleteVideoDialog
+import cn.com.ava.zqproject.ui.videoResource.dialog.SelectDiskDialog
 import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
+import cn.com.ava.zqproject.usb.UsbHelper
 import cn.com.ava.zqproject.vo.VideoResource
+import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
+import java.util.jar.Manifest
 
 class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>() {
 
@@ -25,6 +34,8 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
     private var mVideoResourceListItemAdapter by autoCleared<VideoResourceListItemAdapter>()
 
     private val mVideoResourceListViewModel by viewModels<VideoResourceListViewModel>()
+
+    private val usbHelper = UsbHelper.getHelper()
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_video_resource_list
@@ -57,10 +68,26 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                 }
 
                 override fun onDownload(data: RecordFilesInfo.RecordFile?) {
-                    if (data != null) {
-                        logd("下载")
-                        mVideoManageViewModel.downloadVideo(data)
-                    }
+                    var permission = PermissionUtils.permission(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    permission.callback(object : PermissionUtils.SingleCallback {
+                        @RequiresApi(Build.VERSION_CODES.N)
+                        override fun callback(
+                            isAllGranted: Boolean,
+                            granted: MutableList<String>,
+                            deniedForever: MutableList<String>,
+                            denied: MutableList<String>
+                        ) {
+                            if (isAllGranted == true) {
+                                logd("已同意用户申请权限, ${granted.toString()}")
+                                showSelectDiskDialog(data)
+                            } else {
+                                logd("用户拒绝申请权限, deniedForever: ${deniedForever.toString()}, denied: ${denied.toString()}")
+                            }
+                        }
+                    })
+                    // 申请权限
+                    permission.request()
                 }
 
                 override fun onUpload(data: RecordFilesInfo.RecordFile?) {
@@ -72,20 +99,31 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                 }
 
                 override fun onDelete(data: RecordFilesInfo.RecordFile?) {
-                    logd("删除")
+                    val dialog = DeleteVideoDialog("您确定要删除该视频吗？", {
+                        logd("删除")
+                    })
+                    dialog.show(childFragmentManager, "")
                 }
             })
         }
-
-//        mVideoResourceListItemAdapter?.setDatas(mVideoResources)
 
         mBinding.rvResourceList.adapter = mVideoResourceListItemAdapter
         mBinding.rvResourceList.layoutManager = LinearLayoutManager(requireContext())
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun showSelectDiskDialog(data: RecordFilesInfo.RecordFile?) {
+        val paths = UsbHelper.getUDiskPath()
+        logd("U盘路径: ${paths.toString()}")
+
+        val dialog = SelectDiskDialog(paths , {
+            logd("视频信息： $it")
+        })
+        dialog.show(childFragmentManager, "")
+    }
+
     override fun observeVM() {
         mVideoManageViewModel.videoResources.observe(viewLifecycleOwner) {
-            logd("获取视频资源成功")
             mVideoResourceListItemAdapter?.setDatas(it)
         }
         mVideoManageViewModel.refreshState.observe(viewLifecycleOwner) {

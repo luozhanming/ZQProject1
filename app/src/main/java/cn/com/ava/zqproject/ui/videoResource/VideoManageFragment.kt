@@ -47,6 +47,7 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
 
     override fun initView() {
         super.initView()
+
         mBinding.viewPager.apply {
             adapter = object : FragmentStateAdapter(this@VideoManageFragment) {
                 override fun getItemCount(): Int {
@@ -86,25 +87,24 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 搜索
         mBinding.ivSearch.setOnClickListener {
-//            findNavController().navigate(
-//                R.id.action_videoFragment_to_searchFragment,
-//                Bundle().apply {
-////                    putString("videos", GsonUtil.toJson(mVideoManageViewModel.videoResources))
-//                }
-//            )
-//            logd(GsonUtil.toJson(mVideoManageViewModel.videoResources))
-
-//            logd(Gson().toJson(mVideoManageViewModel.videoResources.value))
-
-            findNavController().navigate(VideoManageFragmentDirections.actionVideoFragmentToSearchFragment(GsonUtil.toJson(mVideoManageViewModel.videoResources.value)))
+            findNavController().navigate(
+                VideoManageFragmentDirections.actionVideoFragmentToSearchFragment(
+                    GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+                )
+            )
         }
         // 排序
         mBinding.ivSort.setOnClickListener {
-            findNavController().navigate(R.id.action_videoResourceFragment_to_videoPlayFragment)
+            mVideoManageViewModel.sortByFileSize()
+//            mVideoManageViewModel.sortByRecordTime()
         }
         // 批量管理
         mBinding.ivManage.setOnClickListener {
-            findNavController().navigate(R.id.action_videoFragment_to_manageFragment)
+            findNavController().navigate(
+                VideoManageFragmentDirections.actionVideoFragmentToManageFragment(
+                    GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+                )
+            )
         }
     }
 
