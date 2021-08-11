@@ -6,16 +6,25 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
+import cn.com.ava.common.util.GsonUtil
+import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoManageBinding
+import cn.com.ava.zqproject.ui.splash.SplashFragment
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.Gson
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
+
+    private val mVideoManageViewModel by viewModels<VideoManageViewModel>()
+
     private val mFragments: List<Fragment> by lazy {
         val fragments = arrayListOf<Fragment>()
         fragments.add(VideoResourceListFragment())
@@ -38,6 +47,7 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
 
     override fun initView() {
         super.initView()
+
         mBinding.viewPager.apply {
             adapter = object : FragmentStateAdapter(this@VideoManageFragment) {
                 override fun getItemCount(): Int {
@@ -77,15 +87,24 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 搜索
         mBinding.ivSearch.setOnClickListener {
-            findNavController().navigate(R.id.action_videoFragment_to_searchFragment)
+            findNavController().navigate(
+                VideoManageFragmentDirections.actionVideoFragmentToSearchFragment(
+                    GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+                )
+            )
         }
         // 排序
         mBinding.ivSort.setOnClickListener {
-
+            mVideoManageViewModel.sortByFileSize()
+//            mVideoManageViewModel.sortByRecordTime()
         }
         // 批量管理
         mBinding.ivManage.setOnClickListener {
-            findNavController().navigate(R.id.action_videoFragment_to_manageFragment)
+            findNavController().navigate(
+                VideoManageFragmentDirections.actionVideoFragmentToManageFragment(
+                    GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+                )
+            )
         }
     }
 

@@ -76,7 +76,6 @@
             app:enterAnim="@anim/slide_from_right"
             app:exitAnim="@anim/slide_to_left"
             app:destination="@id/homeFragment" />
-
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -92,6 +91,13 @@
             app:destination="@id/createMeetingFragment" />
         <action
             android:id="@+id/action_homeFragment_to_videoResourceFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoResourceFragment"
+            app:launchSingleTop="true" />
+
             app:destination="@id/videoResourceFragment" />
         <action
             android:id="@+id/action_homeFragment_to_listenerFragment"
@@ -139,18 +145,40 @@
             app:popExitAnim="@anim/pop_exit"
             app:destination="@id/searchVideoFragment"
             app:launchSingleTop="true"/>
+        <action
+            android:id="@+id/action_videoResourceFragment_to_videoPlayFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoPlayFragment"
+            app:launchSingleTop="true" />
     </fragment>
 
     <fragment android:id="@+id/manageResourceFragment"
         tools:layout="@layout/fragment_manage_resources"
         android:name="cn.com.ava.zqproject.ui.videoResource.ManageResourcesFragment">
-
+        <argument
+            android:name="videos"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 
     <fragment android:id="@+id/searchVideoFragment"
         tools:layout="@layout/fragment_search_video"
         android:name="cn.com.ava.zqproject.ui.videoResource.SearchVideoFragment">
-
+        <argument
+            android:name="videos"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_videoPlayFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoPlayFragment"
+            app:launchSingleTop="true"/>
     </fragment>
     <fragment
         android:id="@+id/listenerFragment"
@@ -161,4 +189,8 @@
         android:id="@+id/masterFragment"
         android:name="cn.com.ava.zqproject.ui.meeting.MasterFragment"
         android:label="MasterFragment" />
+    <fragment
+        android:id="@+id/videoPlayFragment"
+        android:name="cn.com.ava.zqproject.ui.videoResource.VideoPlayFragment"
+        android:label="VideoPlayFragment" />
 </navigation>

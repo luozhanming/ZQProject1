@@ -282,5 +282,37 @@ public class RecordFilesInfo implements QueryResult {
             return rawFileSize;
         }
 
+
+        @Override
+        public String toString() {
+            return "RecordFile{" +
+                    "rawFileName='" + rawFileName + '\'' +
+                    ", streamIndex='" + streamIndex + '\'' +
+                    ", fileSize='" + fileSize + '\'' +
+                    ", rtspUrl='" + rtspUrl + '\'' +
+                    ", classTheme='" + classTheme + '\'' +
+                    ", teacher='" + teacher + '\'' +
+                    ", recordBeginTime='" + recordBeginTime + '\'' +
+                    ", recordRawEndTime='" + recordRawEndTime + '\'' +
+                    ", recordEndTime='" + recordEndTime + '\'' +
+                    ", duration='" + duration + '\'' +
+                    ", rawDuration='" + rawDuration + '\'' +
+                    ", downloadUrl='" + downloadUrl + '\'' +
+                    ", rawFileSize=" + rawFileSize +
+                    ", recordRawBeginTime='" + recordRawBeginTime + '\'' +
+                    ", videoSize='" + videoSize + '\'' +
+                    ", GOP='" + GOP + '\'' +
+                    ", streamMode='" + streamMode + '\'' +
+                    ", fps='" + fps + '\'' +
+                    ", videoBps='" + videoBps + '\'' +
+                    ", videoCodecMode='" + videoCodecMode + '\'' +
+                    ", audioBps='" + audioBps + '\'' +
+                    ", sampleRate='" + sampleRate + '\'' +
+                    ", channelCount='" + channelCount + '\'' +
+                    ", sampleBit='" + sampleBit + '\'' +
+                    ", audioCodecMode='" + audioCodecMode + '\'' +
+                    ", downloadFileName='" + downloadFileName + '\'' +
+                    '}';
+        }
     }
 }
