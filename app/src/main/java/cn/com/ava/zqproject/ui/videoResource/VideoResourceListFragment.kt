@@ -262,8 +262,12 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvResourceList.adapter = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         unbindService()
         super.onDestroy()
     }

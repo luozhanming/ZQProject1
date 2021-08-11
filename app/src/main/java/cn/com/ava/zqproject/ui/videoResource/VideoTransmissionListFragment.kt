@@ -58,11 +58,15 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
         mBinding.rvTransmissionList.adapter = mVideoTransmissionListItemAdapter
     }
 
-
     override fun observeVM() {
         mVideoManageViewModel.transmissionVideos.observe(viewLifecycleOwner) {
             logd("更新传输列表")
             mVideoTransmissionListItemAdapter?.setDatas(it)
         }
+    }
+
+    override fun onDestroyView() {
+        mBinding.rvTransmissionList.adapter = null
+        super.onDestroyView()
     }
 }

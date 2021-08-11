@@ -317,8 +317,12 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         disposable?.dispose()
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
     }
 }

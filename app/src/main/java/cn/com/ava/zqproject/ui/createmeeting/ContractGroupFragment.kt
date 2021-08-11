@@ -103,8 +103,12 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvGroup.adapter = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
     }
 

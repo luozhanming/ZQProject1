@@ -126,9 +126,13 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvSelectedUser.adapter = null
         mBinding.viewPager.adapter = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
 
     }

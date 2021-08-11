@@ -70,9 +70,12 @@ class RecentCallFragment : BaseFragment<FragmentRecentCallBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvContractUser.adapter = null
-        super.onDestroy()
+        super.onDestroyView()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

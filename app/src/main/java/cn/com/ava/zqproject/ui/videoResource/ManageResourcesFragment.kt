@@ -243,8 +243,12 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvResourceList.adapter = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         unbindService()
         super.onDestroy()
     }
