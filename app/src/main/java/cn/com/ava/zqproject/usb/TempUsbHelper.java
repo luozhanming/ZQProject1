@@ -5,11 +5,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.blankj.utilcode.util.Utils;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,32 +25,27 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.documentfile.provider.DocumentFile;
-
-import cn.com.ava.common.util.LoggerUtil;
 import cn.com.ava.common.util.LoggerUtilKt;
 import cn.com.ava.lubosdk.entity.RecordFilesInfo;
 
-public class UsbHelper {
+public class TempUsbHelper {
 
     public static final String DIRECTORY_DOWNLOAD = "AVADownload";
     /**最大下载队列个数*/
-    private static final int MAX_QUEUE_COUNT = 10;
+    private static final int MAX_QUEUE_COUNT = 3;
 
-    private static UsbHelper sInstance;
+    private static TempUsbHelper sInstance;
 
     private Map<DownloadObject< RecordFilesInfo.RecordFile>, UDiskDownloadTask> mTasks = new LinkedHashMap<>();
     private ArrayBlockingQueue<DownloadObject< RecordFilesInfo.RecordFile>> mDownloadQueue = new ArrayBlockingQueue<>(MAX_QUEUE_COUNT);
     private Executor mExecutor;
     private Uri mUSBUri;
-    private List<FileDownloadCallback> mDLCallbackList = new ArrayList<>();  //注意释放
+    private List<TempUsbHelper.FileDownloadCallback> mDLCallbackList = new ArrayList<>();  //注意释放
+    private String downloadPath;
 
-
-    public static UsbHelper getHelper() {
+    public static TempUsbHelper getHelper() {
         if (sInstance == null) {
-            sInstance = new UsbHelper();
+            sInstance = new TempUsbHelper();
         }
         return sInstance;
     }
@@ -119,7 +118,7 @@ public class UsbHelper {
      * @param callback
      * @return 返回下载句柄，用于解注册用
      */
-    public synchronized int registerDownloadCallback(FileDownloadCallback callback) {
+    public synchronized int registerDownloadCallback(TempUsbHelper.FileDownloadCallback callback) {
         if (!mDLCallbackList.contains(callback)) {
             mDLCallbackList.add(callback);
         }
@@ -178,51 +177,40 @@ public class UsbHelper {
                 }
             }
         }
-        if (mUSBUri == null) {
-            ToastUtils.showShort("未授予U盘访问权限");
-        } else {
-            final DocumentFile documentFile = DocumentFile.fromTreeUri(Utils.getApp(), mUSBUri);
-            DocumentFile downloadDirectory = documentFile.findFile(DIRECTORY_DOWNLOAD);
-            if (downloadDirectory == null) {
-                downloadDirectory = documentFile.createDirectory(DIRECTORY_DOWNLOAD);
-            }
-            DocumentFile file = downloadDirectory.findFile(name);
-            if (file == null) {
-                file = downloadDirectory.createFile("video/mp4", name);
-            } else {
-                file.delete();
-                file = downloadDirectory.createFile("video/mp4", name);
-            }
+
             if (mExecutor == null) {
                 mExecutor = Executors.newSingleThreadExecutor();
             }
             DownloadObject<RecordFilesInfo.RecordFile> download = new DownloadObject<>(src);
 
-            UDiskDownloadTask task = new UDiskDownloadTask(download, file);
+            File saveFile = new File(new File(downloadPath), "download/" + name);
+            if(!saveFile.getParentFile().exists()) {
+                saveFile.getParentFile().mkdirs();
+            }
+            DocumentFile docFile = DocumentFile.fromFile(saveFile);
+            UDiskDownloadTask task = new UDiskDownloadTask(download, docFile);
             task.executeOnExecutor(mExecutor, "");
             mTasks.put(download, task);
-        }
     }
 
     void notifyDownloadStateChanged(DownloadObject<RecordFilesInfo.RecordFile> download,
-                                            String dstPath,
-                                            @DownloadObject.DownloadState int state,
-                                            int progress) {
+                                    String dstPath,
+                                    @DownloadObject.DownloadState int state,
+                                    int progress) {
         download.setState(state);
         for (int i = 0, size = mDLCallbackList.size(); i < size; i++) {
-            final FileDownloadCallback callback = mDLCallbackList.get(i);
+            final TempUsbHelper.FileDownloadCallback callback = mDLCallbackList.get(i);
             callback.onDownloadStateChanged(download, dstPath, state, progress);
         }
-
-        if(state==DownloadObject.IN_QUEUE){
+//        if(state==DownloadObject.IN_QUEUE){
 //            LoggerUtilKt.logd(this,String.format("%s加入下载队列",download.getObj().getDownloadFileName()));
-        }else if(state==DownloadObject.DOWNLOADING){
+//        }else if(state==DownloadObject.DOWNLOADING){
 //            LoggerUtilKt.logd(this,String.format("%s下载中，进度%d%",download.getObj().getDownloadFileName(),progress));
-        }else if(state==DownloadObject.SUCCESS){
+//        }else if(state==DownloadObject.SUCCESS){
 //            LoggerUtilKt.logd(this,String.format("%s下载成功，保存至%s",download.getObj().getDownloadFileName(),dstPath));
-        }else if(state==DownloadObject.FAILED){
+//        }else if(state==DownloadObject.FAILED){
 //            LoggerUtilKt.logd(this,String.format("%s下载失败",download.getObj().getDownloadFileName()));
-        }
+//        }
     }
 
     /**
@@ -260,6 +248,10 @@ public class UsbHelper {
 
     public void setUsbStorageUri(Uri uri) {
         mUSBUri = uri;
+    }
+
+    public void setDownloadPath(String downloadPath) {
+        this.downloadPath = downloadPath;
     }
 
     public Uri getUSBUri() {

@@ -17,7 +17,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 /**
  * IJKPlayer
  */
-public class IjkVideoPlayer implements VideoPlayer {
+public class WYVideoPlayer implements VideoPlayer {
 
 
     private IjkMediaPlayer mPlayer;
@@ -40,7 +40,7 @@ public class IjkVideoPlayer implements VideoPlayer {
     }
 
 
-    public IjkVideoPlayer() {
+    public WYVideoPlayer() {
         this.mPlayer = new IjkMediaPlayer();
     }
 
@@ -69,8 +69,8 @@ public class IjkVideoPlayer implements VideoPlayer {
             mPlayer.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(IMediaPlayer iMediaPlayer) {
-                    mCallback.onStart();
                     iMediaPlayer.start();
+                    mCallback.onStart();
                 }
             });
             mPlayer.setOnCompletionListener(new IMediaPlayer.OnCompletionListener() {
@@ -101,13 +101,13 @@ public class IjkVideoPlayer implements VideoPlayer {
                                 stopThreshold = 0;
                             }
                             lastVideoBytes = bytes;
-                            if (stopThreshold >= 10) {
-                                disposable.dispose();
-                                mCallback.notifyRemoteStop();
-                                stopThreshold = 0;
-                                ToastUtils.showShort("啦啦啦");
-                                startPlay(url,mCallback);
-                            }
+//                            if (stopThreshold >= 10) {
+//                                disposable.dispose();
+//                                mCallback.notifyRemoteStop();
+//                                stopThreshold = 0;
+//                                ToastUtils.showShort("啦啦啦");
+//                                startPlay(url,mCallback);
+//                            }
                         }
                     }, new Consumer<Throwable>() {
                         @Override
@@ -158,7 +158,7 @@ public class IjkVideoPlayer implements VideoPlayer {
             mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,  "max_cached_duration", 3); //300
             //    ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "nobuffer");
             mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_frame", 0);
-      //      mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"fflags","nobuffer");
+            //      mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"fflags","nobuffer");
         }else {
             mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 20000);
             mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "buffer_size", 1024*900);
@@ -208,6 +208,11 @@ public class IjkVideoPlayer implements VideoPlayer {
     @Override
     public void seekTo(long pos) {
         mPlayer.seekTo(pos);
+        mPlayer.start();
+    }
+
+    public void start() {
+        mPlayer.start();
     }
 
     @Override
