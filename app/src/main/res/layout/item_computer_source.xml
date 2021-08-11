@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="source"
+            type="cn.com.ava.zqproject.vo.InteractComputerSource" />
+    </data>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity = "center"
+        android:layout_marginBottom="16dp"
+        android:selected="@{source.curSelected}"
+        android:background="@drawable/bg_button_7">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@{source.name}"
+            android:textColor="@drawable/selector_text_color_3"
+            android:textSize="19sp" />
+
+    </FrameLayout>
+</layout>

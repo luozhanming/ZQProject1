@@ -7,6 +7,9 @@ import cn.com.ava.base.ui.BasePopupWindow
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.zqproject.R
 
+/**
+ * 音量窗口
+ * */
 class VolumePopupWindow(context: Context, val onVolumeChanged: ((Int) -> Unit)? = null) :
     BasePopupWindow(context) {
 

@@ -12,7 +12,9 @@ import cn.com.ava.zqproject.databinding.DialogKeyControlBinding
 import cn.com.ava.zqproject.ui.record.adapter.CustomKeyAdapter
 import cn.com.ava.zqproject.vo.CommandButton
 import cn.com.ava.zqproject.vo.StatefulView
-
+/**
+ * 已选择按键对话框
+ * */
 class KeyControlDialog : BaseDialogV2<DialogKeyControlBinding>() {
 
     private val mKeyControlViewModel by viewModels<KeyControlViewModel>()

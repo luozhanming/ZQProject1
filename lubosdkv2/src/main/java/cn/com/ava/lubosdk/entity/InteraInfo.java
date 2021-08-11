@@ -6,7 +6,7 @@ import java.util.List;
 
 public class InteraInfo implements QueryResult{
     @SerializedName("rmma_id")
-    private int rmmaId;
+    private String rmmaId;
     @SerializedName("max_rcv_count")
     /**最大互动数*/
     private int maxRcvCount;
@@ -16,14 +16,14 @@ public class InteraInfo implements QueryResult{
     @SerializedName("onlineList")
     /**在线互动用户列表*/
     private List<LinkedUser> onlineList;
-    /**互动布局*/
+    /**互动布局（第一个为窗口数)*/
     private List<Integer> layout;
 
-    public int getRmmaId() {
+    public String getRmmaId() {
         return rmmaId;
     }
 
-    public void setRmmaId(int rmmaId) {
+    public void setRmmaId(String rmmaId) {
         this.rmmaId = rmmaId;
     }
 

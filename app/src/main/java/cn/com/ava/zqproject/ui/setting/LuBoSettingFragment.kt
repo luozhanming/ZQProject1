@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.Extra
@@ -66,19 +67,28 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
         mLuboSettingViewModel.showLoading.observe(viewLifecycleOwner) {
             mMainViewModel.isShowLoading.postValue(it)
         }
-        mLuboSettingViewModel.isShowWakeUp.observe(viewLifecycleOwner){
-            if(it!=0){
-                if(mWakeupMachineDialog==null){
-                    mWakeupMachineDialog = ConfirmDialog(Utils.getApp().getString(R.string.tips_lubo_need_wake_up),false,
-                        {dialog->
-                            dialog?.dismiss()
-                            mLuboSettingViewModel.wakeupMachine()
-                        },{dialog->
-                            dialog?.dismiss()
-                        })
+        mLuboSettingViewModel.isShowWakeUp.observe(viewLifecycleOwner) {
+            if (it != 0) {
+
+                mWakeupMachineDialog = mWakeupMachineDialog ?: ConfirmDialog(Utils.getApp()
+                    .getString(R.string.tips_lubo_need_wake_up),
+                    false,
+                    { dialog ->
+                        dialog?.dismiss()
+                        mLuboSettingViewModel.wakeupMachine()
+                    },
+                    { dialog ->
+                        dialog?.dismiss()
+                    })
+                if(mWakeupMachineDialog?.isAdded==false){
+                    mWakeupMachineDialog?.show(childFragmentManager,"wakeup_confirm")
+
                 }
+
             }
         }
+
+
 
     }
 
@@ -109,9 +119,11 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
     override fun onBackPressed(): Boolean {
         logd("onBackPressed")
         if (LoginManager.isLogin() && PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null) {
-            if (!findNavController().popBackStack()) {   //无法popup证明没有loginFragment
-                findNavController().navigate(R.id.action_back_to_login)
-            }
+            findNavController().navigate(R.id.action_back_to_login, null, navOptions {
+                popUpTo(R.id.luBoSettingFragment) {
+                    inclusive = true
+                }
+            })
         }
         return true
     }

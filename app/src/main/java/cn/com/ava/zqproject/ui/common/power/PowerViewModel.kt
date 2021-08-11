@@ -50,12 +50,6 @@ class PowerViewModel:BaseViewModel() {
             })
     }
 
-
-
-
-
-
-
     fun turnoffMachine() {
         PowerManager.turnOffMachine()
             .subscribeOn(Schedulers.io())

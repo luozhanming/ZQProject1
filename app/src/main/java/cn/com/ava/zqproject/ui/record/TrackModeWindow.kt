@@ -10,6 +10,7 @@ import cn.com.ava.lubosdk.Constant
 import cn.com.ava.zqproject.R
 
 /**
+ * 跟踪模式选择窗口
  * @param context
  * @param trackMode 自动模式
  * @param callback 回调

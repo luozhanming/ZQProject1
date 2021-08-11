@@ -20,7 +20,9 @@ import cn.com.ava.zqproject.vo.StatefulView
 import cn.com.ava.zqproject.vo.VideoPresetButton
 import cn.com.ava.zqproject.vo.VideoWindowButton
 import com.blankj.utilcode.util.ToastUtils
-
+/**
+ * 按键设置对话框
+ * */
 class KeySettingDialog : BaseDialogV2<DialogKeySettingBinding>() {
 
     private val mKeySettingViewModel by viewModels<KeySettingViewModel>()
@@ -51,7 +53,6 @@ class KeySettingDialog : BaseDialogV2<DialogKeySettingBinding>() {
                             ToastUtils.showShort(getString(R.string.toast_max_button_add))
                         }
                     }
-
                 })
         }
         mBinding.rvVideoWindow.adapter = mVideoWindowAdapter

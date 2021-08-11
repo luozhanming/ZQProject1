@@ -3,7 +3,9 @@ package cn.com.ava.lubosdk.control
 import cn.com.ava.lubosdk.IControl
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
-
+/**
+ * 会议主讲音量设置
+ * */
 class MeetingVolumeControl(
         val level: Int,
         val otherVolumeInfo:String,

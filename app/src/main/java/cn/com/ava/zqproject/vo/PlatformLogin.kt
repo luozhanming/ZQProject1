@@ -7,5 +7,5 @@ data class PlatformLogin(
     val id: String,
     val loginCount: Int,
     val name: String,
-    val token: String
+    var token: String
 )
