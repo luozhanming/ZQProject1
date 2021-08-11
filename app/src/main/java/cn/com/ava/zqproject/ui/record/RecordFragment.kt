@@ -29,7 +29,7 @@ import cn.com.ava.zqproject.ui.MainViewModel
  *     2.需求中的录播操作
  * </p>
  */
-class RecordFragment : BaseFragment<FragmentRecordBinding>() {
+class RecordFragment : BaseFragment<FragmentRecordBinding>(),SurfaceHolder.Callback {
 
     private val mRecordViewModel by viewModels<RecordViewModel>()
 
@@ -62,51 +62,8 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
 
     override fun initView() {
         initAnim()
-        mVideoPlayer = IjkVideoPlayer()
-        mBinding.videoView.holder.addCallback(object : SurfaceHolder.Callback {
-            override fun surfaceCreated(holder: SurfaceHolder) {
-                mVideoPlayer?.setSurface(holder.surface)
-                mVideoPlayer?.startPlay(
-                    "rtsp://${
-                        CommonPreference.getElement(
-                            CommonPreference.KEY_LUBO_IP,
-                            ""
-                        )
-                    }/stream/4?config.login=web", object : PlayerCallback {
-                        override fun onStart() {
-                            logd("Video player onStart()")
-                        }
 
-                        override fun onCompleted() {
-                            logd("Video player onComplete()")
-                        }
-
-                        override fun onError(error: Int) {
-                            logd("Video player onError(${error})")
-                        }
-
-                        override fun notifyRemoteStop() {
-                            logd("Video player notifyRemoteStop()")
-                        }
-
-                    })
-            }
-
-            override fun surfaceChanged(
-                holder: SurfaceHolder?,
-                format: Int,
-                width: Int,
-                height: Int
-            ) {
-
-            }
-
-            override fun surfaceDestroyed(holder: SurfaceHolder?) {
-                mVideoPlayer?.stopPlay()
-                mVideoPlayer?.release()
-            }
-
-        })
+        mBinding.videoView.holder.addCallback(this)
 
         mBinding.llRecord.setOnClickListener {
             mRecordViewModel.toggleRecord()
@@ -265,7 +222,6 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
         }
         mRecordViewModel.recordInfo.observe(viewLifecycleOwner) { info ->
             mTrackModeWindow?.setTrackMode(info.trackMode)
-
         }
         mRecordViewModel.isRecording.observe(viewLifecycleOwner) {
             breatheAnim?.apply {
@@ -295,8 +251,57 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>() {
 
     override fun onDestroyView() {
         cancelAnim()
+        mBinding.videoView.holder.removeCallback(this)
         super.onDestroyView()
     }
+
+
+
+        override fun surfaceCreated(holder: SurfaceHolder) {
+            mVideoPlayer = IjkVideoPlayer()
+            mVideoPlayer?.setSurface(holder.surface)
+            mVideoPlayer?.startPlay(
+                "rtsp://${
+                    CommonPreference.getElement(
+                        CommonPreference.KEY_LUBO_IP,
+                        ""
+                    )
+                }/stream/4?config.login=web", object : PlayerCallback {
+                    override fun onStart() {
+                        logd("Video player onStart()")
+                    }
+
+                    override fun onCompleted() {
+                        logd("Video player onComplete()")
+                    }
+
+                    override fun onError(error: Int) {
+                        logd("Video player onError(${error})")
+                    }
+
+                    override fun notifyRemoteStop() {
+                        logd("Video player notifyRemoteStop()")
+                    }
+
+                })
+        }
+
+        override fun surfaceChanged(
+            holder: SurfaceHolder?,
+            format: Int,
+            width: Int,
+            height: Int
+        ) {
+
+        }
+
+        override fun surfaceDestroyed(holder: SurfaceHolder?) {
+            mVideoPlayer?.stopPlay()
+            mVideoPlayer?.release()
+            mVideoPlayer = null
+        }
+
+
 
     private fun cancelAnim() {
         mBinding.topBar.clearAnimation()

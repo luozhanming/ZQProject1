@@ -122,14 +122,9 @@ class RecordViewModel : BaseViewModel() {
         )
     }
 
-    fun togglePause() {
-        val curState = recordInfo.value?.recordState ?: Constant.RECORD_RECORDING
-        var nextState = when (curState) {
-            Constant.RECORD_PAUSE -> Constant.RECORD_RESUME
-            else -> Constant.RECORD_PAUSE
-        }
+    fun toggleLive() {
         mDisposables.add(
-            RecordManager.controlRecord(nextState)
+            RecordManager.controlLiving(recordInfo.value?.isLiving?.not() ?: false)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
@@ -139,9 +134,14 @@ class RecordViewModel : BaseViewModel() {
         )
     }
 
-    fun toggleLive() {
+    fun togglePause() {
+        val curState = recordInfo.value?.recordState ?: Constant.RECORD_RECORDING
+        var nextState = when (curState) {
+            Constant.RECORD_PAUSE -> Constant.RECORD_RESUME
+            else -> Constant.RECORD_PAUSE
+        }
         mDisposables.add(
-            RecordManager.controlLiving(recordInfo.value?.isLiving?.not() ?: false)
+            RecordManager.controlRecord(nextState)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 

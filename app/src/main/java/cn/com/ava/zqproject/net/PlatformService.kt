@@ -1,12 +1,10 @@
 package cn.com.ava.zqproject.net
 
 import cn.com.ava.zqproject.net.PlatformApiManager.PATH_GET_INTERFACE
-import cn.com.ava.zqproject.vo.ContractGroup
-import cn.com.ava.zqproject.vo.ContractUser
-import cn.com.ava.zqproject.vo.PlatformResponse
-import cn.com.ava.zqproject.vo.PlatformSetting
+import cn.com.ava.zqproject.vo.*
 import io.reactivex.Observable
 import retrofit2.http.*
+import retrofit2.http.Query
 
 interface PlatformService {
 
@@ -47,12 +45,13 @@ interface PlatformService {
     /**
      * 刷新凭证
      * */
+    @FormUrlEncoded
     @POST("/{path}")
     fun refreshToken(
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_REFRESH_TOKEN
         ), @Field("token") token: String = ""
-    )
+    ):Observable<PlatformResponse<String>>
 
 
     /**
@@ -94,6 +93,30 @@ interface PlatformService {
         @Field("meetingTitle") meetingTitle: String = "",
         @Field("participantUserId") userId: String = ""
     )
+
+
+    @GET("/{path}")
+    fun requestUpgrade(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_APP_LATEST_VERSION
+        ),
+        @Query("platformIdentify") platformIdentify: Int = 1,/*平台标识:0-未知1-Android2-ios*/
+        @Query("softwareIdentity") softwareIdentity: Int = 1 /**/
+    ):Observable<PlatformResponse<AppUpgrade>>
+
+
+    /**
+     * 退出登录
+     * */
+    @FormUrlEncoded
+    @POST("/{path}")
+    fun logout(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_LOGOUT
+        ),
+        @Field("token") token: String="",/*平台标识:0-未知1-Android2-ios*/
+
+    ):Observable<PlatformResponse<Any>>
 
 
 }

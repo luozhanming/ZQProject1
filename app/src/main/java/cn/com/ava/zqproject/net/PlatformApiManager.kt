@@ -40,6 +40,9 @@ object PlatformApiManager {
 
     const val PATH_REFRESH_TOKEN = "refreshTokenUrl"
 
+    const val PATH_LOGOUT = "logoutUrl"
+
+
     @StringDef(PATH_GET_INTERFACE, PATH_WEBVIEW_LOGIN)
     annotation class PlatformPath
 
@@ -65,8 +68,6 @@ object PlatformApiManager {
             mInterfaceMap[fieldName] = value
         }
         logd(mInterfaceMap.toString())
-
-
     }
 
 

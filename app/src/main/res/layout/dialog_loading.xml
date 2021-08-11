@@ -12,6 +12,8 @@
         app:layout_constraintVertical_chainStyle="packed"
         android:layout_marginBottom="20dp"
         android:layout_height="80dp"
+        app:tint="@color/color_318EF8"
+        android:progressTint="@color/color_318EF8"
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

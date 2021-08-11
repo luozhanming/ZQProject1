@@ -18,7 +18,8 @@ data class PlatformSetting(
     val loginHtmlUrl: String,
     val platformId: String,
     val recentCallUrl: String,
-    val refreshTokenUrl: String
+    val refreshTokenUrl: String,
+    val logoutUrl:String
 )
 
 

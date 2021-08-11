@@ -119,4 +119,41 @@
     <string name="reload_machine">重启</string>
     <string name="success">成功</string>
     <string name="failed">失败</string>
+
+
+    <string name="machine_info">设备信息</string>
+    <string name="software_upgrade">软件升级</string>
+    <string name="click_upgrade">点击升级</string>
+    <string name="upgrade_tip">（升级过程中请勿断电，升级完成后须重启应用）</string>
+    <string name="info_format_1">设备型号：%s</string>
+    <string name="info_format_2">注册状态：%s</string>
+    <string name="info_format_3">设备版本：%s</string>
+    <string name="info_format_4">互动账号：%s</string>
+    <string name="info_format_5">录播IP：%s</string>
+    <string name="info_format_6">互动昵称：%s</string>
+    <string name="upgrade_message">有新版本是否更新？</string>
+    <string name="no_upgrade_message">暂无新版本</string>
+    <string name="logout">退出登录</string>
+    <string name="confirm_logout">是否退出登录？</string>
+    <string name="handup_speak">举手发言</string>
+    <string name="exit_meeting">退出会议</string>
+    <string name="over_meeting">解散会议</string>
+    <string name="tip_confirm_exit_meeting">确定退出当前会议？</string>
+    <string name="source_select">信号源选择</string>
+    <string name="meeting_num">会议号：</string>
+    <string name="meeting_psw">会议密码：</string>
+    <string name="meeting_begin_time">开始时间：</string>
+    <string name="meeting_master_name">发起方：</string>
+    
+    <string name="select_scene_signal">选择画面信号</string>
+    <string name="mic">麦克风</string>
+    <string name="loudspeaker">扬声器</string>
+    <string name="close">关闭</string>
+    <string name="scene_layout">画面布局</string>
+    <string name="member_manage">成员管理</string>
+
+    <string name="next_step">下一步</string>
+    <string name="last_step">上一步</string>
+    <string name="signal_format">信号%d:</string>
+
 </resources>

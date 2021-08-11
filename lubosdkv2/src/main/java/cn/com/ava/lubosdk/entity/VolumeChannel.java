@@ -19,6 +19,11 @@ public class VolumeChannel {
     //最大音量
     private int max;
 
+    /**
+     * 矫正静音音量
+     * */
+    private int adapteVolumeLevel;
+
     public String getChannelName() {
         return channelName;
     }
@@ -36,8 +41,9 @@ public class VolumeChannel {
     }
 
     public boolean isSilent() {
-        return volumnLevel >= 256;
+        return volumnLevel>=256;
     }
+
 
     public boolean isEnable() {
         return enable;
@@ -70,5 +76,14 @@ public class VolumeChannel {
 
     public void setMax(int max) {
         this.max = max;
+    }
+
+
+    public int getAdapteVolumeLevel() {
+        return adapteVolumeLevel;
+    }
+
+    public void setAdapteVolumeLevel(int adapteVolumeLevel) {
+        this.adapteVolumeLevel = adapteVolumeLevel;
     }
 }

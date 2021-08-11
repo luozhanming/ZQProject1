@@ -91,6 +91,8 @@ class LuBoSettingViewModel : BaseViewModel() {
     }
 
 
+
+
     fun loadInitData() {
         val ip = CommonPreference.getElement(CommonPreference.KEY_LUBO_IP, "")
         val port = CommonPreference.getElement(CommonPreference.KEY_LUBO_PORT, "")
@@ -131,7 +133,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                         if (login.isLoginSuccess) {
                             if (login.isSleep) {  // 休眠弹出唤醒窗口
                                 logd("录播休眠中..")
-                                isShowWakeUp.postValue(isShowWakeUp.value?.plus(1))
+                                isShowWakeUp.postValue(1)
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
                                 checkCanBackShow()

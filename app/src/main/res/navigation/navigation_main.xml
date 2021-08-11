@@ -54,6 +54,9 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/luBoSettingFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_luBoSettingFragment_to_listenerFragment"
+            app:destination="@id/listenerFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -95,6 +98,13 @@
             app:destination="@id/videoResourceFragment"
             app:launchSingleTop="true" />
 
+            app:destination="@id/videoResourceFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_listenerFragment"
+            app:destination="@id/listenerFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_masterFragment"
+            app:destination="@id/masterFragment" />
     </fragment>
     <fragment
         android:id="@+id/recordFragment"
@@ -170,6 +180,15 @@
             app:destination="@id/videoPlayFragment"
             app:launchSingleTop="true"/>
     </fragment>
+    <fragment
+        android:id="@+id/listenerFragment"
+        tools:layout="@layout/fragment_listener"
+        android:name="cn.com.ava.zqproject.ui.meeting.ListenerFragment"
+        android:label="ListenerFragment" />
+    <fragment
+        android:id="@+id/masterFragment"
+        android:name="cn.com.ava.zqproject.ui.meeting.MasterFragment"
+        android:label="MasterFragment" />
     <fragment
         android:id="@+id/videoPlayFragment"
         android:name="cn.com.ava.zqproject.ui.videoResource.VideoPlayFragment"

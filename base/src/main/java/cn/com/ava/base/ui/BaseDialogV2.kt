@@ -29,12 +29,17 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
         mBinding.lifecycleOwner = this
         dialog.setContentView(mBinding.root)
         initView(mBinding.root)
+        bindListener()
         onDialogCreated(dialog)
         val windowOptions: WindowOptions = getWindowOptions()
         dialog.window.setLayout(windowOptions.width, windowOptions.height)
         dialog.window.setGravity(windowOptions.gravity)
         dialog.setCanceledOnTouchOutside(windowOptions.canTouchOutsideCancel)
         return dialog
+    }
+
+    open fun bindListener() {
+
     }
 
     open fun onDialogCreated(dialog: Dialog) {

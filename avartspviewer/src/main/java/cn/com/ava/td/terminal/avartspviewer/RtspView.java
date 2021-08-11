@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 
 import cn.com.ava.pd.main.JniHelper;
 
@@ -12,7 +13,7 @@ import cn.com.ava.pd.main.JniHelper;
  * AVA RTSP viewer
  * @author pananfly
  */
-public class RtspView extends SurfaceView{
+public class RtspView extends TextureView {
 
     //surface holder
     private SurfaceHolder mHolder;
@@ -49,7 +50,8 @@ public class RtspView extends SurfaceView{
         if(mRtspHelper == null){
             mRtspHelper = new JniHelper();
         }
-        if(mRtspHelper != null && getHolder() != null){
+        if(mRtspHelper != null && getSurfaceTexture() != null){
+
             int ret =  mRtspHelper.init(surface);
             return isLiveInit = (ret == 0);
         }

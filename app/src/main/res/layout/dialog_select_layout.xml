@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="selectLayoutViewModel"
+            type="cn.com.ava.zqproject.ui.meeting.SelectLayoutManagerViewModel" />
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="720dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dialog">
+
+        <ImageView
+            android:id="@+id/iv_close"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_text_button_1"
+            android:padding="5dp"
+            android:src="@mipmap/ic_close_2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/ll_step1"
+            android:layout_width="0dp"
+            android:layout_height="312dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/view15"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView29"
+            app:layout_constraintVertical_bias="0.0">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_layout_auto"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_AUTO}"
+                    android:src="@drawable/btn_layout_auto" />
+
+                <ImageView
+                    android:id="@+id/iv_layout_1"
+
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="32dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_1}"
+                    android:src="@drawable/btn_layout1" />
+
+                <ImageView
+                    android:id="@+id/iv_layout_2"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="32dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_2}"
+                    android:src="@drawable/btn_layout2" />
+
+                <ImageView
+                    android:id="@+id/iv_layout_3"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="32dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_3}"
+                    android:src="@drawable/btn_layout3" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="72dp"
+                android:layout_marginTop="36dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/iv_layout_4"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_4}"
+                    android:src="@drawable/btn_layout4" />
+
+                <ImageView
+                    android:id="@+id/iv_layout_6"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="32dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_6}"
+                    android:src="@drawable/btn_layout6" />
+
+                <ImageView
+                    android:id="@+id/iv_layout_8"
+                    android:layout_width="120dp"
+                    android:layout_height="72dp"
+                    android:selected="@{selectLayoutViewModel.layoutSelect==selectLayoutViewModel.LAYOUT_8}"
+                    android:layout_marginLeft="32dp"
+                    android:src="@drawable/btn_layout8" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView29"
+            style="@style/DialogTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/scene_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/btn_last_step"
+            android:layout_width="360dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="65dp"
+            android:background="@drawable/bg_text_button_1"
+            android:gravity="center"
+            android:text="@string/last_step"
+            android:textColor="@color/color_999999"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/btn_cancel"
+            android:layout_width="360dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="65dp"
+            android:background="@drawable/bg_text_button_1"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/color_999999"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/btn_sure"
+            android:layout_width="360dp"
+            android:layout_height="54dp"
+            android:background="@drawable/bg_text_button_1"
+            android:gravity="center"
+            android:text="@string/sure"
+            android:textColor="@drawable/selector_text_color_2"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_last_step"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_last_step"
+            app:layout_constraintTop_toTopOf="@+id/btn_last_step" />
+
+        <TextView
+            android:id="@+id/btn_next_step"
+            android:layout_width="360dp"
+            android:layout_height="54dp"
+            android:background="@drawable/bg_text_button_1"
+            android:gravity="center"
+            android:text="@string/next_step"
+            android:enabled="@{selectLayoutViewModel.layoutSelect!=null}"
+            android:textColor="@drawable/selector_text_color_2"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_cancel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_cancel"
+            app:layout_constraintTop_toTopOf="@+id/btn_cancel" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:background="@color/color_E2E2E2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view15" />
+
+        <View
+            android:id="@+id/view15"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginBottom="54dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/color_E2E2E2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{selectLayoutViewModel.step==selectLayoutViewModel.STEP_1?View.VISIBLE:View.GONE}"
+            app:constraint_referenced_ids="btn_next_step,ll_step1,btn_cancel" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group2"
+            android:layout_width="wrap_content"
+            android:visibility="@{selectLayoutViewModel.step==selectLayoutViewModel.STEP_2_1?View.VISIBLE:View.GONE}"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="nsl_step2" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_step2"
+            android:layout_width="wrap_content"
+            android:visibility="@{selectLayoutViewModel.step!=selectLayoutViewModel.STEP_1?View.VISIBLE:View.GONE}"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="btn_sure,btn_last_step" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsl_step2"
+            android:layout_width="0dp"
+            android:layout_height="440dp"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@+id/view15"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView29"
+            app:layout_constraintVertical_bias="0.0">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="176dp"
+                    android:layout_height="106dp"
+                    android:srcId="@{selectLayoutViewModel.bigLayoutDrawableId}"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="32dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="32dp" />
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

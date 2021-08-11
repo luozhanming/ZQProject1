@@ -33,7 +33,12 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
         super.onViewCreated(view, savedInstanceState)
         onBindViewModel2Layout(mBinding)
         initView()
+        bindListener()
         observeVM()
+
+    }
+
+    open fun bindListener() {
 
     }
 
@@ -80,11 +85,10 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
         logd("onStop")
     }
 
+
+
     override fun onDestroy() {
         super.onDestroy()
-        mBinding.unbind()
-        //反射释放
-        releaseBinding()
         logd("onDestroy")
     }
 
@@ -106,6 +110,9 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mBinding.unbind()
+        //反射释放
+        releaseBinding()
         logd("onDestroyView")
     }
 

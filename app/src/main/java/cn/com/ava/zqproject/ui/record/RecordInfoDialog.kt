@@ -55,9 +55,6 @@ class RecordInfoDialog : BaseDialogV2<DialogRecordinfoBinding>() {
     }
 
 
-    fun setRecordInfo(recordInfo:RecordInfo){
-
-    }
 
     override fun onBindViewModel2Layout(binding: DialogRecordinfoBinding) {
         binding.recordInfoViewModel = mRecordInfoViewModel

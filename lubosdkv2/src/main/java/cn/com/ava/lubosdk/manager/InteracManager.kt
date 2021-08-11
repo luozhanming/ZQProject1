@@ -1,6 +1,7 @@
 package cn.com.ava.lubosdk.manager
 
 import cn.com.ava.lubosdk.AVAHttpEngine
+import cn.com.ava.lubosdk.AVATable
 import cn.com.ava.lubosdk.NetResult
 import cn.com.ava.lubosdk.control.*
 import cn.com.ava.lubosdk.entity.*
@@ -1035,6 +1036,51 @@ object InteracManager {
             }
         }
 
+    }
+
+
+    /**
+     * 获取互动模式下音频通道信息
+     * */
+    fun getInteracVolumeChannels():Observable<List<VolumeChannel>>{
+        return Observable.create { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<ListWrapper<VolumeChannel>> {
+                    AVAHttpEngine.addQueryCommand(InteracVolumeChannelQuery(
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<VolumeChannel>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
+                    ))
+                }
+                emitter.onNext(result.datas)
+            }
+        }
+    }
+
+    /**
+     * 设置互动音频
+     * */
+    fun setInteracVolumeChannels(channelName:String,channelLevel:Int):Observable<Boolean>{
+        return Observable.create { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<ListWrapper<String>> {
+                    AVAHttpEngine.addQueryCommand(RawQuery(
+                        arrayOf(AVATable.ARM_EXTVOL_I),
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<String>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
+                    ))
+                }
+                val raw = result.datas[0]
+                val isSuccess = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        InteracVolumeControl(
+                            channelName,channelLevel,raw,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(isSuccess)
+            }
+        }
     }
 
 

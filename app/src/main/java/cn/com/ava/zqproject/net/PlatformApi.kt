@@ -21,8 +21,6 @@ object PlatformApi : BaseHttpApi() {
 
 
     override fun configOkHttpClient(builder: OkHttpClient.Builder) {
-
-
     }
 
     override fun getInterceptors(): List<Interceptor>? {
@@ -53,6 +51,12 @@ object PlatformApi : BaseHttpApi() {
 
     fun isCanLinkPlatform(): Boolean {
         return PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null
+    }
+
+    fun refreshLoginToken(token:String){
+        platformLogin?.apply {
+            this.token = token
+        }
     }
 
     fun getPlatformLogin():PlatformLogin?{

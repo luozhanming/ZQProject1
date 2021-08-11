@@ -37,7 +37,7 @@ class KeySettingViewModel : BaseViewModel() {
      * 用于恢复已选择按钮
      */
     private val selectedKey: MutableList<CommandButton> by lazy {
-        arrayListOf<CommandButton>()
+        arrayListOf()
     }
 
     /**
