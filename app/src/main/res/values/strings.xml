@@ -50,6 +50,9 @@
     <string name="no_disk_warning">未检测到U盘，请插入！</string>
     <string name="tip_remain_only_one_udisk">请拔出留下唯一一个U盘</string>
     <string name="tip_find_no_udisk">检测不到U盘设备</string>
+    <string name="sort_by_size">按文件大小</string>
+    <string name="sort_by_time">按录制时间</string>
+    <string name="batch_manage">批量管理</string>
 
     <string name="tip">提示</string>
     <string name="cancel">取消</string>

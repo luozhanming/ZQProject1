@@ -47,9 +47,9 @@ class DownloadService : Service() {
     }
 
     fun downloadVideo(data: RecordFilesInfo.RecordFile) {
-        logd("开始下载")
+
         thread {
-            logd(Thread.currentThread().toString())
+            logd("开始下载的线程：${Thread.currentThread().toString()}")
             UsbHelper.getHelper().downloadFile2UDisk(data, data.getDownloadFileName())
 
             UsbHelper.getHelper().registerDownloadCallback(object : UsbHelper.FileDownloadCallback {
@@ -67,7 +67,6 @@ class DownloadService : Service() {
                     }
                     downloadInfo.put(file?.obj?.downloadUrl, video)
                     mCallback?.onDownloadStateChanged(downloadInfo)
-                    logd("downloadInfo: ${downloadInfo.toString()}")
                     if (state == 1003) { // 下载完成需要移除
                         downloadInfo.remove(file?.obj?.downloadUrl)
                     }

@@ -113,7 +113,7 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
         mBinding.ivBack.setOnClickListener {
             onBackPressed()
         }
-        mLuboSettingViewModel.tabIndex.value = mTabIndex
+        mLuboSettingViewModel.tabIndex.value = 1
     }
 
     override fun onBackPressed(): Boolean {

@@ -7,12 +7,13 @@ import cn.com.ava.base.recyclerview.BaseViewHolder
 import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.ItemResourceListBinding
+import cn.com.ava.zqproject.vo.StatefulView
 import cn.com.ava.zqproject.vo.VideoResource
 
-class VideoResourceListItemAdapter(private val mCallback: VideoResourceListCallback? = null) : BaseAdapter<RecordFilesInfo.RecordFile>() {
+class VideoResourceListItemAdapter(private val mCallback: VideoResourceListCallback? = null) : BaseAdapter<StatefulView<RecordFilesInfo.RecordFile>>() {
 
-    override fun createDiffCallback(): AdapterDiffCallback<RecordFilesInfo.RecordFile> {
-        return object : AdapterDiffCallback<RecordFilesInfo.RecordFile>() {
+    override fun createDiffCallback(): AdapterDiffCallback<StatefulView<RecordFilesInfo.RecordFile>> {
+        return object : AdapterDiffCallback<StatefulView<RecordFilesInfo.RecordFile>>() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return oldList[oldItemPosition] == newList[newItemPosition]
             }
@@ -30,24 +31,24 @@ class VideoResourceListItemAdapter(private val mCallback: VideoResourceListCallb
     override fun getViewHolder(
         viewType: Int,
         binding: ViewDataBinding
-    ): BaseViewHolder<RecordFilesInfo.RecordFile, ViewDataBinding> {
-        return VideoResourceListViewHolder(binding, mCallback) as BaseViewHolder<RecordFilesInfo.RecordFile, ViewDataBinding>
+    ): BaseViewHolder<StatefulView<RecordFilesInfo.RecordFile>, ViewDataBinding> {
+        return VideoResourceListViewHolder(binding, mCallback) as BaseViewHolder<StatefulView<RecordFilesInfo.RecordFile>, ViewDataBinding>
     }
 
     /**
      * 定义一个操作回调
      * */
     interface VideoResourceListCallback {
-        fun onDidClickedItem(data:RecordFilesInfo.RecordFile?)
-        fun onDownload(data:RecordFilesInfo.RecordFile?)
-        fun onUpload(data:RecordFilesInfo.RecordFile?)
-        fun onDelete(data:RecordFilesInfo.RecordFile?)
+        fun onDidClickedItem(data:StatefulView<RecordFilesInfo.RecordFile>?)
+        fun onDownload(data:StatefulView<RecordFilesInfo.RecordFile>?)
+        fun onUpload(data:StatefulView<RecordFilesInfo.RecordFile>?)
+        fun onDelete(data:StatefulView<RecordFilesInfo.RecordFile>?)
     }
 
     class VideoResourceListViewHolder(binding: ViewDataBinding, val callback: VideoResourceListCallback? = null) :
-        BaseViewHolder<RecordFilesInfo.RecordFile, ItemResourceListBinding>(binding as ItemResourceListBinding) {
+        BaseViewHolder<StatefulView<RecordFilesInfo.RecordFile>, ItemResourceListBinding>(binding as ItemResourceListBinding) {
 
-        override fun setDataToBinding(binding: ItemResourceListBinding, data: RecordFilesInfo.RecordFile) {
+        override fun setDataToBinding(binding: ItemResourceListBinding, data: StatefulView<RecordFilesInfo.RecordFile>) {
             binding.video = data
         }
 
