@@ -16,13 +16,13 @@ class CamPreviewAdapter(val callback: ((PreviewVideoWindow) -> Unit)? = null) :
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val old = oldList[oldItemPosition]
                 val new = newList[newItemPosition]
-                return old.obj.windowName == old.obj.windowName
+                return old.obj.windowName == new.obj.windowName
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val old = oldList[oldItemPosition]
                 val new = newList[newItemPosition]
-                return old.obj.windowName == old.obj.windowName && old.isSelected == new.isSelected
+                return old.obj.windowName == new.obj.windowName && old.isSelected == new.isSelected
             }
 
         }

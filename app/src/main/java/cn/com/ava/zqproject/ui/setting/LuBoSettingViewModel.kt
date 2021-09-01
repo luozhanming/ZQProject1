@@ -3,6 +3,8 @@ package cn.com.ava.zqproject.ui.setting
 import android.text.TextUtils
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.LuBoSDK
@@ -13,7 +15,6 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.extension.toServerException
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
-import cn.com.ava.zqproject.ui.splash.SplashViewModel
 import com.blankj.utilcode.util.RegexUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
@@ -62,8 +63,8 @@ class LuBoSettingViewModel : BaseViewModel() {
     }
 
     //展示唤醒对话框
-    val isShowWakeUp: MutableLiveData<Int> by lazy {
-        MutableLiveData()
+    val isShowWakeUp: OneTimeLiveData<Int> by lazy {
+        OneTimeLiveData()
     }
 
     //跳到平台设置
@@ -77,20 +78,18 @@ class LuBoSettingViewModel : BaseViewModel() {
     }
 
     //展示toast
-    val toastMsg: MutableLiveData<String> by lazy {
-        MutableLiveData()
+    val toastMsg: OneTimeLiveData<String> by lazy {
+        OneTimeLiveData()
     }
 
     //展示加载框
-    val showLoading: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+    val showLoading: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
     val canBackShow: MutableLiveData<Boolean> by lazy {
         MutableLiveData()
     }
-
-
 
 
     fun loadInitData() {
@@ -116,29 +115,40 @@ class LuBoSettingViewModel : BaseViewModel() {
         if (RegexUtils.isIP(ip.value) && TextUtils.isDigitsOnly(port.value)) {
             LuBoSDK.init(ip.value!!, port.value!!, true)
         } else {//标记输入不正确
-            toastMsg.postValue(Utils.getApp().getString(R.string.toast_input_correct_lubo_info))
+            toastMsg.postValue(
+                OneTimeEvent(
+                    Utils.getApp().getString(R.string.toast_input_correct_lubo_info)
+                )
+            )
         }
         val platformAddr: String =
             CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")
         if (TextUtils.isEmpty(username.value) || TextUtils.isEmpty(password.value)) {
             // 提示用户名密码错误
-            toastMsg.postValue(Utils.getApp().getString(R.string.toast_input_account_psw))
+            toastMsg.postValue(
+                OneTimeEvent(
+                    Utils.getApp().getString(R.string.toast_input_account_psw)
+                )
+            )
         } else {  //尝试登录
-            showLoading.postValue(true)
+            showLoading.postValue(OneTimeEvent(true))
             mDisposables.add(
                 LoginManager.newLogin(username.value ?: "", password.value ?: "")
+                    .timeout(2000,TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
-                        showLoading.postValue(false)
+                        showLoading.postValue(OneTimeEvent(false))
                         if (login.isLoginSuccess) {
                             if (login.isSleep) {  // 休眠弹出唤醒窗口
                                 logd("录播休眠中..")
-                                isShowWakeUp.postValue(1)
+                                isShowWakeUp.postValue(OneTimeEvent(1))
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
                                 checkCanBackShow()
                                 toastMsg.postValue(
-                                    Utils.getApp().getString(R.string.toast_lubo_login_success)
+                                    OneTimeEvent(
+                                        Utils.getApp().getString(R.string.toast_lubo_login_success)
+                                    )
                                 )
                                 saveLuboAccount()
                                 if (TextUtils.isEmpty(platformAddr)) {
@@ -150,15 +160,19 @@ class LuBoSettingViewModel : BaseViewModel() {
                         } else {// 失败弹出提示并跳到录播设置页面
                             logd("录播登录失败..")
                             toastMsg.postValue(
-                                Utils.getApp().getString(R.string.toast_lubo_login_failed)
+                                OneTimeEvent(
+                                    Utils.getApp().getString(R.string.toast_lubo_login_failed)
+                                )
                             )
                         }
                     }, {
-                        showLoading.postValue(false)
+                        showLoading.postValue(OneTimeEvent(false))
                         logd("录播登录失败..")
                         logPrint2File(it)
                         toastMsg.postValue(
-                            Utils.getApp().getString(R.string.toast_lubo_login_failed)
+                            OneTimeEvent(
+                                Utils.getApp().getString(R.string.toast_lubo_login_failed)
+                            )
                         )
                     })
             )
@@ -172,7 +186,7 @@ class LuBoSettingViewModel : BaseViewModel() {
     fun loadPlatformInterface() {
         var addr = platformAddr.value
         if (TextUtils.isEmpty(addr)) {
-            toastMsg.postValue(Utils.getApp().getString(R.string.input_platform_addr))
+            toastMsg.postValue(OneTimeEvent(Utils.getApp().getString(R.string.input_platform_addr)))
             return
         }
         addr = if (addr?.startsWith("https://") == true || addr?.startsWith("http://") == true) {
@@ -181,35 +195,41 @@ class LuBoSettingViewModel : BaseViewModel() {
             "http://${addr}"
         }
 
-        showLoading.postValue(true)
+        showLoading.postValue(OneTimeEvent(true))
         mDisposables.add(
             PlatformApi.getService(addr).getInterface()
+                .timeout(2000,TimeUnit.MILLISECONDS)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    showLoading.postValue(false)
+                    PlatformApiManager.setApiPath(it.data)
                     checkCanBackShow()
+                    showLoading.postValue(OneTimeEvent(false))
                     toastMsg.postValue(
-                        Utils.getApp().getString(R.string.toast_platform_link_success)
+                        OneTimeEvent(Utils.getApp().getString(R.string.toast_platform_link_success))
                     )
                     CommonPreference.putElement(
                         CommonPreference.KEY_PLATFORM_ADDR,
                         addr
                     )
-                    PlatformApiManager.setApiPath(it.data)
+
                 }, {
-                    showLoading.postValue(false)
+                    showLoading.postValue(OneTimeEvent(false))
                     logPrint2File(it)
                     it.toServerException()?.apply {
-                        toastMsg.postValue(message)
+                        toastMsg.postValue(OneTimeEvent(message?:""))
                     } ?: toastMsg.postValue(
-                        Utils.getApp().getString(R.string.toast_platform_link_failed)
+                        OneTimeEvent(
+                            Utils.getApp().getString(R.string.toast_platform_link_failed)
+                        )
                     )
                 })
         )
     }
 
-
+    /**
+     * 检查后退键是否可以出现
+     * */
     private fun checkCanBackShow() {
         if (LoginManager.isLogin() && PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null) {
             canBackShow.postValue(true)
@@ -227,22 +247,22 @@ class LuBoSettingViewModel : BaseViewModel() {
 
 
     fun wakeupMachine() {
-        showLoading.postValue(true)
+        showLoading.postValue(OneTimeEvent(true))
         mDisposables.add(
             PowerManager.wakeupMachine()
-            .flatMap {
-                Observable.timer(75, TimeUnit.SECONDS)
-            }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                //唤醒完登录
-                showLoading.postValue(false)
-                login()
-            }, {
-                showLoading.postValue(false)
-                logPrint2File(it)
-                ToastUtils.showShort(Utils.getApp().getString(R.string.wakeup_failed))
-            })
+                .flatMap {
+                    Observable.timer(75, TimeUnit.SECONDS)
+                }
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    //唤醒完登录
+                    showLoading.postValue(OneTimeEvent(false))
+                    login()
+                }, {
+                    showLoading.postValue(OneTimeEvent(false))
+                    logPrint2File(it)
+                    ToastUtils.showShort(Utils.getApp().getString(R.string.wakeup_failed))
+                })
         )
     }
 }

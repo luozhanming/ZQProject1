@@ -51,7 +51,7 @@ interface PlatformService {
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_REFRESH_TOKEN
         ), @Field("token") token: String = ""
-    ):Observable<PlatformResponse<String>>
+    ): Observable<PlatformResponse<String>>
 
 
     /**
@@ -102,7 +102,7 @@ interface PlatformService {
         ),
         @Query("platformIdentify") platformIdentify: Int = 1,/*平台标识:0-未知1-Android2-ios*/
         @Query("softwareIdentity") softwareIdentity: Int = 1 /**/
-    ):Observable<PlatformResponse<AppUpgrade>>
+    ): Observable<PlatformResponse<AppUpgrade>>
 
 
     /**
@@ -114,9 +114,23 @@ interface PlatformService {
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_LOGOUT
         ),
-        @Field("token") token: String="",/*平台标识:0-未知1-Android2-ios*/
+        @Field("token") token: String = "",/*平台标识:0-未知1-Android2-ios*/
 
-    ):Observable<PlatformResponse<Any>>
+    ): Observable<PlatformResponse<Any>>
+
+
+    /**
+     * 发送心跳
+     * @param rsAcct 互动账号
+     * */
+    @FormUrlEncoded
+    @POST("/{path}")
+    fun heartBeat(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_HEART_BEAT
+        ),
+        @Field("rsAcct") rsAcct: String = ""
+    ): Observable<PlatformResponse<Any>>
 
 
 }

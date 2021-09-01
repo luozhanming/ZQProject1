@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <data>
+        <variable
+            name="member"
+            type="cn.com.ava.zqproject.vo.MeetingMember" />
+    </data>
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp">
+        <TextView
+            android:id="@+id/textView38"
+            android:layout_width="92dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:text="林建国"
+            android:textColor="@color/color_333333"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView40"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            android:ellipsize="end"
+            android:text="汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅..."
+            android:textColor="@color/color_888888"
+            android:textSize="20sp"
+            android:layout_marginRight="90dp"
+            android:maxWidth="700dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/textView38"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/btn_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accept_enter"
+            android:textColor="@color/color_318EF8"
+            android:textSize="20sp"
+            android:padding="5dp"
+            android:background="@drawable/bg_text_button_1"
+            android:layout_marginRight="38dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginLeft="29dp"
+            android:layout_marginRight="29dp"
+            android:background="@color/color_E2E2E2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

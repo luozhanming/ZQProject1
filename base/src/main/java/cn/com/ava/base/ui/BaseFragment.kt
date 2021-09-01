@@ -35,7 +35,6 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
         initView()
         bindListener()
         observeVM()
-
     }
 
     open fun bindListener() {
@@ -74,6 +73,11 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        childFragmentManager.popBackStack()
+    }
+
     override fun onStart() {
         super.onStart()
         logd("onStart")
@@ -105,7 +109,6 @@ abstract class BaseFragment<B : ViewDataBinding> : Fragment(), MVVMView<B> {
         }catch (e:NoSuchFieldException){
 
         }
-
     }
 
     override fun onDestroyView() {

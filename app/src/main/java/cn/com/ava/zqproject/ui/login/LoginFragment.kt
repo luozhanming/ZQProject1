@@ -28,7 +28,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
     private val mWebView by lazy {
         val webView = WebViewUtil.getH5WebView()
-        webView.addJavascriptInterface(mLoginViewModel, "androidObj")
         webView
     }
 
@@ -98,6 +97,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         WebViewUtil.destroy(mWebView)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mWebView.addJavascriptInterface(mLoginViewModel, "androidObj")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mWebView.removeJavascriptInterface("androidObj")
     }
 
 }

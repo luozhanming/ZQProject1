@@ -20,6 +20,7 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommandKeyHelper
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentRecordBinding
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.MainViewModel
 
 /**
@@ -29,11 +30,10 @@ import cn.com.ava.zqproject.ui.MainViewModel
  *     2.需求中的录播操作
  * </p>
  */
-class RecordFragment : BaseFragment<FragmentRecordBinding>(),SurfaceHolder.Callback {
+class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolder.Callback {
 
     private val mRecordViewModel by viewModels<RecordViewModel>()
 
-    private val mMainViewModel by activityViewModels<MainViewModel>()
 
     override fun getLayoutId(): Int = R.layout.fragment_record
 
@@ -206,8 +206,8 @@ class RecordFragment : BaseFragment<FragmentRecordBinding>(),SurfaceHolder.Callb
 
 
     override fun observeVM() {
-        mRecordViewModel.isShowLoading.observe(viewLifecycleOwner) {
-            mMainViewModel.isShowLoading.postValue(it)
+        mRecordViewModel.isShowLoading.observeOne(viewLifecycleOwner) {
+            if(it)showLoading() else hideLoading()
         }
         mRecordViewModel.isControlVisible.observe(viewLifecycleOwner) { visible ->
             topVisibleAnim?.apply {

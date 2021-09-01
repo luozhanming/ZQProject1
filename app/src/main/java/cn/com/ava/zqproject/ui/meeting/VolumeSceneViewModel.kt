@@ -26,8 +26,6 @@ class VolumeSceneViewModel : BaseViewModel() {
 
     fun loadCamPreviewInfo() {
         mDisposables.add(
-            Observable.interval(0,1000,TimeUnit.MILLISECONDS)
-                .flatMap {
                     InteracManager.getSceneStream(true).map {
                         val windows = Cache.getCache().windowsCache
                         val cams = windows.filter {
@@ -46,7 +44,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                         )
                         info
                     }.subscribeOn(Schedulers.io())
-                }
+
            .subscribe({
             camPreviewInfo.postValue(it)
         }, {
@@ -72,6 +70,18 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     loadVolumeChannels()
+                },{
+                    logPrint2File(it)
+                })
+        )
+    }
+
+    fun postMainStream(i: Int) {
+        mDisposables.add(
+            InteracManager.postMainStream(i)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    loadCamPreviewInfo()
                 },{
                     logPrint2File(it)
                 })

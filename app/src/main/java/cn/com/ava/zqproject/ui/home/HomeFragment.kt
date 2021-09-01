@@ -1,11 +1,14 @@
 package cn.com.ava.zqproject.ui.home
 
+import android.os.Bundle
+import android.view.Gravity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import cn.com.ava.base.ui.BaseFragment
+import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentHomeBinding
@@ -14,15 +17,12 @@ import cn.com.ava.zqproject.ui.MainViewModel
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
+import cn.com.ava.zqproject.ui.meeting.MemberManagerDialog
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
 
     private val mHomeViewModel by viewModels<HomeViewModel>()
-
-    private val mMainViewModel by activityViewModels<MainViewModel>()
-
-    private val mLuboShareViewModel by activityViewModels<LuBoShareViewModel>()
 
     private val mPowerViewModel by viewModels<PowerViewModel>()
 
@@ -37,10 +37,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             findNavController().navigate(R.id.action_homeFragment_to_recordFragment)
         }
         mBinding.btnResource.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_videoResourceFragment)
+//            findNavController().navigate(R.id.action_homeFragment_to_videoResourceFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
         mBinding.btnJoinMeeting.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_masterFragment)
+
         }
 
         mBinding.ivSetting.setOnClickListener {
@@ -69,7 +71,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                 }
             }
-            popupMenu.showAsDropDown(mBinding.ivSetting)
+            popupMenu.showAtLocation(mBinding.ivSetting,Gravity.RIGHT or Gravity.TOP,-SizeUtils.dp2px(32),SizeUtils.dp2px(60))
         }
 
         //预加载相关
@@ -78,6 +80,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mHomeViewModel.loopRefreshToken()
     }
 
+    override fun onStart() {
+        super.onStart()
+        mHomeViewModel.startloadLuboInfo()
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        mHomeViewModel.stopLoadLuboInfo()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mHomeViewModel.startHeartBeat()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mHomeViewModel.stopHeartBeat()
+    }
 
     override fun onBindViewModel2Layout(binding: FragmentHomeBinding) {
         binding.homeViewModel = mHomeViewModel

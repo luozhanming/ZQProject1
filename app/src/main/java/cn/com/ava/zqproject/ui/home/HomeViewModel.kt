@@ -42,13 +42,15 @@ class HomeViewModel : BaseViewModel() {
     }
 
     private var mLoadLuboInfoDisposable: Disposable? = null
+    private var mSendHeartBeatDisposable:Disposable?=null
+
 
     fun startloadLuboInfo() {
-        mLoadLuboInfoDisposable = Flowable.interval(1000, TimeUnit.MILLISECONDS)
+        mLoadLuboInfoDisposable?.dispose()
+        mLoadLuboInfoDisposable = Observable.interval(5, TimeUnit.SECONDS)
             .flatMap {
                 GeneralManager.getLuboInfo()
                     .retryWhen(RetryFunction(Int.MAX_VALUE))
-                    .toFlowable(BackpressureStrategy.LATEST)
             }.subscribe({
                 luboInfo.postValue(it)
             }, {
@@ -61,21 +63,47 @@ class HomeViewModel : BaseViewModel() {
         mLoadLuboInfoDisposable = null
     }
 
+
+    /**
+     * 开始发送心跳
+     * */
+    fun startHeartBeat(){
+        mSendHeartBeatDisposable?.dispose()
+        mSendHeartBeatDisposable = Observable.interval(0,20, TimeUnit.SECONDS)
+            .flatMap {
+               PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr?:"")
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribe({
+                it.toString()
+            }, {
+                logPrint2File(it)
+                //发送心跳错误
+            })
+    }
+
+
+    /**
+     * 停止发送心跳
+     * */
+    fun stopHeartBeat(){
+        mSendHeartBeatDisposable?.dispose()
+    }
+
     fun preloadWindowAndLayout() {
-        WindowLayoutManager.getPreviewWindowInfo()
+        mDisposables.add(WindowLayoutManager.getPreviewWindowInfo()
             .subscribeOn(Schedulers.io())
             .subscribe({
 
             }, {
                 logPrint2File(it)
-            })
-        WindowLayoutManager.getLayoutButtonInfo()
+            }))
+        mDisposables.add(WindowLayoutManager.getLayoutButtonInfo()
             .subscribeOn(Schedulers.io())
             .subscribe({
 
             }, {
                 logPrint2File(it)
-            })
+            }))
         ComputerModeManager.getComputerIndex()
     }
 
@@ -87,6 +115,7 @@ class HomeViewModel : BaseViewModel() {
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    PlatformApi.logout()
                 }, {
                     logPrint2File(it)
                 })

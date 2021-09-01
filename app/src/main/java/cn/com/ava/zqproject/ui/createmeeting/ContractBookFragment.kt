@@ -105,9 +105,9 @@ class ContractBookFragment : BaseFragment<FragmentContractBookBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvContractUser.adapter = null
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     override fun onBindViewModel2Layout(binding: FragmentContractBookBinding) {

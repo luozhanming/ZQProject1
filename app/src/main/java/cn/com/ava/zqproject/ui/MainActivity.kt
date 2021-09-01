@@ -17,16 +17,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private val mLuboViewModel by viewModels<LuBoShareViewModel>()
 
-    /**
-     *  加载对话框
-     */
-    private val mLoadingDialog by lazy {
-        val dialog = LoadingDialog()
-        dialog.setDismissCallback {
-            mMainViewModel.isShowLoading.postValue(false)
-        }
-        dialog
-    }
+//    /**
+//     *  加载对话框
+//     */
+//    private val mLoadingDialog by lazy {
+//        val dialog = LoadingDialog()
+//        dialog.setDismissCallback {
+//            mMainViewModel.isShowLoading.postValue(false)
+//        }
+//        dialog
+//    }
 
 
     override fun getLayoutId(): Int {
@@ -34,18 +34,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
-        mMainViewModel.isShowLoading.observe(this) { show ->
-            if (show) {
-                if (!mLoadingDialog.isVisible) {
-                    mLoadingDialog.show(supportFragmentManager, "loading1")
-                }
-            } else {
-                mLoadingDialog.dismiss()
-            }
-        }
+//        mMainViewModel.isShowLoading.observe(this) { show ->
+//            if (show) {
+//                if (!mLoadingDialog.isVisible) {
+//                    mLoadingDialog.show(supportFragmentManager, "loading1")
+//                }
+//            } else {
+//                mLoadingDialog.dismiss()
+//            }
+//        }
 
     }
 

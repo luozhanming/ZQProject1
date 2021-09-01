@@ -19,14 +19,14 @@ import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentListenerBinding
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.MainViewModel
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 
-class ListenerFragment : BaseFragment<FragmentListenerBinding>(), SurfaceHolder.Callback {
+class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), SurfaceHolder.Callback {
 
 
     private val mListenerViewModel by viewModels<ListenerViewModel>()
-    private val mMainViewModel by activityViewModels<MainViewModel>()
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
 
     private var mExitMeetingDialog by autoCleared<ConfirmDialog>()
@@ -97,8 +97,8 @@ class ListenerFragment : BaseFragment<FragmentListenerBinding>(), SurfaceHolder.
     }
 
     override fun observeVM() {
-        mListenerViewModel.isShowLoading.observe(viewLifecycleOwner) {
-            mMainViewModel.isShowLoading.postValue(it)
+        mListenerViewModel.isShowLoading.observeOne(viewLifecycleOwner) {
+            if(it)showLoading() else hideLoading()
         }
         mListenerViewModel.isControlVisible.observe(viewLifecycleOwner) { visible ->
             topVisibleAnim?.apply {

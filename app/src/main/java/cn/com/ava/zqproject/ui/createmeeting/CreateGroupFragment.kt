@@ -96,8 +96,9 @@ class CreateGroupFragment : BaseFragment<FragmentCreateGroupBinding>() {
         binding.createGroupViewModel = mCreateGroupViewModel
     }
 
-    override fun onDestroy() {
+
+    override fun onDestroyView() {
         mBinding.rvContractUser.adapter = null
-        super.onDestroy()
+        super.onDestroyView()
     }
 }

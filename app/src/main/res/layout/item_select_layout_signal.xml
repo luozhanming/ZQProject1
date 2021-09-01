@@ -6,12 +6,15 @@
         <variable
             name="layoutsignal"
             type="cn.com.ava.zqproject.vo.LayoutSignalSelect" />
+
+        <import type="android.text.TextUtils"/>
     </data>
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
 
@@ -26,16 +29,30 @@
             android:textSize="16sp" />
 
         <FrameLayout
+            android:id="@+id/fl_spinner"
             android:layout_width="426dp"
             android:layout_height="47dp"
             android:background="@drawable/bg_spinner"
             android:layout_marginLeft="12dp">
 
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:spinnerMode="dropdown" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:textColor="@color/color_222222"
+                android:textSize="17sp"
+                android:layout_marginLeft="22dp"
+                android:text="@{TextUtils.isEmpty(layoutsignal.selectedMemeber.nickname)?@string/no_signal:layoutsignal.selectedMemeber.nickname}"
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content"/>
+
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_text_button_2"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="12dp"
+                android:src="@mipmap/ic_spinner_arrow"
+                android:padding="5dp"/>
         </FrameLayout>
 
 

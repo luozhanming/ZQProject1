@@ -43,6 +43,7 @@ object PlatformApiManager {
     const val PATH_LOGOUT = "logoutUrl"
 
 
+
     @StringDef(PATH_GET_INTERFACE, PATH_WEBVIEW_LOGIN)
     annotation class PlatformPath
 

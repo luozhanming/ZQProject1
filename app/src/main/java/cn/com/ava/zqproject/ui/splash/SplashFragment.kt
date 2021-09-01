@@ -53,7 +53,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (checkPermissions()) {
+        if (checkPermissions()) {  //检测必要权限
             //步骤1
             mSplashViewModel.login()
         }
@@ -85,7 +85,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     }
 
     override fun observeVM() {
-        mSplashViewModel.goWhere.observe(this) { it ->
+        mSplashViewModel.goWhere.observeOne(this) { it ->
             val go: () -> Unit = {
                 when (it) {
                     SplashViewModel.WHERE_LUBO_SETTING -> {
@@ -100,6 +100,9 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                     }
                     SplashViewModel.WHERE_PLATFORM_LOGIN -> {
                         findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+                    }
+                    SplashViewModel.WHERE_GO_HOME->{
+                        findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                     }
                 }
             }

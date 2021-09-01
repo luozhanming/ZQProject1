@@ -3,6 +3,8 @@ package cn.com.ava.zqproject.ui.meeting
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.ListenerInfo
@@ -34,8 +36,8 @@ class ListenerViewModel : BaseViewModel() {
     private var mLoopCurSceneSources: Disposable? = null
 
 
-    val isShowLoading: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+    val isShowLoading: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
     val listenerInfo: MutableLiveData<ListenerInfo> by lazy {
@@ -111,6 +113,7 @@ class ListenerViewModel : BaseViewModel() {
 
 
     fun loopLoadListenerInfo() {
+        isShowLoading.postValue(OneTimeEvent(true))
         mLoopListenerInfoDisposable =
             Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
                 .flatMap {
@@ -118,8 +121,10 @@ class ListenerViewModel : BaseViewModel() {
                         .subscribeOn(Schedulers.io())
                 }
                 .subscribe({
+                    isShowLoading.postValue(OneTimeEvent(false))
                     listenerInfo.postValue(it)
                 }, {
+                    isShowLoading.postValue(OneTimeEvent(false))
                     logPrint2File(it)
                 })
     }

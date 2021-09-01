@@ -74,7 +74,6 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         mTabLayoutMediator =
             TabLayoutMediator(mBinding.tabLayout, mBinding.viewPager) { tab, position ->
                 val textView = TextView(requireView().context)
-
                 val states = arrayOfNulls<IntArray>(2)
                 states[0] = intArrayOf(android.R.attr.state_selected)
                 states[1] = intArrayOf()
@@ -93,7 +92,7 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         mTabLayoutMediator?.attach()
         mBinding.btnCall.setOnClickListener {
             val dialog = CreateMeetingDialog { theme, nickname, waiting ->
-                ToastUtils.showShort("${theme},${nickname},${waiting}")
+                mCreateMeetingViewModel.createMeeting(theme,nickname,waiting)
             }
             dialog.show(childFragmentManager, "")
         }
@@ -126,10 +125,9 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvSelectedUser.adapter = null
         mBinding.viewPager.adapter = null
-        super.onDestroy()
-
+        super.onDestroyView()
     }
 }

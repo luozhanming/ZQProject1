@@ -18,7 +18,7 @@ import com.google.android.material.tabs.TabLayout
 class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.OnTabSelectedListener,
     SeekBar.OnSeekBarChangeListener {
 
-    private val mVolumeSceneViewModel by viewModels<VolumeSceneViewModel>()
+    private val mVolumeSceneViewModel by viewModels<VolumeSceneViewModel>({requireParentFragment()})
 
     override fun getWindowOptions(): WindowOptions {
         return WindowOptions(SizeUtils.dp2px(720), SizeUtils.dp2px(453), Gravity.CENTER)
@@ -26,6 +26,9 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
 
     override fun initView(root: View) {
         mBinding.tabLayout.addOnTabSelectedListener(this)
+        mBinding.previewWidget.onMainStreamSelected = {
+            i->mVolumeSceneViewModel.postMainStream(i)
+        }
         val tabNames =
             arrayOf(
                 getString(R.string.select_scene_signal),
@@ -35,7 +38,6 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
         tabNames.forEach {
             val tab = mBinding.tabLayout.newTab()
             val textView = TextView(context)
-
             val states = arrayOfNulls<IntArray>(2)
             states[0] = intArrayOf(android.R.attr.state_selected)
             states[1] = intArrayOf()
@@ -113,6 +115,11 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
         mVolumeSceneViewModel.loadVolumeChannels()
     }
 
+    override fun onDestroy() {
+        mBinding.previewWidget.onMainStreamSelected=null
+        super.onDestroy()
+    }
+
     override fun getLayoutId(): Int {
         return R.layout.dialog_volume_scene
     }
@@ -123,7 +130,11 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
 
     override fun observeVM() {
         mVolumeSceneViewModel.camPreviewInfo.observe(this) {
-            mBinding.previewWidget.setCamPreviewInfo(it)
+            //post用于让previewWidget在完全显示才执行，影响setCamPreviewInfo的正确显示
+            mBinding.previewWidget.post {
+                mBinding.previewWidget.setCamPreviewInfo(it)
+            }
+
         }
     }
 

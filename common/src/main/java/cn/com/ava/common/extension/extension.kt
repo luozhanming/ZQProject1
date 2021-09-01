@@ -5,6 +5,8 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.BounceInterpolator
+import android.widget.PopupWindow
+import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import cn.com.ava.common.R
 import cn.com.ava.common.util.Extra
@@ -46,29 +48,29 @@ inline fun Fragment.bindExtras() {
     }
 }
 
+/**
+ * 避免spinner展开时popupwindow获取焦点从而使导航栏出现
+ * */
+fun Spinner.avoidDropdownFocus(){
+    try {
+        val isAppCompat = this is androidx.appcompat.widget.AppCompatSpinner
+        val spinnerClass = if (isAppCompat) androidx.appcompat.widget.AppCompatSpinner::class.java else Spinner::class.java
+        val popupWindowClass = if (isAppCompat) androidx.appcompat.widget.ListPopupWindow::class.java else android.widget.ListPopupWindow::class.java
 
-fun View.bounceClick() {
-    val animate = AnimationUtils.loadAnimation(context, R.anim.scale_small).apply {
-        duration = 100
-        interpolator = BounceInterpolator()
+        val listPopup = spinnerClass
+            .getDeclaredField("mPopup")
+            .apply { isAccessible = true }
+            .get(this)
+        if (popupWindowClass.isInstance(listPopup)) {
+            val popup = popupWindowClass
+                .getDeclaredField("mPopup")
+                .apply { isAccessible = true }
+                .get(listPopup)
+            if (popup is PopupWindow) {
+                popup.isFocusable = false
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
-    this.animation = animate
-    animate.start()
-    animate.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {
-
-        }
-
-        override fun onAnimationEnd(animation: Animation?) {
-            this@bounceClick.animation.cancel()
-            this@bounceClick.animation = null
-            animate.setAnimationListener(null)
-        }
-
-        override fun onAnimationRepeat(animation: Animation?) {
-
-        }
-
-    })
-
 }

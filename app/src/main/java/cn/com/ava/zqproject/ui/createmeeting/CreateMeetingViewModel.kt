@@ -70,5 +70,16 @@ class CreateMeetingViewModel : BaseViewModel() {
 
     }
 
+    /**
+     * 创建会议
+     * @param theme 会议主题
+     * @param nickname 入会称呼
+     * @param waiting 是否开启等候室
+     * */
+    fun createMeeting(theme: String, nickname: String, waiting: Boolean) {
+        TODO()
+
+    }
+
 
 }

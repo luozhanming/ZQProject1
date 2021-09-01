@@ -20,6 +20,19 @@
         android:layout_height="match_parent"
         android:background="#000000">
 
+        <FrameLayout
+            android:id="@+id/fl_drag_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="#545454" />
+        </FrameLayout>
+
 
         <SurfaceView
             android:id="@+id/video_view"
@@ -30,6 +43,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <cn.com.ava.zqproject.ui.widget.SliceVideoView
+            android:id="@+id/video_top_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="h,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/topBar"
@@ -42,11 +65,13 @@
 
 
             <ImageView
+                android:id="@+id/iv_back"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="23dp"
                 android:padding="5dp"
+                android:background="@drawable/bg_text_button_2"
                 android:src="@mipmap/ic_back_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

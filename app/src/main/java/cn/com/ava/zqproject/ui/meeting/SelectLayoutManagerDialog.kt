@@ -4,14 +4,29 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.base.ui.BaseDialogV2
+import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.DialogSelectLayoutBinding
+import cn.com.ava.zqproject.ui.meeting.adapter.AutoPatrolMemberAdapter
+import cn.com.ava.zqproject.ui.meeting.adapter.SelectLayoutSignalAdapter
+import cn.com.ava.zqproject.vo.LayoutSignalSelect
+import cn.com.ava.zqproject.vo.StatefulView
 
 class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
 
     private val mSelectLayoutViewModel by viewModels<SelectLayoutManagerViewModel>()
+
+    private var mSelectLayoutSignalAdapter by autoCleared<SelectLayoutSignalAdapter>()
+
+    private var mSelectSignalPopupWindow by autoCleared<SignalSelectPopupWindow>()
+
+    private var mAutoPatrolMemberAdapter by autoCleared<AutoPatrolMemberAdapter>()
+
+
 
 
     override fun getWindowOptions(): WindowOptions {
@@ -29,15 +44,23 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
         }
         mBinding.btnCancel.setOnClickListener { dismiss() }
         val layoutClicked = View.OnClickListener {
-            when(it.id){
-                R.id.iv_layout_auto->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_AUTO
-                R.id.iv_layout_1->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_1
-                R.id.iv_layout_2->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_2
-                R.id.iv_layout_3->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_3
-                R.id.iv_layout_4->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_4
-                R.id.iv_layout_6->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_6
-                R.id.iv_layout_8->mSelectLayoutViewModel.layoutSelect.value = SelectLayoutManagerViewModel.LAYOUT_8
+            when (it.id) {
+                R.id.iv_layout_auto -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_AUTO
+                R.id.iv_layout_1 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_1
+                R.id.iv_layout_2 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_2
+                R.id.iv_layout_3 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_3
+                R.id.iv_layout_4 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_4
+                R.id.iv_layout_6 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_6
+                R.id.iv_layout_8 -> mSelectLayoutViewModel.layoutSelect.value =
+                    SelectLayoutManagerViewModel.LAYOUT_8
             }
+            mSelectLayoutViewModel.getInteracMemberInfo()
         }
         mBinding.ivLayoutAuto.setOnClickListener(layoutClicked)
         mBinding.ivLayout1.setOnClickListener(layoutClicked)
@@ -48,15 +71,39 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
         mBinding.ivLayout8.setOnClickListener(layoutClicked)
         mBinding.btnNextStep.setOnClickListener {
             val selectLayout = mSelectLayoutViewModel.layoutSelect.value!!
-            if(selectLayout==SelectLayoutManagerViewModel.LAYOUT_AUTO){
+            if (selectLayout == SelectLayoutManagerViewModel.LAYOUT_AUTO) {
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_2
-            }else{
+            } else {
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_1
             }
         }
         mBinding.btnLastStep.setOnClickListener {
             mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_1
         }
+        mBinding.rvLayoutSignal.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        mSelectLayoutSignalAdapter = SelectLayoutSignalAdapter{index,view->
+            // 在View下弹出选择框
+            mSelectSignalPopupWindow?.showAsDropDown(index,view,0,0)
+        }
+        mBinding.rvLayoutSignal.adapter = mSelectLayoutSignalAdapter
+
+        mSelectSignalPopupWindow = mSelectSignalPopupWindow?: SignalSelectPopupWindow(requireContext()){i,user->
+            mSelectLayoutViewModel.selectSignal(i,user)
+            mSelectSignalPopupWindow?.dismiss()
+        }
+        mBinding.btnSure.setOnClickListener {
+            val layoutMode = mSelectLayoutViewModel?.layoutSelect.value?:-1
+            if(layoutMode==SelectLayoutManagerViewModel.LAYOUT_AUTO){
+                mSelectLayoutViewModel.patrolSure(mAutoPatrolMemberAdapter?.getSelectedUser()?: emptyList())
+            }else{
+                mSelectLayoutViewModel.layoutSure()
+            }
+
+        }
+        mBinding.rvSelectWhatPatrol.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+        mAutoPatrolMemberAdapter = AutoPatrolMemberAdapter()
+        mBinding.rvSelectWhatPatrol.adapter = mAutoPatrolMemberAdapter
     }
 
     override fun getLayoutId(): Int {
@@ -68,6 +115,24 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
     }
 
     override fun observeVM() {
+        mSelectLayoutViewModel.layoutSignals.observe(this) {
+            mSelectLayoutSignalAdapter?.setDatas(it)
+        }
+        mSelectLayoutViewModel.unSelectSignals.observe(this){
+            mSelectSignalPopupWindow?.setDatas(it)
+        }
+        mSelectLayoutViewModel.layoutSure.observeOne(this){
+            dismiss()
+        }
+        mSelectLayoutViewModel.linkUsers.observe(this){
+            val statefuls = arrayListOf<StatefulView<LinkedUser>>()
+            it.forEach {
+                statefuls.add(StatefulView(it))
+            }
+            mAutoPatrolMemberAdapter?.setDatas(
+                statefuls
+            )
+        }
 
     }
 }

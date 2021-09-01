@@ -8,7 +8,7 @@ public class LinkedUser implements Comparable<Integer> {
     private String username;
     private String nickname;
     @SerializedName("short_num")
-    private int shortNumer;
+    private String shortNumer;
     @SerializedName("online_state")
     /**在线状态*/
     private int onlineState;
@@ -39,11 +39,11 @@ public class LinkedUser implements Comparable<Integer> {
         this.nickname = nickname;
     }
 
-    public int getShortNumer() {
+    public String getShortNumer() {
         return shortNumer;
     }
 
-    public void setShortNumer(int shortNumer) {
+    public void setShortNumer(String shortNumer) {
         this.shortNumer = shortNumer;
     }
 
@@ -63,6 +63,18 @@ public class LinkedUser implements Comparable<Integer> {
         isOnVideo = onVideo;
     }
 
+
+    @Override
+    public String toString() {
+        return "LinkedUser{" +
+                "number=" + number +
+                ", username='" + username + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", shortNumer='" + shortNumer + '\'' +
+                ", onlineState=" + onlineState +
+                ", isOnVideo=" + isOnVideo +
+                '}';
+    }
 
     @Override
     public int compareTo(Integer o) {

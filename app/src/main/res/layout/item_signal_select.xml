@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="user"
+            type="cn.com.ava.lubosdk.entity.LinkedUser" />
+
+        <import type="android.text.TextUtils"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:foreground="@drawable/bg_text_button_1"
+        android:layout_height="47dp">
+
+        <TextView
+            android:id="@+id/tv_signal_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{TextUtils.isEmpty(user.nickname)?@string/no_signal:user.nickname}"
+            android:layout_marginLeft="22dp"
+            android:textSize="17sp"
+            android:textColor="@color/color_222222"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -20,7 +20,9 @@ object BindingAdapters {
     @JvmStatic
     @BindingAdapter("android:srcId")
     fun setDrawableId(view:ImageView,resId:Int){
-        view.setImageResource(resId)
+        if(resId>0){
+            view.setImageResource(resId)
+        }
     }
 
 
@@ -32,4 +34,7 @@ object BindingAdapters {
             it.isEnabled = enable
         }
     }
+
+
+
 }

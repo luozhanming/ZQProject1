@@ -11,6 +11,10 @@
         android:id="@+id/action_back_to_login"
         app:popUpTo="@navigation/navigation_main"
         app:popUpToInclusive="true"
+        app:enterAnim="@anim/enter"
+        app:exitAnim="@anim/exit"
+        app:popEnterAnim="@anim/pop_enter"
+        app:popExitAnim="@anim/pop_exit"
         app:destination="@id/loginFragment" />
 
     <!--退出登录action-->
@@ -18,9 +22,11 @@
         android:id="@+id/action_back_to_lubo_setting"
         app:popUpTo="@navigation/navigation_main"
         app:popUpToInclusive="true"
+        app:enterAnim="@anim/enter"
+        app:exitAnim="@anim/exit"
+        app:popEnterAnim="@anim/pop_enter"
+        app:popExitAnim="@anim/pop_exit"
         app:destination="@id/luBoSettingFragment" />
-
-
 
     <fragment
         android:id="@+id/splashFragment"
@@ -30,19 +36,30 @@
         <action
             android:id="@+id/action_splashFragment_to_luBoSettingFragment"
             app:destination="@id/luBoSettingFragment"
-            app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:launchSingleTop="true"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/loginFragment"
-            app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:launchSingleTop="true"
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_homeFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/luBoSettingFragment"
@@ -53,9 +70,17 @@
             android:id="@+id/action_luBoSettingFragment_to_loginFragment"
             app:destination="@id/loginFragment"
             app:popUpTo="@id/luBoSettingFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_luBoSettingFragment_to_listenerFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:destination="@id/listenerFragment" />
     </fragment>
     <fragment
@@ -66,15 +91,19 @@
         <action
             android:id="@+id/action_loginFragment_to_luBoSettingFragment"
             app:destination="@id/luBoSettingFragment"
-            app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left"
-           />
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            />
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true"
-            app:enterAnim="@anim/slide_from_right"
-            app:exitAnim="@anim/slide_to_left"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:destination="@id/homeFragment" />
     </fragment>
     <fragment
@@ -85,9 +114,17 @@
         <action
             android:id="@+id/action_homeFragment_to_recordFragment"
             app:destination="@id/recordFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:launchSingleTop="true" />
         <action
             android:id="@+id/action_homeFragment_to_createMeetingFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:destination="@id/createMeetingFragment" />
         <action
             android:id="@+id/action_homeFragment_to_videoResourceFragment"
@@ -98,13 +135,24 @@
             app:destination="@id/videoResourceFragment"
             app:launchSingleTop="true" />
 
-            app:destination="@id/videoResourceFragment" />
+
         <action
             android:id="@+id/action_homeFragment_to_listenerFragment"
             app:destination="@id/listenerFragment" />
         <action
             android:id="@+id/action_homeFragment_to_masterFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:destination="@id/masterFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_joinMeetingFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/joinMeetingFragment" />
     </fragment>
     <fragment
         android:id="@+id/recordFragment"
@@ -117,7 +165,20 @@
         android:label="CreateMeetingFragment" >
         <action
             android:id="@+id/action_createMeetingFragment_to_createGroupFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
             app:destination="@id/createGroupFragment" />
+        <action
+            android:id="@+id/action_createMeetingFragment_to_masterFragment"
+            app:popUpTo="@id/createMeetingFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/masterFragment" />
     </fragment>
     <fragment
         android:id="@+id/createGroupFragment"
@@ -193,4 +254,15 @@
         android:id="@+id/videoPlayFragment"
         android:name="cn.com.ava.zqproject.ui.videoResource.VideoPlayFragment"
         android:label="VideoPlayFragment" />
+    <fragment
+        android:id="@+id/joinMeetingFragment"
+        tools:layout="@layout/fragment_join_meeting"
+        android:name="cn.com.ava.zqproject.ui.joinmeeting.JoinMeetingFragment"
+        android:label="JoinMeetingFragment" >
+        <action
+            android:id="@+id/action_joinMeetingFragment_to_listenerFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/joinMeetingFragment"
+            app:destination="@id/listenerFragment" />
+    </fragment>
 </navigation>

@@ -9,7 +9,6 @@ import cn.com.ava.lubosdk.entity.LayoutButtonInfo
 import cn.com.ava.lubosdk.entity.PreviewVideoWindow
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.lubosdk.util.LayoutButtonHelper
-import cn.com.ava.zqproject.common.CommandKeyHelper
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.vo.CommandButton
 import cn.com.ava.zqproject.vo.LayoutButton
@@ -101,7 +100,7 @@ class KeySettingViewModel : BaseViewModel() {
                         it.forEachIndexed { index, layoutButtonInfo ->
                             val button = LayoutButton(
                                 index,
-                                LayoutButtonHelper.getInstance()
+                                cn.com.ava.zqproject.common.LayoutButtonHelper
                                     .getLayoutDrawable(layoutButtonInfo.cmd),
                                 layoutButtonInfo.cmd
                             )
@@ -127,7 +126,7 @@ class KeySettingViewModel : BaseViewModel() {
                         it.forEachIndexed { index, layoutButtonInfo ->
                             val button = LayoutButton(
                                 index,
-                                LayoutButtonHelper.getInstance()
+                                cn.com.ava.zqproject.common.LayoutButtonHelper
                                     .getLayoutDrawable(layoutButtonInfo.cmd),
                                 layoutButtonInfo.cmd
                             )

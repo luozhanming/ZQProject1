@@ -130,7 +130,7 @@
     <string name="info_format_4">互动账号：%s</string>
     <string name="info_format_5">录播IP：%s</string>
     <string name="info_format_6">互动昵称：%s</string>
-    <string name="upgrade_message">有新版本是否更新？</string>
+    <string name="upgrade_message">检测到软件新版本,是否确定更新？</string>
     <string name="no_upgrade_message">暂无新版本</string>
     <string name="logout">退出登录</string>
     <string name="confirm_logout">是否退出登录？</string>
@@ -154,5 +154,24 @@
     <string name="next_step">下一步</string>
     <string name="last_step">上一步</string>
     <string name="signal_format">信号%d:</string>
+    
+    <string name="patrol_interval">轮播间隔时长：</string>
+    <string name="unit_second">(单位：秒)</string>
+    <string name="select_what_patrol">选择参与轮播：</string>
+    <string name="join_meeting">加入会议</string>
+    <string name="hint_meeting_num">请输入会议号</string>
+    <string name="hint_meeting_psw">请输入会议密码</string>
+    <string name="hint_meeting_nickname">请输入入会称呼</string>
+    <string name="join">加入</string>
+    <string name="all_remove">全部移出</string>
+    <string name="lock_meeting">锁定会议</string>
+    <string name="all_silent">全体静音</string>
+    <string name="all_accept">全部准入</string>
+    <string name="has_enter">已入会</string>
+    <string name="waitingroom">等候室</string>
+    <string name="accept_enter">准入</string>
+    <string name="no_signal">无信号</string>
+
+    <string name="set_meeting_layout_failed">切换布局失败</string>
 
 </resources>

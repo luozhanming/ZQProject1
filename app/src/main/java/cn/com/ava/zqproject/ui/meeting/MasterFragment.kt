@@ -1,45 +1,44 @@
 package cn.com.ava.zqproject.ui.meeting
 
+import android.content.ClipData
+import android.graphics.RectF
+import android.os.Build
+import android.os.Handler
 import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.View
+import android.view.View.DragShadowBuilder
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentMasterBinding
-import cn.com.ava.zqproject.ui.MainViewModel
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
+import cn.com.ava.zqproject.ui.widget.SliceVideoView
+import java.util.*
 
 /**
  * 主讲界面
  * */
-class MasterFragment : BaseFragment<FragmentMasterBinding>(), SurfaceHolder.Callback {
+class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHolder.Callback {
 
     private val mMasterViewModel by viewModels<MasterViewModel>()
-
-    private val mMainViewModel by activityViewModels<MainViewModel>()
-
 
     private var mExitMeetingDialog by autoCleared<ConfirmDialog>()
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
     private var mMeetingInfoWindow by autoCleared<MeetingInfoPopupWindow>()
     private var mComputerSourceWindow by autoCleared<ComputerSourcePopupWindow>()
-
-
-
-
 
 
     //控制台动画相关
@@ -63,13 +62,16 @@ class MasterFragment : BaseFragment<FragmentMasterBinding>(), SurfaceHolder.Call
         bindListener()
         mMasterViewModel.startLoadMeetingInfo()
         mMasterViewModel.loopCurVideoSceneSources()
+        mMasterViewModel.startLoopInteracInfo()
     }
 
 
-
     override fun observeVM() {
-        mMasterViewModel.isShowLoading.observe(viewLifecycleOwner) {
-            mMainViewModel.isShowLoading.postValue(it)
+        mMasterViewModel.isShowLoading.observeOne(viewLifecycleOwner) {
+            if (it)
+                showLoading()
+            else
+                hideLoading()
         }
         mMasterViewModel.isControlVisible.observe(viewLifecycleOwner) { visible ->
             topVisibleAnim?.apply {
@@ -107,6 +109,11 @@ class MasterFragment : BaseFragment<FragmentMasterBinding>(), SurfaceHolder.Call
                 }
             }
         }
+        mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner){
+            mBinding.videoTopView.changeSliceCount(it.size)
+            mBinding.videoTopView.setUsersOnVideo(it)
+        }
+
 
     }
 
@@ -116,7 +123,9 @@ class MasterFragment : BaseFragment<FragmentMasterBinding>(), SurfaceHolder.Call
 
     override fun bindListener() {
         mBinding.videoView.holder.addCallback(this)
-
+        mBinding.ivBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
         mBinding.root.setOnClickListener {
             mMasterViewModel.isControlVisible.value =
                 mMasterViewModel.isControlVisible.value?.not() ?: true
@@ -163,11 +172,47 @@ class MasterFragment : BaseFragment<FragmentMasterBinding>(), SurfaceHolder.Call
         }
         mBinding.llSceneLayout.setOnClickListener {
             val dialog = SelectLayoutManagerDialog()
-            dialog.show(childFragmentManager,"select_layout")
+            dialog.show(childFragmentManager, "select_layout")
         }
         mBinding.llMemberManager.setOnClickListener {
 
         }
+        mBinding.videoTopView.setOnLabelDropListener(object :SliceVideoView.OnVideoCallback{
+            override fun onReplaceVideo(userNum: String?, locateIndex: Int) {
+
+            }
+
+            override fun onVideoLongPress(user: LinkedUser?, location: Int, rect: RectF?) {
+                Handler().postDelayed({
+                    val clipData = ClipData.newPlainText(
+                        SliceVideoView.DRAG_VIDEO,
+                        location.toString() + ""
+                    )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        mBinding.videoTopView.startDragAndDrop(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
+                    }else{
+                        mBinding.videoTopView.startDrag(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
+                    }
+                }, 200)
+            }
+
+            override fun onExchangeVideo(srcIndex: Int, dstIndex: Int) {
+                val layoutInfo= mMasterViewModel.onVideoWindow.value?: emptyList()
+                val temp = arrayListOf<Int>()
+                val size = layoutInfo.size
+                for (i in 0 until size) {
+                    if (i == srcIndex) {
+                        temp.add(layoutInfo[dstIndex].number)
+                    } else if (i == dstIndex) {
+                        temp.add(layoutInfo[srcIndex].number)
+                    } else {
+                        temp.add(layoutInfo[i].number)
+                    }
+                }
+                mMasterViewModel.setVideoLayout(temp)
+            }
+
+        })
     }
 
 

@@ -1,16 +1,15 @@
 package cn.com.ava.lubosdk.query
 
-import cn.com.ava.lubosdk.AVATable
 import cn.com.ava.lubosdk.IQuery
 import cn.com.ava.lubosdk.entity.ListWrapper
 import cn.com.ava.lubosdk.entity.QueryResult
-import cn.com.ava.lubosdk.entity.SimpleWrapper
+
 /**
  * 不解析获取信息
  *
  * */
 class RawQuery(
-    val queryWhat:Array<Int>,
+    val queryWhat: Array<Int>,/*请求哪些信息*/
     override var onResult: (QueryResult) -> Unit,
     override var onError: ((Throwable) -> Unit)? = null
 ) : IQuery<ListWrapper<String>> {

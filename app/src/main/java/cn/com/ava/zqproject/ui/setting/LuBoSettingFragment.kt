@@ -2,11 +2,9 @@ package cn.com.ava.zqproject.ui.setting
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
-import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.Extra
 import cn.com.ava.common.util.logd
@@ -14,7 +12,7 @@ import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentLuboSettingBinding
 import cn.com.ava.zqproject.net.PlatformApiManager
-import cn.com.ava.zqproject.ui.MainViewModel
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
@@ -28,7 +26,7 @@ import com.blankj.utilcode.util.Utils
  * 3.只有录播连接成功和平台连接成功才能返回到平台登录界面
  * </p>
  */
-class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
+class LuBoSettingFragment : BaseLoadingFragment<FragmentLuboSettingBinding>() {
 
 
     companion object {
@@ -41,7 +39,6 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
 
     private val mLuboSettingViewModel by viewModels<LuBoSettingViewModel>()
 
-    private val mMainViewModel by activityViewModels<MainViewModel>()
 
     override fun getLayoutId(): Int = R.layout.fragment_lubo_setting
 
@@ -61,15 +58,17 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
 
 
     override fun observeVM() {
-        mLuboSettingViewModel.toastMsg.observe(viewLifecycleOwner) {
+        mLuboSettingViewModel.toastMsg.observeOne(viewLifecycleOwner) {
             ToastUtils.showShort(it)
         }
-        mLuboSettingViewModel.showLoading.observe(viewLifecycleOwner) {
-            mMainViewModel.isShowLoading.postValue(it)
+        mLuboSettingViewModel.showLoading.observeOne(viewLifecycleOwner) {
+            if (it)
+                showLoading()
+            else
+                hideLoading()
         }
-        mLuboSettingViewModel.isShowWakeUp.observe(viewLifecycleOwner) {
+        mLuboSettingViewModel.isShowWakeUp.observeOne(viewLifecycleOwner) {
             if (it != 0) {
-
                 mWakeupMachineDialog = mWakeupMachineDialog ?: ConfirmDialog(Utils.getApp()
                     .getString(R.string.tips_lubo_need_wake_up),
                     false,
@@ -80,14 +79,11 @@ class LuBoSettingFragment : BaseFragment<FragmentLuboSettingBinding>() {
                     { dialog ->
                         dialog?.dismiss()
                     })
-                if(mWakeupMachineDialog?.isAdded==false){
-                    mWakeupMachineDialog?.show(childFragmentManager,"wakeup_confirm")
-
+                if (mWakeupMachineDialog?.isAdded == false) {
+                    mWakeupMachineDialog?.show(childFragmentManager, "wakeup_confirm")
                 }
-
             }
         }
-
 
 
     }

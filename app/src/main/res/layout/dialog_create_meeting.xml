@@ -88,8 +88,12 @@
 
     <Switch
         android:id="@+id/switch_waiting_room"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="67dp"
+        android:layout_height="35dp"
+        android:thumb="@drawable/switch_po"
+        android:track="@drawable/switch_track"
+
+        android:checked="true"
         app:layout_constraintBottom_toBottomOf="@+id/textView17"
         app:layout_constraintStart_toStartOf="@+id/et_meeting_nickname"
         app:layout_constraintTop_toTopOf="@+id/textView17" />

@@ -3,6 +3,8 @@ package cn.com.ava.zqproject.ui.record
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.Constant
@@ -24,8 +26,8 @@ class RecordViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
-    val isShowLoading: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+    val isShowLoading: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
     val isControlVisible: MutableLiveData<Boolean> by lazy {
@@ -79,18 +81,18 @@ class RecordViewModel : BaseViewModel() {
     private var mLoadRecordInfoLoop: Disposable? = null
 
     fun startLoadRecordInfo() {
-        isShowLoading.postValue(true)
+        isShowLoading.postValue(OneTimeEvent(true))
         mLoadRecordInfoLoop?.dispose()
         mLoadRecordInfoLoop = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 RecordManager.getRecordInfo()
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
-                isShowLoading.postValue(false)
+                isShowLoading.postValue(OneTimeEvent(false))
                 recordInfo.postValue(it)
             }, {
                 logPrint2File(it)
-                isShowLoading.postValue(false)
+                isShowLoading.postValue(OneTimeEvent(false))
             })
 
 

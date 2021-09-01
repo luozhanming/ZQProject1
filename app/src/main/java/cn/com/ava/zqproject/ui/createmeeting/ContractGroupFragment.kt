@@ -103,9 +103,10 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvGroup.adapter = null
-        super.onDestroy()
+        super.onDestroyView()
+
     }
 
     override fun onBindViewModel2Layout(binding: FragmentContractGroupBinding) {

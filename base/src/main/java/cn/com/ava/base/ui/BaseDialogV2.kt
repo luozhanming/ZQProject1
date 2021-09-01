@@ -1,9 +1,12 @@
 package cn.com.ava.base.ui
 
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.DialogFragment
@@ -37,6 +40,34 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
         dialog.setCanceledOnTouchOutside(windowOptions.canTouchOutsideCancel)
         return dialog
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        logd("onAttach")
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        logd("onCreateView()")
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        logd("onDestroyView()")
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        logd("onDetach")
+    }
+
+
+
+
 
     open fun bindListener() {
 
@@ -89,6 +120,7 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
 
     override fun onDestroy() {
         super.onDestroy()
+        logd("onDestroy()")
         releaseBinding()
     }
 

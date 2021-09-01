@@ -20,7 +20,7 @@ class RecordInfoDialog : BaseDialogV2<DialogRecordinfoBinding>() {
 
     private val mRecordViewModel by viewModels<RecordViewModel>({requireParentFragment()})
 
-    private val mRecordInfoViewModel by viewModels<RecordInfoViewModel>()
+    private val mRecordInfoViewModel by viewModels<RecordInfoViewModel>({requireParentFragment()})
 
     override fun getWindowOptions(): WindowOptions {
         return WindowOptions(
@@ -28,7 +28,6 @@ class RecordInfoDialog : BaseDialogV2<DialogRecordinfoBinding>() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             Gravity.CENTER
         )
-
     }
 
     override fun initView(root: View) {

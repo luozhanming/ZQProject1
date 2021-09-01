@@ -10,9 +10,12 @@
     
     <color name="color_318EF8">#318EF8</color>
     <color name="color_AF318EF8">#137BF3</color>
+    <color name="color_AFF4646">#F85858</color>
+
     <color name="color_222222">#222222</color>
     <color name="color_EFF3F9">#EFF3F9</color>
     <color name="color_999999">#999999</color>
+    <color name="color_888888">#888888</color>
     <color name="color_1F000000">#1F000000</color>
     <color name="color_E2E2E2">#E2E2E2</color>
     <color name="color_white">#FFFFFF</color>

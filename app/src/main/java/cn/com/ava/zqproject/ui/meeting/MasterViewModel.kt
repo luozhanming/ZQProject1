@@ -3,9 +3,13 @@ package cn.com.ava.zqproject.ui.meeting
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.Constant
+import cn.com.ava.lubosdk.entity.InteraInfo
+import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.LocalVideoStream
 import cn.com.ava.lubosdk.entity.MeetingInfo
 import cn.com.ava.lubosdk.manager.InteracManager
@@ -17,6 +21,7 @@ import cn.com.ava.zqproject.vo.InteractComputerSources
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class MasterViewModel : BaseViewModel() {
@@ -35,9 +40,11 @@ class MasterViewModel : BaseViewModel() {
 
     private var mLoopCurSceneSourcesDisposable: Disposable? = null
 
+    private var mLoopInteracInfoDisposable: Disposable? = null
 
-    val isShowLoading: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+
+    val isShowLoading: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
     val meetingInfo: MutableLiveData<MeetingInfo> by lazy {
@@ -118,6 +125,67 @@ class MasterViewModel : BaseViewModel() {
         }
     }
 
+    val interacInfo: MutableLiveData<InteraInfo> by lazy {
+        MutableLiveData()
+    }
+
+    val onVideoWindow: MediatorLiveData<List<LinkedUser>> by lazy {
+        MediatorLiveData<List<LinkedUser>>().apply {
+            addSource(interacInfo) {
+                val layout = it.layout
+                layout.removeAt(0)
+                val onlineList = it.onlineList
+                if(onlineList==null)return@addSource
+                val onVideoWindowList = onlineList.filter {
+                    it.number in layout
+                }
+                onVideoWindowList.forEach {
+                    it.isOnVideo = true
+                }
+                val windowOnVideo = arrayListOf<LinkedUser>()
+                for(i in layout.indices){
+                    var userOnVideo:LinkedUser?=null
+                    userOnVideo = onVideoWindowList.firstOrNull { it.number == layout[i] }
+                    if(userOnVideo==null){
+                        userOnVideo = LinkedUser()
+                        userOnVideo?.number = -1
+                        windowOnVideo.add(userOnVideo)
+                    }else{
+                        windowOnVideo.add(userOnVideo)
+                    }
+                }
+                //只有不同的时候才更新
+                var hasChanged = false
+                if (windowOnVideo.size==value?.size ?: 0 ) {
+                    for (i in windowOnVideo.indices) {
+                        if(windowOnVideo[i] != value?.get(i)){
+                            hasChanged = true
+                            break
+                        }
+                    }
+                }else{
+                    hasChanged = true
+                }
+                if(hasChanged){
+                    postValue(windowOnVideo)
+                }
+            }
+        }
+    }
+
+    val videoLayoutCount: MediatorLiveData<Int> by lazy {
+        MediatorLiveData<Int>().apply {
+            addSource(interacInfo) {
+                val layout = it.layout
+                if(layout.size>0){
+                    if(layout[0]!=value){
+                        postValue(layout[0])
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * 上次不是电脑的画面，用于恢复
@@ -126,7 +194,7 @@ class MasterViewModel : BaseViewModel() {
 
 
     fun startLoadMeetingInfo() {
-        isShowLoading.postValue(true)
+        isShowLoading.value = OneTimeEvent(true)
         mLoopMeetingInfoDisposable?.dispose()
         mLoopMeetingInfoDisposable = Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
             .flatMap {
@@ -134,10 +202,24 @@ class MasterViewModel : BaseViewModel() {
                     .subscribeOn(Schedulers.io())
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
-                isShowLoading.postValue(false)
+                isShowLoading.postValue(OneTimeEvent(false))
                 meetingInfo.postValue(it)
             }, {
-                isShowLoading.postValue(false)
+                isShowLoading.postValue(OneTimeEvent(false))
+                logPrint2File(it)
+            })
+    }
+
+    fun startLoopInteracInfo() {
+        mLoopInteracInfoDisposable?.dispose()
+        mLoopInteracInfoDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+                InteracManager.getInteracInfo()
+                    .subscribeOn(Schedulers.io())
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribe({
+                interacInfo.postValue(it)
+            }, {
                 logPrint2File(it)
             })
     }
@@ -251,12 +333,10 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
-
     fun loopCurVideoSceneSources() {
         mLoopCurSceneSourcesDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 InteracManager.getSceneStream(true)
-
 //                    .map {
 //                        //过滤掉电脑的选项
 //                        it.filter { stream->
@@ -275,7 +355,26 @@ class MasterViewModel : BaseViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        exitMeeting.removeSource(meetingInfo)
+        isPluginComputer.removeSource(curSceneSources)
+        isRecording.removeSource(meetingInfo)
+        onVideoWindow.removeSource(interacInfo)
+        videoLayoutCount.removeSource(interacInfo)
         mLoopMeetingInfoDisposable?.dispose()
         mLoopCurSceneSourcesDisposable?.dispose()
+        mLoopInteracInfoDisposable?.dispose()
+    }
+
+
+    fun setVideoLayout(usersOnVideo: List<Int>) {
+        mDisposables.add(
+            InteracManager.setVideoLayout(usersOnVideo.size,usersOnVideo)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+
+                },{
+                    logPrint2File(it)
+                })
+        )
     }
 }

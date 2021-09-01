@@ -5,6 +5,7 @@ import cn.com.ava.base.recyclerview.BaseAdapter
 import cn.com.ava.base.recyclerview.BaseViewHolder
 import cn.com.ava.lubosdk.Cache
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.common.LayoutButtonHelper
 import cn.com.ava.zqproject.databinding.ItemPresetControlBinding
 import cn.com.ava.zqproject.databinding.ItemVideoWindowBinding
 import cn.com.ava.zqproject.databinding.ItemWindowLayoutBinding
@@ -91,7 +92,7 @@ class CustomKeyAdapter(val callback: CustomKeyCallback?=null) : BaseAdapter<Stat
             //TODO 有越界崩溃
             val layoutButtonInfo = Cache.getCache().layoutInfosCache[data.obj.layoutIndex]
             data.obj.layoutCmd = layoutButtonInfo.cmd
-            data.obj.layoutDrawable = layoutButtonInfo.drawableId
+            data.obj.layoutDrawable = LayoutButtonHelper.getLayoutDrawable(layoutButtonInfo.cmd)
             binding.button = data
         }
 

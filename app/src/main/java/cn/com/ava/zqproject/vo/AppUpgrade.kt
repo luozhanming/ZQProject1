@@ -3,7 +3,7 @@ package cn.com.ava.zqproject.vo
 data class AppUpgrade(
     val forceUpdated: Boolean,
     val platformIdentify: Int,
-    val remark: Int,
+    val remark: String,
     val logoUri: String?,
     val packageDFSId: String,
     val versionName: String,

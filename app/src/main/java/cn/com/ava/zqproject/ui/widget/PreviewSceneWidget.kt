@@ -11,15 +11,14 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.PreviewVideoWindow
-import cn.com.ava.lubosdk.manager.InteracManager
-import cn.com.ava.td.terminal.avartspviewer.RtspView
+import cn.com.ava.player.IjkVideoPlayer
+import cn.com.ava.player.PlayerCallback
+import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.ui.meeting.adapter.CamPreviewAdapter
 import cn.com.ava.zqproject.vo.CamPreviewInfo
 import cn.com.ava.zqproject.vo.StatefulView
-import io.reactivex.schedulers.Schedulers
 
 class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle: Int) :
     HorizontalScrollView(context, attributeSet, defStyle), TextureView.SurfaceTextureListener {
@@ -32,7 +31,7 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
     private var rvPreviewInfo: RecyclerView? = null
     private var mLinearLayout: LinearLayout? = null
     private var mFrameLayout: FrameLayout? = null
-    private var mRtspView: RtspView? = null
+    private var mRtspView: TextureView? = null
 
     private var mCurCamPreviewInfo: CamPreviewInfo? = null
 
@@ -40,12 +39,21 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
 
     private var mCamPreviewAdapter: CamPreviewAdapter? = null
 
+    private var mPlayer: IjkVideoPlayer? = null
+
+    var onMainStreamSelected: ((Int) -> Unit)? = null
+        get() = field
+        set(value) {
+            field = value
+        }
+
 
     constructor(context: Context, attributeSet: AttributeSet?) : this(context, attributeSet, 0)
 
     constructor(context: Context) : this(context, null, 0)
 
     init {
+        mPlayer = IjkVideoPlayer()
         mLinearLayout = LinearLayout(context)
         mLinearLayout?.orientation = LinearLayout.HORIZONTAL
         addView(
@@ -56,17 +64,10 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
             )
         )
         mFrameLayout = FrameLayout(context)
-        mRtspView = RtspView(context)
+        mRtspView = TextureView(context)
         rvPreviewInfo = RecyclerView(context)
-        mCamPreviewAdapter = CamPreviewAdapter(){
-            //简单功能直接上业务代码  别学
-            InteracManager.postMainStream(it.index)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-
-                },{
-                    logPrint2File(it)
-                })
+        mCamPreviewAdapter = CamPreviewAdapter {
+            onMainStreamSelected?.invoke(it.index)
         }
         rvPreviewInfo?.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -81,6 +82,7 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
             return
         }
         mCurCamPreviewInfo = camPreviewInfo
+
         //根据控件高度计算每个窗口的宽度16:9
         val eachWidth = height * 16 / 9
         logd("window each width:${eachWidth}")
@@ -110,9 +112,10 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
                 stateful.isSelected = it.isCurrentOutput
                 statefuls.add(stateful)
             }
-            mCamPreviewAdapter?.setDatasWithDiff(statefuls)
+            mCamPreviewAdapter?.setDatas(statefuls)
         }
     }
+
 
     private fun updateCamPreviewInfo(camPreviewInfo: CamPreviewInfo) {
         camPreviewInfo.previewWindow.apply {
@@ -127,42 +130,49 @@ class PreviewSceneWidget(context: Context, attributeSet: AttributeSet?, defStyle
     }
 
 
+    override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+        logd("onSurfaceTextureAvailable")
+        isDestroyLive = false
+        val callback = object : PlayerCallback {
+            override fun onStart() {
+            }
 
+            override fun onCompleted() {
+            }
 
+            override fun onError(error: Int) {
+            }
 
-override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-    logd("onSurfaceTextureAvailable")
-    isDestroyLive = false
-    mRtspView?.initLiveTool(Surface(surface))
-    val num_streams = 1
-    val in_x = intArrayOf(0)
-    val in_y = intArrayOf(0)
-    val in_width = intArrayOf(0)
-    val in_height = intArrayOf(0)
-    mRtspView?.startLiving(
-        "rtsp://192.168.21.204:554/stream/1?config.login=web",
-        num_streams,
-        in_x,
-        in_y,
-        in_width,
-        in_height
-    )
-}
+            override fun notifyRemoteStop() {
+            }
+        }
+        mPlayer?.setSurface(Surface(surface))
+        mPlayer?.startPlay(
+            "rtsp://${
+                CommonPreference.getElement(
+                    CommonPreference.KEY_LUBO_IP,
+                    ""
+                )
+            }:554/stream/1?config.login=web", callback
+        )
 
-override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+    }
 
-}
+    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
 
-override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-    mRtspView?.stopLiving()
-    mRtspView?.destroyLiveTool()
-    isDestroyLive = true
-    logd("onSurfaceTextureDestroyed")
-    return true
-}
+    }
 
-override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
 
-}
+        isDestroyLive = true
+        mPlayer?.stopPlay()
+        mPlayer?.release()
+        logd("onSurfaceTextureDestroyed")
+        return true
+    }
+
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
+
+    }
 
 }

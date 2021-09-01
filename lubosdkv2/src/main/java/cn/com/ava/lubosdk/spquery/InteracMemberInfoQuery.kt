@@ -7,6 +7,7 @@ import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.QueryResult
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.util.GsonUtil
+import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
 import java.util.*
 
 
@@ -33,7 +34,10 @@ class InteracMemberInfoQuery(
         val onlineList: List<LinkedUser> = info.getOnlineList() ?: return info
         val newUsers: MutableList<LinkedUser> = ArrayList<LinkedUser>()
         for (user in onlineList) {
-            if (user.getShortNumer() !== 0 || !TextUtils.isEmpty(user.getUsername())) {
+            if (user.getShortNumer() != "0" || !TextUtils.isEmpty(user.getUsername())) {
+                if(!TextUtils.isEmpty(user.nickname)){
+                    user.nickname = URLHexEncodeDecodeUtil.hexToStringUrlDecode(user.nickname)
+                }
                 newUsers.add(user)
             }
         }

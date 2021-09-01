@@ -2,6 +2,8 @@ package cn.com.ava.zqproject.net
 
 import cn.com.ava.common.http.BaseHttpApi
 import cn.com.ava.common.http.ServerException
+import cn.com.ava.common.util.GsonUtil
+import cn.com.ava.common.util.logi
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.vo.PlatformLogin
 import cn.com.ava.zqproject.vo.PlatformResponse
@@ -66,9 +68,13 @@ object PlatformApi : BaseHttpApi() {
 
     fun login(login: PlatformLogin) {
         platformLogin = login
+        //保存到SP
+        val toJson = GsonUtil.toJson(login)
+        CommonPreference.putElement(CommonPreference.KEY_PLATFORM_LATEST_LOGIN,toJson)
     }
 
     fun logout(){
         platformLogin = null
+        CommonPreference.putElement(CommonPreference.KEY_PLATFORM_LATEST_LOGIN,"")
     }
 }

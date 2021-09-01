@@ -21,7 +21,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-
             android:text='@{String.format(@string/custom_layout_format,button.obj.customIndex())}'
             android:visibility="@{button.obj.custom?View.VISIBLE:View.GONE}"
             android:textColor="@drawable/selector_text_color_4"
@@ -30,6 +29,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_gravity="center"
+            android:srcId="@{button.obj.layoutDrawable}"
             android:visibility="@{button.obj.custom?View.GONE:View.VISIBLE}"
             android:layout_height="wrap_content"/>
 
