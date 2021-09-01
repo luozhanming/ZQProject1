@@ -1,6 +1,7 @@
 package cn.com.ava.zqproject.ui.createmeeting.dialog
 
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.Gravity
@@ -11,7 +12,9 @@ import android.widget.Switch
 import android.widget.TextView
 import cn.com.ava.base.ui.BaseDialog
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.common.widget.SpecialCharInputFilter
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.net.PlatformApi
 
 class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : BaseDialog() {
 
@@ -20,6 +23,8 @@ class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : 
     private var switchWaitingRoom: Switch? = null
     private var btnCancel: TextView? = null
     private var btnCall: TextView? = null
+
+
 
     private var mTextWatcher: TextWatcher? = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -65,6 +70,19 @@ class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : 
         }
         btnCancel?.setOnClickListener {
             dismiss()
+        }
+
+        etMeetingTheme?.filters = arrayOf(SpecialCharInputFilter(),InputFilter.LengthFilter(20))
+        etMeetingNickname?.filters = arrayOf(SpecialCharInputFilter(),InputFilter.LengthFilter(20))
+        //设置默认
+        val platformLogin = PlatformApi.getPlatformLogin()
+        platformLogin?.apply {
+            etMeetingTheme?.setText( "${name}${getString(R.string.who_launch_meeting)}")
+            if(TextUtils.isEmpty(professionTitleName)){
+                etMeetingNickname?.setText("${name}")
+            }else{
+                etMeetingNickname?.setText("${name}-${professionTitleName}")
+            }
         }
     }
 

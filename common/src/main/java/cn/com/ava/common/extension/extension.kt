@@ -1,14 +1,9 @@
 package cn.com.ava.common.extension
 
 import android.app.Activity
-import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.animation.BounceInterpolator
 import android.widget.PopupWindow
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
-import cn.com.ava.common.R
 import cn.com.ava.common.util.Extra
 
 inline fun Activity.bindExtras() {
@@ -51,11 +46,13 @@ inline fun Fragment.bindExtras() {
 /**
  * 避免spinner展开时popupwindow获取焦点从而使导航栏出现
  * */
-fun Spinner.avoidDropdownFocus(){
+fun Spinner.avoidDropdownFocus() {
     try {
         val isAppCompat = this is androidx.appcompat.widget.AppCompatSpinner
-        val spinnerClass = if (isAppCompat) androidx.appcompat.widget.AppCompatSpinner::class.java else Spinner::class.java
-        val popupWindowClass = if (isAppCompat) androidx.appcompat.widget.ListPopupWindow::class.java else android.widget.ListPopupWindow::class.java
+        val spinnerClass =
+            if (isAppCompat) androidx.appcompat.widget.AppCompatSpinner::class.java else Spinner::class.java
+        val popupWindowClass =
+            if (isAppCompat) androidx.appcompat.widget.ListPopupWindow::class.java else android.widget.ListPopupWindow::class.java
 
         val listPopup = spinnerClass
             .getDeclaredField("mPopup")
@@ -74,3 +71,10 @@ fun Spinner.avoidDropdownFocus(){
         e.printStackTrace()
     }
 }
+
+
+fun Char.isChinese(): Boolean {
+    return compareTo('\u4e00') >= 0 && compareTo('\u9fa5') <= 0
+}
+
+

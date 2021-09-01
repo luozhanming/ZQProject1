@@ -71,7 +71,7 @@
     <string name="meeting_theme">会议主题</string>
     <string name="meeting_user_nickname">入会称呼</string>
     <string name="waiting_room">等候室</string>
-    <string name="input_meeting_theme">请输入会议主题(选填)</string>
+    <string name="input_meeting_theme">请输入会议主题(必填)</string>
     <string name="input_meeting_user_nickname">请输入入会称呼(必填)</string>
 
     <string name="toast_create_meeting_max_count">当前最大支持选择人数为：9</string>
@@ -173,5 +173,7 @@
     <string name="no_signal">无信号</string>
 
     <string name="set_meeting_layout_failed">切换布局失败</string>
+
+    <string name="who_launch_meeting">发起的会议</string>
 
 </resources>
