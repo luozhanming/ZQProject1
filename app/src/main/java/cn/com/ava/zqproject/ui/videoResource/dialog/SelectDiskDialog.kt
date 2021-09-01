@@ -1,10 +1,10 @@
 package cn.com.ava.zqproject.ui.videoResource.dialog
 
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.webkit.JavascriptInterface
-import android.widget.FrameLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.Keep
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
@@ -19,6 +19,9 @@ class SelectDiskDialog(var paths: List<String>, val callback: ((String) -> Unit)
 
     private var btnCancel: TextView? = null
     private var tvWarning: TextView? = null
+    private var btnDownload: TextView? = null
+    private var spinner: Spinner? = null
+    private var downloadPath = ""
 
     override fun getWindowOptions(): WindowOptions {
         return WindowOptions(
@@ -32,15 +35,39 @@ class SelectDiskDialog(var paths: List<String>, val callback: ((String) -> Unit)
 
         btnCancel = root.findViewById(R.id.btn_cancel)
         tvWarning = root.findViewById(R.id.tv_warning)
-        btnCancel?.setOnClickListener {
-            dismiss()
-        }
+        btnDownload = root.findViewById(R.id.btn_sure)
+        spinner = root.findViewById(R.id.spinner)
+
         if (paths.size == 0) {
             tvWarning?.isVisible = true
         } else {
             tvWarning?.isVisible = false
         }
 
+        btnCancel?.setOnClickListener {
+            dismiss()
+        }
+        btnDownload?.setOnClickListener {
+            if (TextUtils.isEmpty(downloadPath)) {
+                return@setOnClickListener
+            }
+            dismiss()
+            callback?.invoke(downloadPath)
+        }
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paths)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner?.adapter = adapter
+        spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                downloadPath = paths[p2]
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
     }
 
     override fun getLayoutId(): Int {

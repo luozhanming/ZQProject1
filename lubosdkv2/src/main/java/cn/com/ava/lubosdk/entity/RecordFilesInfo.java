@@ -55,6 +55,10 @@ public class RecordFilesInfo implements QueryResult {
 
 //        //下载信息
         private String downloadFileName;
+        // 下载进度
+        private int downloadProgress;
+        // 下载路径
+        private String downloadDstPath;
 
 
 
@@ -262,6 +266,22 @@ public class RecordFilesInfo implements QueryResult {
             this.downloadFileName = downloadFileName;
         }
 
+        public int getDownloadProgress() {
+            return downloadProgress;
+        }
+
+        public void setDownloadProgress(int downloadProgress) {
+            this.downloadProgress = downloadProgress;
+        }
+
+        public String getDownloadDstPath() {
+            return downloadDstPath;
+        }
+
+        public void setDownloadDstPath(String downloadDstPath) {
+            this.downloadDstPath = downloadDstPath;
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == null) return false;
@@ -281,7 +301,6 @@ public class RecordFilesInfo implements QueryResult {
         public long getRawFileSize() {
             return rawFileSize;
         }
-
 
         @Override
         public String toString() {
@@ -312,6 +331,8 @@ public class RecordFilesInfo implements QueryResult {
                     ", sampleBit='" + sampleBit + '\'' +
                     ", audioCodecMode='" + audioCodecMode + '\'' +
                     ", downloadFileName='" + downloadFileName + '\'' +
+                    ", downloadProgress=" + downloadProgress +
+                    ", downloadDstPath='" + downloadDstPath + '\'' +
                     '}';
         }
     }

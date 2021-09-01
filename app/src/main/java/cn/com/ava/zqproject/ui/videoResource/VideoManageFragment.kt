@@ -16,7 +16,9 @@ import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoManageBinding
 import cn.com.ava.zqproject.ui.splash.SplashFragment
+import cn.com.ava.zqproject.usb.UsbHelper
 import com.blankj.utilcode.util.Utils
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,6 +63,8 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
             // 预加载页面数
             offscreenPageLimit = 2
         }
+        // 禁止滑动
+        mBinding.viewPager.isUserInputEnabled = false
 
         mTabLayoutMediator = TabLayoutMediator(mBinding.tabLayout, mBinding.viewPager) {tab, position ->
             val textView = TextView(requireView().context)
@@ -81,6 +85,22 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
             tab.customView = textView
         }
         mTabLayoutMediator?.attach()
+
+        mBinding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                logd("position: ${tab?.position}")
+                mBinding.btnClearAllRecord.visibility = if(tab?.position == 1) View.VISIBLE else View.GONE
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+        })
+
         // 返回
         mBinding.ivBack.setOnClickListener {
 
@@ -105,6 +125,11 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
                     GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
                 )
             )
+        }
+        // 清除全部记录
+        mBinding.btnClearAllRecord.setOnClickListener {
+            UsbHelper.getHelper().cancelAllTask()
+            mVideoManageViewModel.clearAllCacheVideos()
         }
     }
 

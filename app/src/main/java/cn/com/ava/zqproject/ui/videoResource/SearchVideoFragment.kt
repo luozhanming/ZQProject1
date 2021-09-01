@@ -109,8 +109,12 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         mBinding.rvResourceList.adapter = null
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
         super.onDestroy()
     }
 
