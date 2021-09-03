@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:layout_width="884dp"
+        android:layout_height="96dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="868dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{!isExpand&amp;&amp;!isFirst?View.GONE:View.VISIBLE}"
+            android:background="@drawable/bg_dialog"
+            android:clipChildren="false">
+
+
+
+            <ImageView
+                android:id="@+id/imageView8"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginLeft="24dp"
+                android:src="@mipmap/ic_handup"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="#FF9A41" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="@{String.format(@string/format_apply_speak,user.name,user.position)}"
+                android:textColor="@color/color_222222"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView8"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/btn_agree"
+                android:layout_width="104dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="27dp"
+                android:background="@drawable/bg_button_1"
+                android:gravity="center"
+                android:text="@string/agree"
+                android:textColor="@color/white"
+                android:textSize="21sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/btn_disagree"
+                android:layout_width="104dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="24dp"
+                android:background="@drawable/bg_text_button_1"
+                android:gravity="center"
+                android:text="@string/disagree"
+                android:textColor="@color/color_666666"
+                android:textSize="21sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btn_agree"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <ImageView
+            android:id="@+id/ivMore"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/ic_more"
+            android:visibility="@{isFirst&amp;&amp;!isExpand&amp;&amp;!isLast?View.VISIBLE:View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivShrink"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/ic_shrink_2"
+            android:visibility="@{isLast&amp;&amp;isExpand&amp;&amp;!isFirst?View.VISIBLE:View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </FrameLayout>
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="user"
+            type="cn.com.ava.lubosdk.entity.zq.ApplySpeakUser" />
+
+        <variable
+            name="isExpand"
+            type="Boolean" />
+
+        <variable
+            name="isFirst"
+            type="Boolean" />
+
+        <variable
+            name="isLast"
+            type="Boolean" />
+    </data>
+
+</layout>

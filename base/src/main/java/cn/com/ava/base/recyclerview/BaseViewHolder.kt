@@ -8,6 +8,12 @@ abstract class BaseViewHolder<DATA, DB : ViewDataBinding>(val binding: DB) :
 
     protected var mData: DATA? = null
 
+    var isFirst:Boolean = false
+
+    var isLast:Boolean = false
+
+    var itemCount:Int = 0
+
     fun bind(data: DATA) {
         mData = data
         setDataToBinding(binding,data)

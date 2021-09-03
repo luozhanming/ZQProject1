@@ -38,9 +38,5 @@ class SpecialCharInputFilter:InputFilter {
         return if(TextUtils.isEmpty(replace1))"" else replace1!!
     }
 
-
-
-
-
 }
 

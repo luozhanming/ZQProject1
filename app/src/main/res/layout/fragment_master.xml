@@ -24,6 +24,7 @@
             android:id="@+id/fl_drag_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -402,6 +403,16 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_request_speak_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{masterViewModel.applySpeakUsers.size()>0?View.VISIBLE:View.GONE}"
+            app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -12,9 +12,11 @@ import cn.com.ava.lubosdk.entity.InteraInfo
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.LocalVideoStream
 import cn.com.ava.lubosdk.entity.MeetingInfo
+import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.RecordManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
+import cn.com.ava.zqproject.common.ApplySpeakManager
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.vo.InteractComputerSource
 import cn.com.ava.zqproject.vo.InteractComputerSources
@@ -26,12 +28,16 @@ import java.util.concurrent.TimeUnit
 
 class MasterViewModel : BaseViewModel() {
 
-
+    /**
+     * 电脑信息
+     * */
     val computerSources: MutableLiveData<InteractComputerSources> by lazy {
         MutableLiveData()
     }
 
-
+    /**
+     * 当前互动视频源
+     * */
     val curSceneSources: MutableLiveData<List<LocalVideoStream>> by lazy {
         MutableLiveData()
     }
@@ -46,7 +52,9 @@ class MasterViewModel : BaseViewModel() {
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
-
+    /**
+     * 会议信息
+     * */
     val meetingInfo: MutableLiveData<MeetingInfo> by lazy {
         MutableLiveData()
     }
@@ -124,11 +132,15 @@ class MasterViewModel : BaseViewModel() {
             }
         }
     }
-
+    /**
+     * 互动信息
+     * */
     val interacInfo: MutableLiveData<InteraInfo> by lazy {
         MutableLiveData()
     }
-
+    /**
+     * 画面上的用户
+     * */
     val onVideoWindow: MediatorLiveData<List<LinkedUser>> by lazy {
         MediatorLiveData<List<LinkedUser>>().apply {
             addSource(interacInfo) {
@@ -172,7 +184,9 @@ class MasterViewModel : BaseViewModel() {
             }
         }
     }
-
+    /**
+     * 画面布局数
+     * */
     val videoLayoutCount: MediatorLiveData<Int> by lazy {
         MediatorLiveData<Int>().apply {
             addSource(interacInfo) {
@@ -185,6 +199,16 @@ class MasterViewModel : BaseViewModel() {
             }
         }
     }
+    /**
+     * 申请发言用户
+     * */
+    val applySpeakUsers:MutableLiveData<List<ApplySpeakUser>> by lazy {
+        MutableLiveData()
+    }
+    /**
+     *
+     */
+    var mApplySpeakListenLoopDisposable:Disposable?=null
 
 
     /**
@@ -248,11 +272,39 @@ class MasterViewModel : BaseViewModel() {
             InteracManager.exitInteraction()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-
                 }, {
                     logPrint2File(it)
                 })
         )
+    }
+
+
+    fun loadApplySpeakUsers(){
+        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(1,"悟空","撒亚人"))
+        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(2,"悟饭","撒亚人"))
+        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(3,"悟天","撒亚人"))
+        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(4,"比达","撒亚人"))
+    }
+
+    /**
+     * 开启申请发言列表监听
+     * */
+    fun startApplySpeakListen(){
+        mApplySpeakListenLoopDisposable?.dispose()
+        mApplySpeakListenLoopDisposable = Observable.interval(1000,TimeUnit.MILLISECONDS)
+            .subscribe({
+                val users = ApplySpeakManager.getApplySpeakUsers()
+                applySpeakUsers.postValue(users)
+            },{
+                logPrint2File(it)
+            })
+    }
+
+    /**
+     * 停止申请发言列表监听
+     * */
+    fun stopApplySpeakListen(){
+        mApplySpeakListenLoopDisposable?.dispose()
     }
 
     fun getComputerSourceInfo() {
@@ -363,6 +415,7 @@ class MasterViewModel : BaseViewModel() {
         mLoopMeetingInfoDisposable?.dispose()
         mLoopCurSceneSourcesDisposable?.dispose()
         mLoopInteracInfoDisposable?.dispose()
+        mApplySpeakListenLoopDisposable?.dispose()
     }
 
 

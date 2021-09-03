@@ -18,11 +18,11 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
         arrayListOf()
     }
 
-    private val mDiffCallback: AdapterDiffCallback<DATA> by lazy {
+    private val mDiffCallback: AdapterDiffCallback<DATA>? by lazy {
         createDiffCallback()
     }
 
-    abstract fun createDiffCallback(): AdapterDiffCallback<DATA>
+    abstract fun createDiffCallback(): AdapterDiffCallback<DATA>?
 
     @LayoutRes
     abstract fun getLayoutId(viewType: Int): Int
@@ -45,6 +45,9 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
 
     override fun onBindViewHolder(holder: BaseViewHolder<DATA, ViewDataBinding>, position: Int) {
         val data = mDatas[position]
+        holder.isFirst = position==0
+        holder.isLast = position==itemCount-1
+        holder.itemCount = itemCount
         holder.bind(data)
     }
 
@@ -58,11 +61,12 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
 
 
     fun refresh() {
-        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, mDatas))
+        if(mDiffCallback==null)return
+        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, mDatas)!!)
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun setDatas(newData: List<DATA>) {
+    open fun setDatas(newData: List<DATA>) {
         //垃圾
         //    val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, newData))
         mDatas.clear()
@@ -73,8 +77,12 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
 
 
     fun setDatasWithDiff(newData: List<DATA>) {
+        if(mDiffCallback==null){
+            setDatas(newData)
+            return
+        }
         //垃圾
-        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, newData))
+        val diffResult = DiffUtil.calculateDiff(updateDiffCallback(mDatas, newData)!!)
         mDatas.clear()
         mDatas.addAll(newData)
         notifyDataSetChanged()
@@ -101,8 +109,8 @@ abstract class BaseAdapter<DATA> : RecyclerView.Adapter<BaseViewHolder<DATA, Vie
     private fun updateDiffCallback(
         oldDatas: List<DATA>,
         newDatas: List<DATA>
-    ): AdapterDiffCallback<DATA> {
-        return mDiffCallback.apply {
+    ): AdapterDiffCallback<DATA>? {
+        return mDiffCallback?.apply {
             oldList.clear()
             oldList.addAll(oldDatas)
             newList.clear()

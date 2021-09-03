@@ -13,11 +13,13 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
+import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
@@ -25,6 +27,7 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentMasterBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
+import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
 import java.util.*
 
@@ -40,7 +43,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     private var mMeetingInfoWindow by autoCleared<MeetingInfoPopupWindow>()
     private var mComputerSourceWindow by autoCleared<ComputerSourcePopupWindow>()
 
-
     //控制台动画相关
     private var topVisibleAnim by autoCleared<Animation>()
 
@@ -51,6 +53,8 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     private var bottomGoneAnim by autoCleared<Animation>()
 
     private var breatheAnim by autoCleared<Animation>()
+
+    private var mApplySpeakUserAdapter by autoCleared<ApplySpeakUserAdapter>()
 
 
     override fun getLayoutId(): Int {
@@ -63,6 +67,13 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.startLoadMeetingInfo()
         mMasterViewModel.loopCurVideoSceneSources()
         mMasterViewModel.startLoopInteracInfo()
+
+        //初始化发言列表
+        mApplySpeakUserAdapter = mApplySpeakUserAdapter?:ApplySpeakUserAdapter()
+        mBinding.rvRequestSpeakList.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,true)
+        mBinding.rvRequestSpeakList.adapter = mApplySpeakUserAdapter
+        mMasterViewModel.loadApplySpeakUsers()
+        mMasterViewModel.startApplySpeakListen()
     }
 
 
@@ -113,8 +124,16 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             mBinding.videoTopView.changeSliceCount(it.size)
             mBinding.videoTopView.setUsersOnVideo(it)
         }
+        mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner){
+            mApplySpeakUserAdapter?.setDatasWithDiff(it)
+        }
 
+    }
 
+    override fun onDestroyView() {
+        //需要置空才能回调相关方法
+        mBinding.rvRequestSpeakList.adapter = null
+        super.onDestroyView()
     }
 
     override fun onBindViewModel2Layout(binding: FragmentMasterBinding) {

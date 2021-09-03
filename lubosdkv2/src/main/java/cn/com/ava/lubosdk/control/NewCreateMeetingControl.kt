@@ -29,7 +29,6 @@ class NewCreateMeetingControl(
                    if(i!=users.size-1){
                        append(";")
                    }
-
                }
             }
 

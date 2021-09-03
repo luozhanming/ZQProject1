@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -153,7 +154,7 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
     data class WindowOptions(
         val width: Int,
         val height: Int,
-        val gravity: Int,
+        val gravity: Int = Gravity.CENTER,
         val canTouchOutsideCancel: Boolean = true
     )
 }

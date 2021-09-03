@@ -59,6 +59,8 @@
             app:exitAnim="@anim/exit"
             app:popEnterAnim="@anim/pop_enter"
             app:popExitAnim="@anim/pop_exit"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/splashFragment"
             app:destination="@id/homeFragment" />
     </fragment>
     <fragment

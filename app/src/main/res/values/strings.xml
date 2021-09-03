@@ -177,4 +177,11 @@
 
     <string name="who_launch_meeting">发起的会议</string>
 
+    <string name="title_record_upload">已录制视频文件归档选择</string>
+    <string name="record_upload_msg">（归档至平台：归档成功后请前往平台个人空间查看）</string>
+    <string name="upload_to_platform">归档至平台</string>
+    <string name="format_apply_speak">%s—%s请求发言</string>
+    <string name="agree">同意</string>
+    <string name="disagree">不同意</string>
+
 </resources>
