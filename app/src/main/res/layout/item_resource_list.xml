@@ -6,7 +6,7 @@
     <data>
         <variable
             name="video"
-            type="cn.com.ava.lubosdk.entity.RecordFilesInfo.RecordFile" />
+            type="cn.com.ava.zqproject.vo.StatefulView&lt;cn.com.ava.lubosdk.entity.RecordFilesInfo.RecordFile>" />
     </data>
 
     <com.mcxtzhang.swipemenulib.SwipeMenuLayout
@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="@+id/imageView1"
                 app:layout_constraintStart_toEndOf="@+id/imageView1"
                 app:layout_constraintEnd_toStartOf="@+id/iv_download"
-                android:text="@{video.downloadFileName}"
+                android:text="@{video.obj.downloadFileName}"
                 android:textColor="@color/color_222222"
                 android:textSize="19sp"/>
 
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView1"
                 app:layout_constraintStart_toStartOf="@+id/tv_title"
-                android:text="@{video.recordBeginTime}"
+                android:text="@{video.obj.recordBeginTime}"
                 android:textColor="@color/color_999999"
                 android:textSize="16sp"/>
 
@@ -58,7 +58,7 @@
                 android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView1"
                 app:layout_constraintStart_toEndOf="@+id/tv_time"
-                android:text="@{video.fileSize}"
+                android:text="@{video.obj.fileSize}"
                 android:textColor="@color/color_999999"
                 android:textSize="16sp"/>
 

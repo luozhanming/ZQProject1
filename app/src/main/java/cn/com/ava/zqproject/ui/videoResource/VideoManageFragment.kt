@@ -3,19 +3,26 @@ package cn.com.ava.zqproject.ui.videoResource
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.GsonUtil
+import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoManageBinding
 import cn.com.ava.zqproject.ui.splash.SplashFragment
+import cn.com.ava.zqproject.ui.videoResource.pop.VRManageMenuWindow
+import cn.com.ava.zqproject.ui.videoResource.pop.VideoResourceSortMenuWindow
+import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 import cn.com.ava.zqproject.usb.UsbHelper
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayout
@@ -25,7 +32,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
 
-    private val mVideoManageViewModel by viewModels<VideoManageViewModel>()
+    private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
+    // 排序弹框
+    var sortWindow: VideoResourceSortMenuWindow ?= null
+    // 批量管理弹框
+    var batchManageWindow: VRManageMenuWindow ?= null
 
     private val mFragments: List<Fragment> by lazy {
         val fragments = arrayListOf<Fragment>()
@@ -115,16 +126,43 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         }
         // 排序
         mBinding.ivSort.setOnClickListener {
-            mVideoManageViewModel.sortByFileSize()
-//            mVideoManageViewModel.sortByRecordTime()
+            if (sortWindow == null) {
+                sortWindow = VideoResourceSortMenuWindow(requireContext(), SizeUtils.dp2px(210), SizeUtils.dp2px(140))
+            }
+            sortWindow?.setIndex(mVideoManageViewModel.sortIndex)
+            sortWindow?.sortBySize {
+                logd("根据文件大小排序")
+                mVideoManageViewModel.sortByFileSize()
+                mVideoManageViewModel.sortIndex = 0
+            }
+            sortWindow?.sortByTime {
+                logd("根据录制时间排序")
+                mVideoManageViewModel.sortByRecordTime()
+                mVideoManageViewModel.sortIndex = 1
+            }
+            if (sortWindow?.isShowing == false) {
+                sortWindow?.showAsDropDown(it)
+            } else {
+                sortWindow?.dismiss()
+            }
         }
         // 批量管理
         mBinding.ivManage.setOnClickListener {
-            findNavController().navigate(
-                VideoManageFragmentDirections.actionVideoFragmentToManageFragment(
-                    GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+            if (batchManageWindow == null) {
+                batchManageWindow = VRManageMenuWindow(requireContext(), SizeUtils.dp2px(180), SizeUtils.dp2px(100))
+            }
+            batchManageWindow?.batchManage {
+                findNavController().navigate(
+                    VideoManageFragmentDirections.actionVideoFragmentToManageFragment(
+                        GsonUtil.toJson(mVideoManageViewModel.videoResources.value)
+                    )
                 )
-            )
+            }
+            if (batchManageWindow?.isShowing == false) {
+                batchManageWindow?.showAsDropDown(it)
+            } else {
+                batchManageWindow?.dismiss()
+            }
         }
         // 清除全部记录
         mBinding.btnClearAllRecord.setOnClickListener {
@@ -139,5 +177,10 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
         mBinding.ivBack.setOnClickListener {
             findNavController().navigateUp()
         }
+    }
+
+    override fun onDestroyView() {
+        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(mVideoManageViewModel.cacheVideos))
+        super.onDestroyView()
     }
 }
