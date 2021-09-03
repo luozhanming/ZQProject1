@@ -37,8 +37,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             findNavController().navigate(R.id.action_homeFragment_to_recordFragment)
         }
         mBinding.btnResource.setOnClickListener {
-//            findNavController().navigate(R.id.action_homeFragment_to_videoResourceFragment)
-            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_videoResourceFragment)
+//            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
         mBinding.btnJoinMeeting.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_masterFragment)
