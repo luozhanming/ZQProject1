@@ -3,15 +3,17 @@ package cn.com.ava.zqproject.ui.splash
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import cn.com.ava.authcode.AuthKeyUtil
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
+import cn.com.ava.zqproject.BuildConfig
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentSplashBinding
 import cn.com.ava.zqproject.extension.getMainHandler
 import cn.com.ava.zqproject.ui.MainViewModel
@@ -42,6 +44,10 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private var mWakeUpConfirmDialog by autoCleared<ConfirmDialog>()
 
+    private var hasAutoCode by CommonPreference(CommonPreference.KEY_HAS_AUTH_CODE, false)
+
+    private var mAuthCodeDialog by autoCleared<AuthCodeDialog>()
+
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_splash
@@ -55,7 +61,14 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         super.onCreate(savedInstanceState)
         if (checkPermissions()) {  //检测必要权限
             //步骤1
-            mSplashViewModel.login()
+            if (!BuildConfig.DEBUG&&!hasAutoCode) {
+                AuthKeyUtil.generateDeviceFile()
+                //弹出对话框
+                mAuthCodeDialog = mAuthCodeDialog?: AuthCodeDialog()
+                mAuthCodeDialog?.show(childFragmentManager,"auth")
+            }else{
+                mSplashViewModel.login()
+            }
         }
     }
 
@@ -101,7 +114,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                     SplashViewModel.WHERE_PLATFORM_LOGIN -> {
                         findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
                     }
-                    SplashViewModel.WHERE_GO_HOME->{
+                    SplashViewModel.WHERE_GO_HOME -> {
                         findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
                     }
                 }
@@ -126,13 +139,13 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                                 dialog?.dismiss()
                                 //1.弹出60秒对话框唤醒设备
                                 //2.再次调用登录
-                               mSplashViewModel.wakeupMachine()
+                                mSplashViewModel.wakeupMachine()
                             }, { dialog ->
                                 dialog?.dismiss()
                                 findNavController().navigate(R.id.action_splashFragment_to_luBoSettingFragment)
                             })
                 }
-                mWakeUpConfirmDialog?.show(childFragmentManager,"wakeup")
+                mWakeUpConfirmDialog?.show(childFragmentManager, "wakeup")
             }
         }
         mSplashViewModel.isShowLoading.observe(viewLifecycleOwner) {
@@ -147,8 +160,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             mMainViewModel.isShowLoading.postValue(it)
         }
     }
-
-
 
 
 }

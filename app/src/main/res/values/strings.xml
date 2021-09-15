@@ -186,5 +186,14 @@
     <string name="format_apply_speak">%s—%s请求发言</string>
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
-
+    <string name="app_jihuo">应用激活</string>
+    <string name="jihuo_code">激活码</string>
+    <string name="get_code">获取激活码</string>
+    <string name="hint_input_code">请输入激活码</string>
+    <string name="get_no_code">获取不到激活码</string>
+    <string name="validate_success">激活成功</string>
+    <string name="validate_failed">激活失败</string>
+    <string name="format_device_code">设备码：%s</string>
+    <string name="reject">拒绝</string>
+    <string name="accept_call">接听</string>
 </resources>

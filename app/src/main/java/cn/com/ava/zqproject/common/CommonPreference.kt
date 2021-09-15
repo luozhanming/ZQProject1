@@ -27,6 +27,8 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
         const val KEY_PLATFORM_TOKEN = "Platform_Token"
         //平台最后一个登录的用户，没主动登出
         const val KEY_PLATFORM_LATEST_LOGIN = "Platform_Latest_Login"
+        //是否已授权
+        const val KEY_HAS_AUTH_CODE = "Has_Auth_Code"
 
 
         val pref = MMKV.mmkvWithID(SP_COMMON_NAME,MMKV.SINGLE_PROCESS_MODE,AppConfig.MMKV_CRYPT_KEY)

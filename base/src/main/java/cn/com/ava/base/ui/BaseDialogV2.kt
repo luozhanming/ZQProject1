@@ -151,6 +151,7 @@ abstract class BaseDialogV2<B : ViewDataBinding>(val style: Int = R.style.Common
     abstract fun getLayoutId(): Int
 
 
+
     data class WindowOptions(
         val width: Int,
         val height: Int,

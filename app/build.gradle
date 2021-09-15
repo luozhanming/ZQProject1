@@ -27,7 +27,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -42,6 +43,8 @@ android {
     buildFeatures {
         dataBinding = true
     }
+
+
 }
 
 dependencies {
@@ -49,6 +52,7 @@ dependencies {
     implementation project(path: ':base')
     implementation project(path: ':lubosdkv2')
     implementation project(path: ':player')
+    implementation project(path: ':authcode')
     implementation deps.xcrash
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'

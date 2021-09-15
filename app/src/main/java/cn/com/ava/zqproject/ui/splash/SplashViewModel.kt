@@ -83,6 +83,7 @@ class SplashViewModel : BaseViewModel() {
         } else {  //尝试登录
             mDisposables.add(
                 LoginManager.newLogin(username, password)
+                    .timeout(2000,TimeUnit.MILLISECONDS)   //2秒得不到结果就抛出一床
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
                         if (login.isLoginSuccess) {
@@ -122,7 +123,9 @@ class SplashViewModel : BaseViewModel() {
         //2.如果能够连接跳到平台登录，如果不能跳到平台设置页面
         mDisposables.add(
             PlatformApi.getService(platformUrl)
-                .getInterface().compose(PlatformApi.applySchedulers())
+                .getInterface()
+                .timeout(2000,TimeUnit.MILLISECONDS)
+                .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ response ->
                     PlatformApiManager.setApiPath(response.data)
@@ -151,6 +154,7 @@ class SplashViewModel : BaseViewModel() {
             PlatformApi.getService().refreshToken(
                token= latestLogin.token
             )
+                .timeout(2000,TimeUnit.MILLISECONDS)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -171,6 +175,7 @@ class SplashViewModel : BaseViewModel() {
     fun wakeupMachine() {
         isShowLoading.postValue(true)
         mDisposables.add(PowerManager.wakeupMachine()
+            .timeout(2000,TimeUnit.MILLISECONDS)
             .flatMap {
                 Observable.timer(70, TimeUnit.SECONDS)
             }
