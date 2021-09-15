@@ -47,4 +47,7 @@ interface AVAServerService {
 
     @GET("cgi-bin/plat.cgi")
     fun uploadVideoResource(@QueryMap params: Map<String, String>): Call<ResponseBody>
+
+    @POST("cgi-bin/plat.cgi")
+    fun deleteRecordFile(@FieldMap params: Map<String, String>): Call<ResponseBody>
 }
