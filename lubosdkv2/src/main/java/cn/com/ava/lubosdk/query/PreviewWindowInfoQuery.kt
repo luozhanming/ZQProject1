@@ -107,7 +107,6 @@ class PreviewWindowInfoQuery(
             AVATable.CUE_NAMEC6, AVATable.CUE_NAMEC7,
             AVATable.CUE_NAMEC8, AVATable.CUE_NAMEC9,
             AVATable.UI_KEYWINDOWLOCATE,
-
             AVATable.UI_NWINDOWNAME, AVATable.UI_NEUTRAL
         )
     override var offsets: Int = 0
