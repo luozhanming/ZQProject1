@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.os.storage.StorageVolume
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,7 +34,8 @@ import java.util.concurrent.ConcurrentMap
 
 class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
-    private val mManageResourcesViewModel by viewModels<ManageResourcesViewModel>()
+    private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
+//    private val mManageResourcesViewModel by viewModels<ManageResourcesViewModel>()
 
     private var mManageResourceItemAdapter by autoCleared<ManageResourceItemAdapter>()
 
@@ -43,13 +46,6 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
         object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 mDownloadService = p1?.let { (it as DownloadService.DownloadBinder).service }
-                logd("下载服务")
-//                mDownloadService?.registerDownloadCallback(object : DownloadService.DownloadCallback {
-//                    override fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
-//                        logd("下载列表： ${info.toString()}")
-//                        mVideoManageViewModel.refreshDownloadProgress(info)
-//                    }
-//                })
             }
             override fun onServiceDisconnected(p0: ComponentName?) {
                 mDownloadService = null
@@ -61,57 +57,61 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
         return R.layout.fragment_manage_resources
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mVideoManageViewModel.mSelectedVideos.clear()
+    }
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun initView() {
         super.initView()
         startService()
         bindService()
 
-        val videos: String = arguments?.get("videos").toString()
-        val list = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(videos, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
-
-        val statefuls = arrayListOf<StatefulView<RecordFilesInfo.RecordFile>>()
-        for (video in list) {
-            val stateful = StatefulView(video)
-            statefuls.add(stateful)
-        }
-        mManageResourcesViewModel.videoResources.value = statefuls
-
-        logd("视频size: ${mManageResourcesViewModel.videoResources.value?.size}")
+//        val videos: String = arguments?.get("videos").toString()
+//        val list = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(videos, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
+//
+//        val statefuls = arrayListOf<StatefulView<RecordFilesInfo.RecordFile>>()
+//        for (video in list) {
+//            val stateful = StatefulView(video)
+//            statefuls.add(stateful)
+//        }
+//        mManageResourcesViewModel.videoResources.value = statefuls
+//
+        logd("视频size: ${mVideoManageViewModel.videoResources.value?.size}")
 
         mBinding.ivBack.setOnClickListener {
             findNavController().navigateUp()
         }
         // 全选
         mBinding.btnSelectAll.setOnClickListener {
-            mManageResourcesViewModel.selectedAllOrCancel(false)
+            mVideoManageViewModel.selectedAllOrCancel(false)
         }
 
         // 取消全选
         mBinding.btnCancelSelectAll.setOnClickListener {
-            mManageResourcesViewModel.selectedAllOrCancel(true)
+            mVideoManageViewModel.selectedAllOrCancel(true)
         }
 
         // 下载
         mBinding.btnDownload.setOnClickListener {
-            if (mManageResourcesViewModel.mSelectedVideos.size == 0) {
+            if (mVideoManageViewModel.mSelectedVideos.size == 0) {
                 ToastUtils.showShort("请勾选需要下载的视频")
                 return@setOnClickListener
             }
-            logd("下载视频: ${mManageResourcesViewModel.mSelectedVideos.size}")
+            logd("下载视频: ${mVideoManageViewModel.mSelectedVideos.size}")
             // 检测是否有下载缓存
 
             var hasCache = false
-            mManageResourcesViewModel.mSelectedVideos.forEach {
-                if (mManageResourcesViewModel.checkCacheResult(it)) {
+            mVideoManageViewModel.mSelectedVideos.forEach {
+                if (mVideoManageViewModel.checkCacheResult(it)) {
                     hasCache = true
                 }
             }
             if (hasCache) {
-                ToastUtils.showShort("部分视频已在下载队列，请勿重复下载")
+                ToastUtils.showShort("部分视频已在下载队列")
                 return@setOnClickListener
             }
-
             val uDiskPath = UsbHelper.getUDiskPath()
             if (uDiskPath.isEmpty()) {
                 ToastUtils.showShort(getString(R.string.tip_find_no_udisk))
@@ -139,11 +139,14 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
         // 删除
         mBinding.btnDelete.setOnClickListener {
-            if (mManageResourcesViewModel.mSelectedVideos.size == 0) {
+            if (mVideoManageViewModel.mSelectedVideos.size == 0) {
                 ToastUtils.showShort("请勾选需要删除的视频")
                 return@setOnClickListener
             }
-            logd("删除视频: ${mManageResourcesViewModel.mSelectedVideos.size}")
+            logd("删除视频: ${mVideoManageViewModel.mSelectedVideos.size}")
+            mVideoManageViewModel.mSelectedVideos.forEach {
+                mVideoManageViewModel.deleteVideo(it)
+            }
         }
 
         if (mManageResourceItemAdapter == null) {
@@ -157,7 +160,7 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
                         data.isSelected = isSelected
                         mManageResourceItemAdapter?.changeData(data)
                     }
-                    mManageResourcesViewModel.addOrDelSelectedVideo(data.obj)
+                    mVideoManageViewModel.addOrDelSelectedVideo(data.obj)
                 }
             })
         }
@@ -182,17 +185,18 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
     // 下载视频
     fun downloadVideo() {
         logd("下载视频")
-        mManageResourcesViewModel.saveCacheVideo(mManageResourcesViewModel.mSelectedVideos)
-        mManageResourcesViewModel.mSelectedVideos.forEach {
+        mVideoManageViewModel.saveCacheVideo(mVideoManageViewModel.mSelectedVideos)
+        mVideoManageViewModel.mSelectedVideos.forEach {
             mDownloadService?.downloadVideo(it)
         }
     }
 
     override fun observeVM() {
-        mManageResourcesViewModel.videoResources.observe(viewLifecycleOwner) {
+
+        mVideoManageViewModel.videoResources.observe(viewLifecycleOwner) {
             mManageResourceItemAdapter?.setDatas(it)
         }
-        mManageResourcesViewModel.isSelectedAll.observe(viewLifecycleOwner) { isSelectedAll ->
+        mVideoManageViewModel.isSelectedAll.observe(viewLifecycleOwner) { isSelectedAll ->
             logd("是否全选, ${isSelectedAll.toString()}")
             mBinding.btnSelectAll.isVisible = !isSelectedAll
             mBinding.btnCancelSelectAll.isVisible = isSelectedAll
@@ -245,6 +249,10 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
     override fun onDestroyView() {
         mBinding.rvResourceList.adapter = null
+        mVideoManageViewModel.mSelectedVideos.clear()
+        mVideoManageViewModel.videoResources.value?.forEach {
+            it.isSelected = false
+        }
         super.onDestroyView()
     }
 

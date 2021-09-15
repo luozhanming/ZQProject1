@@ -40,4 +40,11 @@ interface AVAServerService {
 
     @GET("/cgi-bin/getPtFilesInfo.cgi")
     fun getPtFilesInfo(@Query("program") program: String): Call<ResponseBody>
+
+    @FormUrlEncoded
+    @POST("cgi-bin/delFile.cgi")
+    fun deleteVideoResource(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
+    @GET("cgi-bin/plat.cgi")
+    fun uploadVideoResource(@QueryMap params: Map<String, String>): Call<ResponseBody>
 }

@@ -1,6 +1,7 @@
 package cn.com.ava.zqproject.ui.videoResource
 
 import android.os.Bundle
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,13 +13,14 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoTransmissionListBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoTransmissionListItemAdapter
 import cn.com.ava.zqproject.ui.videoResource.dialog.DeleteVideoDialog
+import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 import cn.com.ava.zqproject.vo.VideoResource
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionListBinding>() {
 
-    private val mVideoManageViewModel by viewModels<VideoManageViewModel>({ requireParentFragment() })
+    private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
 
     private var mVideoTransmissionListItemAdapter by autoCleared<VideoTransmissionListItemAdapter>()
 
@@ -28,10 +30,11 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
 
     override fun initView() {
         super.initView()
-
-        if (mVideoManageViewModel.transmissionVideos.value?.size == 0) { // 初始化数据
-            mVideoManageViewModel.transmissionVideos.value = mVideoManageViewModel.getCacheVideos()
-        }
+        logd("initView_传输列表")
+//        if (mVideoManageViewModel.transmissionVideos.value?.size == 0) { // 初始化数据
+////            mVideoManageViewModel.transmissionVideos.value = mVideoManageViewModel.getCacheVideos()
+//            mVideoManageViewModel.transmissionVideos.value = VideoSingleton.getInstance().cacheVideos
+//        }
 
         mVideoTransmissionListItemAdapter = VideoTransmissionListItemAdapter(object : VideoTransmissionListItemAdapter.VideoTransmissionCallback {
             override fun onDidClickedItem(data: RecordFilesInfo.RecordFile?) {
@@ -60,7 +63,7 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
 
     override fun observeVM() {
         mVideoManageViewModel.transmissionVideos.observe(viewLifecycleOwner) {
-            logd("更新传输列表")
+            logd("刷新列表, ${it.toString()}")
             mVideoTransmissionListItemAdapter?.setDatas(it)
         }
     }
