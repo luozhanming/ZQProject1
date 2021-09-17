@@ -71,6 +71,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="23dp"
+                android:visibility="gone"
                 android:padding="5dp"
                 android:background="@drawable/bg_text_button_2"
                 android:src="@mipmap/ic_back_2"

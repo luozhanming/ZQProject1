@@ -19,7 +19,6 @@ import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
-import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
@@ -29,7 +28,6 @@ import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
-import java.util.*
 
 /**
  * 主讲界面
@@ -67,10 +65,11 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.startLoadMeetingInfo()
         mMasterViewModel.loopCurVideoSceneSources()
         mMasterViewModel.startLoopInteracInfo()
-
+        mMasterViewModel.startLoopMeetingInfoZQ()
         //初始化发言列表
-        mApplySpeakUserAdapter = mApplySpeakUserAdapter?:ApplySpeakUserAdapter()
-        mBinding.rvRequestSpeakList.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,true)
+        mApplySpeakUserAdapter = mApplySpeakUserAdapter ?: ApplySpeakUserAdapter()
+        mBinding.rvRequestSpeakList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         mBinding.rvRequestSpeakList.adapter = mApplySpeakUserAdapter
         mMasterViewModel.loadApplySpeakUsers()
         mMasterViewModel.startApplySpeakListen()
@@ -120,12 +119,15 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 }
             }
         }
-        mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner){
+        mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner) {
             mBinding.videoTopView.changeSliceCount(it.size)
             mBinding.videoTopView.setUsersOnVideo(it)
         }
-        mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner){
+        mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner) {
             mApplySpeakUserAdapter?.setDatasWithDiff(it)
+        }
+        mMasterViewModel.meetingInfoZq.observe(viewLifecycleOwner) {
+
         }
 
     }
@@ -175,7 +177,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         }
         mBinding.ivInfo.setOnClickListener {
             mMeetingInfoWindow = mMeetingInfoWindow ?: MeetingInfoPopupWindow(requireContext())
-            mMeetingInfoWindow?.setMeetingMasterInfo(mMasterViewModel.meetingInfo.value)
+            mMeetingInfoWindow?.setMeetingMasterInfo(mMasterViewModel.meetingInfoZq.value)
             mMeetingInfoWindow?.showAtLocation(
                 mBinding.ivInfo,
                 Gravity.TOP or Gravity.CENTER,
@@ -196,7 +198,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mBinding.llMemberManager.setOnClickListener {
 
         }
-        mBinding.videoTopView.setOnLabelDropListener(object :SliceVideoView.OnVideoCallback{
+        mBinding.videoTopView.setOnLabelDropListener(object : SliceVideoView.OnVideoCallback {
             override fun onReplaceVideo(userNum: String?, locateIndex: Int) {
 
             }
@@ -208,15 +210,25 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                         location.toString() + ""
                     )
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        mBinding.videoTopView.startDragAndDrop(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
-                    }else{
-                        mBinding.videoTopView.startDrag(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
+                        mBinding.videoTopView.startDragAndDrop(
+                            clipData,
+                            DragShadowBuilder(mBinding.flDragTemp),
+                            null,
+                            0
+                        )
+                    } else {
+                        mBinding.videoTopView.startDrag(
+                            clipData,
+                            DragShadowBuilder(mBinding.flDragTemp),
+                            null,
+                            0
+                        )
                     }
                 }, 200)
             }
 
             override fun onExchangeVideo(srcIndex: Int, dstIndex: Int) {
-                val layoutInfo= mMasterViewModel.onVideoWindow.value?: emptyList()
+                val layoutInfo = mMasterViewModel.onVideoWindow.value ?: emptyList()
                 val temp = arrayListOf<Int>()
                 val size = layoutInfo.size
                 for (i in 0 until size) {
@@ -328,5 +340,9 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mVideoPlayer?.stopPlay()
         mVideoPlayer?.release()
         mVideoPlayer = null
+    }
+
+    override fun onBackPressed(): Boolean {
+        return true
     }
 }

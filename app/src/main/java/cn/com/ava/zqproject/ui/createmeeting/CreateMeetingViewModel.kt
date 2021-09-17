@@ -2,8 +2,21 @@ package cn.com.ava.zqproject.ui.createmeeting
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
+import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.ContractGroup
 import cn.com.ava.zqproject.vo.ContractUser
+import com.blankj.utilcode.util.ToastUtils
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class CreateMeetingViewModel : BaseViewModel() {
 
@@ -16,6 +29,14 @@ class CreateMeetingViewModel : BaseViewModel() {
         val list = arrayListOf<ContractUser>()
         data.value = list
         data
+    }
+
+    val goMeeting:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
+    val isLoading:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
 
@@ -58,7 +79,7 @@ class CreateMeetingViewModel : BaseViewModel() {
                 }
             }
             val preCount = (selectedUsers?.size ?: 0) + unAddedUsers.size
-            if (preCount< MAX_SELECTED_USER) {
+            if (preCount < MAX_SELECTED_USER) {
                 selectedUsers?.addAll(unAddedUsers)
                 selectedUser.value = selectedUsers
                 return true
@@ -77,7 +98,55 @@ class CreateMeetingViewModel : BaseViewModel() {
      * @param waiting 是否开启等候室
      * */
     fun createMeeting(theme: String, nickname: String, waiting: Boolean) {
-        TODO()
+
+        val users = arrayListOf<String>().apply {
+            val selected = selectedUser.value
+            selected?.forEach {
+                add(it.userId)
+            }
+        }
+        isLoading.postValue(OneTimeEvent(true))
+        mDisposables.add(ZQManager.createMeeting(theme, "", nickname, waiting, arrayOf())
+            .delay(4000,TimeUnit.MILLISECONDS)
+            .flatMap {
+                if (it) {
+                    ZQManager.loadMeetingInfo()   //加载会议信息
+                        .flatMap {
+                            return@flatMap PlatformApi.getService().createMeeting(  //回传平台
+                                initiator = nickname,
+                                meetingTitle = theme,
+                                meetingNo = it.confId,
+                                userId = users
+                            )
+                                .compose(PlatformApi.applySchedulers())
+                                .flatMap {
+                                    if(it.success){  //成功
+                                        return@flatMap Observable.just(true)
+                                    }else{
+                                        return@flatMap ZQManager.exitMeeting()  //回滚退出会议
+                                            .map {
+                                                return@map false
+                                            }
+                                    }
+                                }
+                        }
+                } else {
+                    return@flatMap Observable.just(false)
+                }
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                isLoading.postValue(OneTimeEvent(false))
+                ToastUtils.showShort(getResources().getString(R.string.create_meeting_success))
+                goMeeting.postValue(OneTimeEvent(true))
+                //创建成功
+            }, {
+                isLoading.postValue(OneTimeEvent(false))
+                ToastUtils.showShort(getResources().getString(R.string.create_meeting_failed))
+                logPrint2File(it)
+            })
+        )
 
     }
 

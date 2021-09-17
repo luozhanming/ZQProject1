@@ -8,7 +8,9 @@ import cn.com.ava.base.ui.BasePopupWindow
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.lubosdk.entity.ListenerInfo
 import cn.com.ava.lubosdk.entity.MeetingInfo
+import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.net.PlatformApi
 
 /**
  * 听课信息弹出窗口
@@ -44,9 +46,11 @@ class MeetingInfoPopupWindow(context: Context) : BasePopupWindow(context) {
         tvMeetingPsw?.text = "${getResources().getString(R.string.meeting_psw)}${info?.meetingPassword}"
     }
 
-    fun setMeetingMasterInfo(info:MeetingInfo?){
-        tvTheme?.text = info?.meetingTheme
-        tvMeetingNum?.text = "${getResources().getString(R.string.meeting_num)}${info?.meetingNumber}"
-        tvMeetingPsw?.text = "${getResources().getString(R.string.meeting_psw)}${info?.meetingPassword}"
+    fun setMeetingMasterInfo(info: MeetingInfoZQ?){
+        tvTheme?.text = info?.confTheme
+        tvMeetingNum?.text = "${getResources().getString(R.string.meeting_num)}${info?.confId}"
+        tvMeetingPsw?.text = "${getResources().getString(R.string.meeting_psw)}${info?.confpsw?:""}"
+        tvBeginTime?.text = "${getResources().getString(R.string.meeting_begin_time)}${info?.confStartTime?:""}"
+        tvMasterName?.text = "${getResources().getString(R.string.meeting_master_name)}${PlatformApi.getPlatformLogin()?.name}-${PlatformApi.getPlatformLogin()?.professionTitleName}"
     }
 }

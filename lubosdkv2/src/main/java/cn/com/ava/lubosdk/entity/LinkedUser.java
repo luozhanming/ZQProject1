@@ -2,8 +2,9 @@ package cn.com.ava.lubosdk.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LinkedUser implements Comparable<Integer> {
+public class LinkedUser implements Comparable<Integer>,QueryResult {
     /**互动号码*/
+    private String userId;
     private int number;
     private String username;
     private String nickname;
@@ -14,6 +15,10 @@ public class LinkedUser implements Comparable<Integer> {
     private int onlineState;
     /**是否在画面上*/
     private boolean isOnVideo;
+
+    private String sessionId;
+
+    private String role;
 
     public int getNumber() {
         return number;
@@ -63,6 +68,29 @@ public class LinkedUser implements Comparable<Integer> {
         isOnVideo = onVideo;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     @Override
     public String toString() {

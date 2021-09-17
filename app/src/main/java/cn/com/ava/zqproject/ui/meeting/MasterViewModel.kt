@@ -16,6 +16,8 @@ import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.RecordManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
+import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.common.ApplySpeakManager
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.vo.InteractComputerSource
@@ -47,6 +49,8 @@ class MasterViewModel : BaseViewModel() {
     private var mLoopCurSceneSourcesDisposable: Disposable? = null
 
     private var mLoopInteracInfoDisposable: Disposable? = null
+
+    private var mLoopMeetingInfoZQDisposable:Disposable?=null
 
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
@@ -103,9 +107,10 @@ class MasterViewModel : BaseViewModel() {
      * */
     val exitMeeting: MediatorLiveData<Boolean> by lazy {
         MediatorLiveData<Boolean>().apply {
-            addSource(meetingInfo) {
-                if (meetingInfo.value?.interaMode != Constant.INTERAC_MODE_CONFERENCE) {
-                    postValue(true)
+            addSource(meetingInfoZq) {
+                val value = "created"!=meetingInfoZq.value?.confStatus
+                if(value){
+                   postValue(true)
                 }
             }
         }
@@ -205,6 +210,15 @@ class MasterViewModel : BaseViewModel() {
     val applySpeakUsers:MutableLiveData<List<ApplySpeakUser>> by lazy {
         MutableLiveData()
     }
+
+
+    /**
+     * 会议信息
+     * */
+    val meetingInfoZq:MutableLiveData<MeetingInfoZQ> by lazy {
+        MutableLiveData()
+    }
+
     /**
      *
      */
@@ -249,6 +263,26 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
+    fun startLoopMeetingInfoZQ(){
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+               ZQManager.loadMeetingInfo()
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                meetingInfoZq.postValue(it)
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+
+
+
+
+
+
     fun toggleComputer() {
         var postIndex = 1
         if (isPluginComputer.value == true) {
@@ -269,7 +303,7 @@ class MasterViewModel : BaseViewModel() {
 
     fun overMeeting() {
         mDisposables.add(
-            InteracManager.exitInteraction()
+            ZQManager.exitMeeting()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                 }, {
@@ -416,6 +450,7 @@ class MasterViewModel : BaseViewModel() {
         mLoopCurSceneSourcesDisposable?.dispose()
         mLoopInteracInfoDisposable?.dispose()
         mApplySpeakListenLoopDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable?.dispose()
     }
 
 

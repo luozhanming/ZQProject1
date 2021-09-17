@@ -5,6 +5,7 @@ import cn.com.ava.zqproject.vo.*
 import io.reactivex.Observable
 import retrofit2.http.*
 import retrofit2.http.Query
+import java.util.LinkedHashMap
 
 interface PlatformService {
 
@@ -91,8 +92,9 @@ interface PlatformService {
         ),
         @Field("initiatorName") initiator: String = "",
         @Field("meetingTitle") meetingTitle: String = "",
-        @Field("participantUserId") userId: String = ""
-    )
+        @Field("meetingNo") meetingNo:String = "",
+        @Field("participantUserId") userId: List<String>? = null
+    ):Observable<PlatformResponse<Any>>
 
 
     @GET("/{path}")

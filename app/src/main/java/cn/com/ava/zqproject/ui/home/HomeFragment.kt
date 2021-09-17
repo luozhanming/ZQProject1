@@ -41,7 +41,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 //            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
         mBinding.btnJoinMeeting.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_masterFragment)
+            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
 
         }
 
@@ -83,12 +83,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onStart() {
         super.onStart()
         mHomeViewModel.startloadLuboInfo()
+        mHomeViewModel.startLoopMeetingInfoZQ()
     }
 
 
     override fun onStop() {
         super.onStop()
         mHomeViewModel.stopLoadLuboInfo()
+        mHomeViewModel.stopLoopMeetingInfoZQ()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,6 +121,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mPowerViewModel.reloadMachine.observe(viewLifecycleOwner, goSetting)
         mPowerViewModel.sleepMachine.observe(viewLifecycleOwner, goSetting)
         mPowerViewModel.turnoffMachine.observe(viewLifecycleOwner, goSetting)
+
+        mHomeViewModel.meetingInfoZq.observeOne(viewLifecycleOwner){
+            if("created"==it.confStatus){
+                if("cloudCtrlMode"==it.confMode){
+                    findNavController().navigate(R.id.action_homeFragment_to_masterFragment)
+                }else if("classMode"==it.confMode){
+                    findNavController().navigate(R.id.action_homeFragment_to_listenerFragment)
+                }
+            }
+        }
     }
 
 }

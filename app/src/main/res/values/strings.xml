@@ -196,4 +196,6 @@
     <string name="format_device_code">设备码：%s</string>
     <string name="reject">拒绝</string>
     <string name="accept_call">接听</string>
+    <string name="create_meeting_failed">创建会议失败</string>
+    <string name="create_meeting_success">创建会议成功</string>
 </resources>
