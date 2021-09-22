@@ -9,6 +9,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.storage.StorageVolume
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -17,6 +20,7 @@ import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.RecordFilesInfo
+import cn.com.ava.lubosdk.entity.TransmissionProgressEntity
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentVideoResourceListBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
@@ -55,6 +59,22 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                     override fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
                         mVideoManageViewModel.refreshDownloadProgress(info)
                     }
+
+                    override fun onSubmitUploadCallback(
+                        isSuccess: Boolean,
+                        msg: String,
+                        data: RecordFilesInfo.RecordFile
+                    ) {
+                        ToastUtils.showShort(msg)
+                        if (isSuccess) { // 提交上传成功
+                            mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
+                        }
+                    }
+
+                    override fun onUploadStateChanged(info: ConcurrentMap<String, TransmissionProgressEntity>) {
+                        logd("onUploadStateChanged thread = ${Thread.currentThread()}")
+                        mVideoManageViewModel.refreshUploadProgress(info)
+                    }
                 })
             }
             override fun onServiceDisconnected(p0: ComponentName?) {
@@ -67,15 +87,24 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
         return R.layout.fragment_video_resource_list
     }
 
+    override fun onResume() {
+        super.onResume()
+        logd("listfragment onResume")
+    }
+
     override fun initView() {
         super.initView()
         startService()
         bindService()
+        logd("listfragment initView")
 
         mBinding.refreshLayout.setOnRefreshListener {
             mVideoManageViewModel.getVideoResourceList()
         }
         mBinding.refreshLayout.autoRefresh()
+        if ((mVideoManageViewModel.videoResources.value?.size ?: 0) > 0) {
+            mVideoManageViewModel.getVideoResourceList()
+        }
         if (mVideoResourceListItemAdapter == null) {
             mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
                 override fun onDidClickedItem(data: StatefulView<RecordFilesInfo.RecordFile>?) {
@@ -112,9 +141,12 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
 //                    })
 //                    // 申请权限
 //                    permission.request()
+
+                    val video = RecordFilesInfo.RecordFile(data?.obj!!)
+                    video.transmissionType = 1
                     // 检测是否有下载缓存
-                    if (mVideoManageViewModel.checkCacheResult(data?.obj!!)) {
-                        ToastUtils.showShort("该视频已在下载队列")
+                    if (mVideoManageViewModel.checkCacheResult(video)) {
+                        ToastUtils.showShort(getString(R.string.tip_download_exist))
                         return
                     }
 
@@ -132,27 +164,37 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             uDiskStorageVolume = UsbHelper.getUDiskStorageVolume()
                             if (uDiskStorageVolume != null) {
-                                mTempRecordFile = data?.obj!!
+                                mTempRecordFile = video
                                 val accessIntent = uDiskStorageVolume.createAccessIntent(null)
                                 startActivityForResult(accessIntent, 3)
                             }
                         }
                         return
                     } else {
-                        showSelectDiskDialog(data?.obj!!)
+                        showSelectDiskDialog(video)
                     }
                 }
 
                 override fun onUpload(data: StatefulView<RecordFilesInfo.RecordFile>?) {
                     logd("上传")
+                    val video = RecordFilesInfo.RecordFile(data?.obj!!)
+                    video.transmissionType = 2
+                    // 检测是否有上传缓存
+                    if (mVideoManageViewModel.checkCacheResult(video)) {
+                        ToastUtils.showShort(getString(R.string.tip_upload_exist))
+                        return
+                    }
                     val dialog = UploadVideoDialog({
                         logd("视频信息： $it")
+//                        mVideoManageViewModel.uploadVideo(video, it)
+
+                        mDownloadService?.uploadVideo(video, "it")
                     })
                     dialog.show(childFragmentManager, "")
                 }
 
                 override fun onDelete(data: StatefulView<RecordFilesInfo.RecordFile>?) {
-                    val dialog = DeleteVideoDialog("您确定要删除该视频吗？", {
+                    val dialog = DeleteVideoDialog(getString(R.string.tip_delete_video), {
                         logd("删除")
                         mVideoManageViewModel.deleteVideo(data?.obj!!)
                     })
@@ -180,32 +222,8 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
 
     // 下载视频
     fun downloadVideo(data: RecordFilesInfo.RecordFile) {
-
         mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
-
         mDownloadService?.downloadVideo(data)
-
-//        UsbHelper.getHelper().downloadFile2UDisk(video, video.getDownloadFileName())
-//        UsbHelper.getHelper().registerDownloadCallback(object : UsbHelper.FileDownloadCallback {
-//            override fun onDownloadStateChanged(
-//                file: DownloadObject<RecordFilesInfo.RecordFile>?,
-//                dstPath: String?,
-//                state: Int,
-//                progress: Int
-//            ) {
-//                logd("视频名称：${file?.obj?.downloadFileName}, 目的路径： $dstPath, 下载进度： $progress, 状态: $state")
-//
-//                var cacheList = getCacheVideos()
-//                cacheList.forEach {
-//                    if (it.downloadUrl == file?.obj?.downloadUrl) {
-//                        it.downloadDstPath = dstPath
-//                        it.downloadProgress = progress
-//                    }
-//                }
-//                transmissionVideos.value = cacheList
-//                VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(cacheList))
-//            }
-//        })
     }
 
     override fun observeVM() {
@@ -217,6 +235,9 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                 mBinding.refreshLayout.finishRefresh(!it.hasError)
             }
         }
+//        mVideoManageViewModel.uploadFileNames.observe(viewLifecycleOwner) {
+//            mDownloadService?.uploadFileNames = it
+//        }
     }
 
     // 开启下载服务

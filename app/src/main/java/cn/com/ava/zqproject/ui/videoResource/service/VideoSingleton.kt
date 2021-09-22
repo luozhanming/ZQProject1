@@ -19,6 +19,8 @@ class VideoSingleton private constructor() {
             }
             return instances!!
         }
+
+
     }
 
 }

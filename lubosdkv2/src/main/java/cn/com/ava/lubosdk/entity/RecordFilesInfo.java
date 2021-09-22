@@ -1,6 +1,7 @@
 package cn.com.ava.lubosdk.entity;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.List;
 
 
@@ -53,14 +54,82 @@ public class RecordFilesInfo implements QueryResult {
         private String sampleBit;
         private String audioCodecMode;
 
-//        //下载信息
+        //        //下载信息
         private String downloadFileName;
         // 下载进度
         private int downloadProgress;
         // 下载路径
         private String downloadDstPath;
 
+        // 上传状态， 0-等待上传，1-上传成功，2-上传中，3-上传失败
+        private int uploadState;
+        // 上传进度
+        private String uploadProgress;
 
+        public RecordFile() {
+
+        }
+
+        public RecordFile(RecordFile file) {
+            this.rawFileName = file.getRawFileName();
+            this.streamIndex = file.getStreamIndex();
+            this.fileSize = file.getFileSize();
+            this.rtspUrl = file.getRtspUrl();
+            this.classTheme = file.getClassTheme();
+            this.teacher = file.getTeacher();
+            this.recordBeginTime = file.getRecordBeginTime();
+            this.recordRawEndTime = file.getRecordRawEndTime();
+            this.recordEndTime = file.getRecordEndTime();
+            this.duration = file.getDuration();
+            this.rawDuration = file.getRawDuration();
+            this.downloadUrl = file.getDownloadUrl();
+            this.rawFileSize = file.getRawFileSize();
+            this.recordRawBeginTime = file.getRecordRawBeginTime();
+            this.videoSize = file.getVideoSize();
+            this.GOP = file.getGOP();
+            this.streamMode = file.getStreamMode();
+            this.fps = file.getFps();
+            this.videoBps = file.getVideoBps();
+            this.videoCodecMode = file.getVideoCodecMode();
+            this.audioBps = file.getAudioBps();
+            this.sampleRate = file.getSampleRate();
+            this.channelCount = file.getChannelCount();
+            this.sampleBit = file.getSampleBit();
+            this.audioCodecMode = file.getAudioCodecMode();
+            this.downloadFileName = file.getDownloadFileName();
+            this.downloadProgress = file.getDownloadProgress();
+            this.downloadDstPath = file.getDownloadDstPath();
+            this.uploadState = file.getUploadState();
+            this.uploadProgress = file.getUploadProgress();
+            this.transmissionType = file.getTransmissionType();
+        }
+
+        public int getUploadState() {
+            return uploadState;
+        }
+
+        public void setUploadState(int uploadState) {
+            this.uploadState = uploadState;
+        }
+
+        public String getUploadProgress() {
+            return uploadProgress;
+        }
+
+        public void setUploadProgress(String uploadProgress) {
+            this.uploadProgress = uploadProgress;
+        }
+
+        public int getTransmissionType() {
+            return transmissionType;
+        }
+
+        public void setTransmissionType(int transmissionType) {
+            this.transmissionType = transmissionType;
+        }
+
+        // 传输类型 1-下载，2-上传
+        private int transmissionType;
 
         public String getRtspUrl() {
             return rtspUrl;
@@ -257,7 +326,6 @@ public class RecordFilesInfo implements QueryResult {
         }
 
 
-
         public String getDownloadFileName() {
             return downloadFileName;
         }
@@ -333,6 +401,9 @@ public class RecordFilesInfo implements QueryResult {
                     ", downloadFileName='" + downloadFileName + '\'' +
                     ", downloadProgress=" + downloadProgress +
                     ", downloadDstPath='" + downloadDstPath + '\'' +
+                    ", uploadState=" + uploadState +
+                    ", uploadProgress=" + uploadProgress +
+                    ", transmissionType=" + transmissionType +
                     '}';
         }
     }

@@ -15,6 +15,7 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.extension.toServerException
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
+import com.blankj.utilcode.util.EncryptUtils
 import com.blankj.utilcode.util.RegexUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils

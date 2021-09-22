@@ -36,6 +36,8 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
 //            mVideoManageViewModel.transmissionVideos.value = VideoSingleton.getInstance().cacheVideos
 //        }
 
+//        mVideoManageViewModel.getUploadList()
+
         mVideoTransmissionListItemAdapter = VideoTransmissionListItemAdapter(object : VideoTransmissionListItemAdapter.VideoTransmissionCallback {
             override fun onDidClickedItem(data: RecordFilesInfo.RecordFile?) {
                 logd("查看视频")
@@ -50,7 +52,7 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
             }
 
             override fun onDelete(data: RecordFilesInfo.RecordFile?) {
-                val dialog = DeleteVideoDialog("您确定要删除该视频吗？", {
+                val dialog = DeleteVideoDialog("您确定要删除该记录吗？", {
                     mVideoManageViewModel.deleteCacheVideo(data!!)
                 })
                 dialog.show(childFragmentManager, "")
@@ -63,7 +65,7 @@ class VideoTransmissionListFragment : BaseFragment<FragmentVideoTransmissionList
 
     override fun observeVM() {
         mVideoManageViewModel.transmissionVideos.observe(viewLifecycleOwner) {
-            logd("刷新列表, ${it.toString()}")
+//            logd("刷新列表, ${it.toString()}")
             mVideoTransmissionListItemAdapter?.setDatas(it)
         }
     }

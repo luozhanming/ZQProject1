@@ -1,5 +1,6 @@
 package cn.com.ava.zqproject.ui.videoResource.adapter
 
+import android.text.TextUtils
 import android.widget.BaseAdapter
 import androidx.databinding.ViewDataBinding
 import cn.com.ava.base.recyclerview.BaseViewHolder
@@ -47,16 +48,40 @@ class VideoTransmissionListItemAdapter(private val mCallback: VideoTransmissionC
         override fun setDataToBinding(binding: ItemTransmissionListBinding, data: RecordFilesInfo.RecordFile) {
             binding.video = data
 
-            binding.tvProgress.setText("${data.downloadProgress}%")
-            if (data.downloadProgress == 100) {
-                binding.tvState.setText("下载完成")
-                binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_318EF8))
-            } else if (data.downloadProgress == -1) {
-                binding.tvState.setText("下载失败")
-                binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_FF4646))
+            if (data.transmissionType == 1) { // 下载
+                binding.tvProgress.setText("${data.downloadProgress}%")
+                if (data.downloadProgress == 100) {
+                    binding.tvState.setText("下载完成")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_318EF8))
+                } else if (data.downloadProgress == -1) {
+                    binding.tvState.setText("下载失败")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_FF4646))
+                } else {
+                    binding.tvState.setText("下载中")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_666666))
+                }
+            } else if (data.transmissionType == 2) { // 上传
+                if (TextUtils.isEmpty(data.uploadProgress) || data.uploadProgress == "0") {
+                    binding.tvProgress.setText("0%")
+                } else {
+                    binding.tvProgress.setText("${data.uploadProgress}")
+                }
+                if (data.uploadState == 1) {
+                    binding.tvState.setText("上传完成")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_318EF8))
+                } else if (data.uploadState == 0) {
+                    binding.tvState.setText("等待上传")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_666666))
+                } else if (data.uploadState == 3) {
+                    binding.tvState.setText("上传失败")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_FF4646))
+                } else {
+                    binding.tvState.setText("上传中")
+                    binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_666666))
+                }
             } else {
-                binding.tvState.setText("下载中")
-                binding.tvState.setTextColor(Utils.getApp().resources.getColor(R.color.color_666666))
+                binding.tvProgress.setText("")
+                binding.tvState.setText("")
             }
         }
 
