@@ -186,8 +186,6 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                     }
                     val dialog = UploadVideoDialog({
                         logd("视频信息： $it")
-//                        mVideoManageViewModel.uploadVideo(video, it)
-
                         mDownloadService?.uploadVideo(video, "it")
                     })
                     dialog.show(childFragmentManager, "")

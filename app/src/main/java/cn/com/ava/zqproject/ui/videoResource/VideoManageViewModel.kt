@@ -13,6 +13,7 @@ import cn.com.ava.lubosdk.manager.VideoResourceManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.ui.common.CanRefresh
+import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 import cn.com.ava.zqproject.vo.RefreshState
 import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
@@ -32,12 +33,14 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
 
     fun initData() {
 
-        val cacheStr = VideoPreference.getElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, "")
-        if (cacheStr != null && cacheStr.length != 0) {
-            cacheVideos = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(cacheStr, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
-        }
-        // 获取本地缓存视频记录
-        transmissionVideos.value = cacheVideos
+//        val cacheStr = VideoPreference.getElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, "")
+//        if (cacheStr != null && cacheStr.length != 0) {
+//            cacheVideos = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(cacheStr, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
+//        }
+        // 调用之前，先实例化一次，保证初始化数据了
+        VideoSingleton.getInstance()
+//        // 获取本地缓存视频记录
+        transmissionVideos.value = VideoSingleton.cacheVideos
     }
 
     override val refreshState: MutableLiveData<RefreshState> by lazy {
@@ -51,7 +54,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
         liveData
     }
     // 本地缓存记录
-    var cacheVideos: ArrayList<RecordFilesInfo.RecordFile> = arrayListOf()
+//    var cacheVideos: ArrayList<RecordFilesInfo.RecordFile> = arrayListOf()
 
     // 传输列表资源
     val transmissionVideos: MutableLiveData<MutableList<RecordFilesInfo.RecordFile>> by lazy {
@@ -113,7 +116,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
     // 检测是否有缓存
     fun checkCacheResult(data: RecordFilesInfo.RecordFile): Boolean {
 //        logd("本地视频: ${cacheList.toString()}")
-        cacheVideos.forEach {
+        VideoSingleton.cacheVideos.forEach {
             if (data.rawFileName == it.rawFileName && data.transmissionType == it.transmissionType) {
                 return true
             }
@@ -220,55 +223,53 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
 
     // 更新下载进度
     fun refreshDownloadProgress(downloadInfo: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
-        cacheVideos.forEach {
+        VideoSingleton.cacheVideos.forEach {
             if (downloadInfo.containsKey(it.downloadUrl) && it.transmissionType == 1) {
                 it.downloadDstPath = downloadInfo.get(it.downloadUrl)!!.downloadDstPath
                 it.downloadProgress = downloadInfo.get(it.downloadUrl)!!.downloadProgress
                 logd("下载进度：${it.downloadProgress}")
             }
         }
-        transmissionVideos.value = cacheVideos
+        transmissionVideos.value = VideoSingleton.cacheVideos
     }
 
     /*
     * 更新上传进度
     * */
     fun refreshUploadProgress(uploadInfo: ConcurrentMap<String, TransmissionProgressEntity>) {
-        cacheVideos.forEach {
+        VideoSingleton.cacheVideos.forEach {
             if (uploadInfo.containsKey(it.rawFileName) && it.transmissionType == 2) {
                 it.uploadState = uploadInfo.get(it.rawFileName)!!.state
                 it.uploadProgress = uploadInfo.get(it.rawFileName)!!.progress
                 logd("上传进度：${it.uploadProgress}")
                 if (it.uploadState == 1) { // 上传成功
-                    VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(cacheVideos))
                     ToastUtils.showShort(it.downloadFileName + getResources().getString(R.string.tip_upload_success))
                 } else if (it.uploadState == 3) { // 上传失败
-                    VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(cacheVideos))
                     ToastUtils.showShort(it.downloadFileName + getResources().getString(R.string.tip_upload_failed))
                 }
             }
         }
-        transmissionVideos.postValue(cacheVideos)
+        transmissionVideos.postValue(VideoSingleton.cacheVideos)
     }
 
     // 保存视频记录
     fun saveCacheVideo(list: MutableList<RecordFilesInfo.RecordFile>) {
-        cacheVideos.addAll(0, list)
-        transmissionVideos.value = cacheVideos
-        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(cacheVideos))
+        VideoSingleton.cacheVideos.addAll(0, list)
+        transmissionVideos.value = VideoSingleton.cacheVideos
+        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
     }
 
     // 删除某一条视频记录
     fun deleteCacheVideo(data: RecordFilesInfo.RecordFile) {
-        cacheVideos.remove(data)
-        transmissionVideos.value = cacheVideos
+        VideoSingleton.cacheVideos.remove(data)
+        transmissionVideos.value = VideoSingleton.cacheVideos
         VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(transmissionVideos.value))
     }
 
     // 清除全部传输记录
     fun clearAllCacheVideos() {
-        cacheVideos = arrayListOf<RecordFilesInfo.RecordFile>()
-        transmissionVideos.value = cacheVideos
+        VideoSingleton.cacheVideos = arrayListOf<RecordFilesInfo.RecordFile>()
+        transmissionVideos.value = VideoSingleton.cacheVideos
         VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(transmissionVideos.value))
     }
 

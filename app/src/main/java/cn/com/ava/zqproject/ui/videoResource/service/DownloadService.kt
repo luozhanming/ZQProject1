@@ -5,17 +5,23 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import cn.com.ava.common.rxjava.RetryFunction
+import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.lubosdk.entity.TransmissionProgressEntity
+import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.manager.VideoResourceManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
+import cn.com.ava.zqproject.ui.videoResource.VideoPreference
 import cn.com.ava.zqproject.ui.videoResource.util.AESUtils
 import cn.com.ava.zqproject.usb.DownloadObject
 import cn.com.ava.zqproject.usb.UsbHelper
+import com.blankj.utilcode.util.TimeUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,24 +50,27 @@ class DownloadService : Service() {
         DownloadBinder(this)
     }
 
-    var uploadFileNames = mutableListOf<String>()
+    var uploadVideos = mutableListOf<RecordFilesInfo.RecordFile>()
 
-    fun getUploadVideoProgress(fileName: String)  {
-        mDisposables.add(VideoResourceManager.checkUploadProgress(fileName)
+    fun getUploadVideoProgress(data: RecordFilesInfo.RecordFile)  {
+        mDisposables.add(VideoResourceManager.checkUploadProgress(data.rawFileName)
             .compose(PlatformApi.applySchedulers())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-//                logd("uploadVideo currentThread ${Thread.currentThread()}")
-                uploadInfo.put(fileName, it)
+                uploadInfo.put(data.rawFileName, it)
                 try {
                     mCallback?.onUploadStateChanged(uploadInfo)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
                 if (it.state == 1 || it.state == 3) { // 上传成功或者失败就移出队列
-                    uploadFileNames.remove(fileName)
-                    uploadInfo.remove(fileName)
+                    saveCache()
+                    if (it.state == 1) { // 上传成功
+                        saveVideoFromFTP(data)
+                    }
+                    uploadVideos.remove(data)
+                    uploadInfo.remove(data.rawFileName)
                 }
             }
         )
@@ -72,8 +81,9 @@ class DownloadService : Service() {
         mDisposables.add(
             Flowable.interval(2000, TimeUnit.MILLISECONDS).doOnNext {
 //                logd("上传视频onCreate")
-                uploadFileNames.forEach {
-                    if (uploadInfo[it]?.state != 1) {
+                saveCache()
+                uploadVideos.forEach {
+                    if (uploadInfo[it.rawFileName]?.state != 1) {
                         getUploadVideoProgress(it)
                     }
                 }
@@ -83,6 +93,12 @@ class DownloadService : Service() {
 
             })
         )
+    }
+
+    fun saveCache() {
+        if (downloadInfo.keys.size == 0 && uploadInfo.keys.size == 0) return
+        logd("缓存在本地")
+        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
     }
 
     class DownloadBinder(service: DownloadService) : Binder() {
@@ -109,7 +125,7 @@ class DownloadService : Service() {
         mBinder.release()
     }
 
-    /*
+    /**
     * 下载视频
     * */
     fun downloadVideo(data: RecordFilesInfo.RecordFile) {
@@ -134,6 +150,7 @@ class DownloadService : Service() {
                     downloadInfo.put(file?.obj?.downloadUrl, video)
                     mCallback?.onDownloadStateChanged(downloadInfo)
                     if (state == 1003) { // 下载完成需要移除
+                        saveCache()
                         downloadInfo.remove(file?.obj?.downloadUrl)
                     }
                 }
@@ -141,7 +158,7 @@ class DownloadService : Service() {
         }
     }
 
-    /*
+    /**
     * 上传视频
     * */
     fun uploadVideo(data: RecordFilesInfo.RecordFile, desc: String) {
@@ -161,13 +178,11 @@ class DownloadService : Service() {
                         logd("提交上传视频资源接口成功")
                         mCallback?.onSubmitUploadCallback(true, "正在上传" + data.downloadFileName, data)
 
-                        if (uploadFileNames?.contains(data.rawFileName) == false) {
-                            uploadFileNames.add(0, data.rawFileName)
+                        if (uploadVideos?.contains(data) == false) {
+                            uploadVideos.add(0, data)
                         }
                     } else {
                         mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", data)
-//                        ToastUtils.showShort("上传失败，请重试")
-//                        logd("上传视频资源提交失败")
                     }
                 }, {
                     logd("提交上传视频资源接口出错")
@@ -177,7 +192,25 @@ class DownloadService : Service() {
         )
     }
 
-    /*
+    /**
+     * 保存FTP中的视频文件
+     * */
+    fun saveVideoFromFTP(data: RecordFilesInfo.RecordFile) {
+        val uuid = "0_${LoginManager.getLogin()?.key}_${System.currentTimeMillis()}"
+
+        mDisposables.add(
+            PlatformApi.getService()
+                .saveVideoFromFTP(fileName = data.downloadFileName, title = data.downloadFileName, period = data.rawDuration.toInt(), uuid = uuid)
+                .compose(PlatformApi.applySchedulers()).subscribeOn(Schedulers.io()).subscribe({
+
+                }, {
+                    logPrint2File(it)
+                })
+        )
+
+    }
+
+    /**
     * json转map
     * */
     fun json2Map(jsonString: String?): HashMap<String, Any>? {
