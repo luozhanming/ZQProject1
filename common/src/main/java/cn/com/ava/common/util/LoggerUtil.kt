@@ -46,6 +46,9 @@ inline fun Any.logi(message: String){
 }
 
 inline fun Any.logPrint2File(throwable: Throwable){
+    if(BuildConfig.DEBUG){
+        throwable.printStackTrace()
+    }
     val file = File(
         "${LoggerUtil.logFileDir}/${
             TimeUtils.date2String(

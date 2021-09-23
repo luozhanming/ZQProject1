@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.net.PlatformApi
@@ -37,7 +38,7 @@ class LoginViewModel : ViewModel() {
         logd("getLuboInfo()")
         val ip = CommonPreference.getElement(CommonPreference.KEY_LUBO_IP,"")
         val port = CommonPreference.getElement(CommonPreference.KEY_LUBO_PORT,"")
-        val username = CommonPreference.getElement(CommonPreference.KEY_LUBO_USERNAME,"")
+        val username = LoginManager.getLogin()?.rserverInfo?.usr?:""
         val psw = CommonPreference.getElement(CommonPreference.KEY_LUBO_PASSWORD,"")
         val luboInfo =  """{
             "lubo_ip":"${ip}",

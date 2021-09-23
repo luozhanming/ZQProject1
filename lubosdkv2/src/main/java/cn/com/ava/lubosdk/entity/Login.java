@@ -22,6 +22,8 @@ public class Login implements QueryResult {
     /**token*/
     private String token="";
 
+    private LuBoInfo.LoginIdStun rserverInfo;
+
     public String getUsername() {
         return username;
     }
@@ -84,6 +86,14 @@ public class Login implements QueryResult {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public LuBoInfo.LoginIdStun getRserverInfo() {
+        return rserverInfo;
+    }
+
+    public void setRserverInfo(LuBoInfo.LoginIdStun rserverInfo) {
+        this.rserverInfo = rserverInfo;
     }
 
     @Override

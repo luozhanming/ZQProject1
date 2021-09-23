@@ -4,7 +4,9 @@ import android.text.TextUtils
 import android.util.Log
 import cn.com.ava.lubosdk.AVAHttpEngine
 import cn.com.ava.lubosdk.entity.Login
+import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.entity.RSAKey
+import cn.com.ava.lubosdk.query.LuboInfoQuery
 import cn.com.ava.lubosdk.spquery.LoginSPQuery
 import cn.com.ava.lubosdk.spquery.RSAKeyQuery
 import io.reactivex.Observable
@@ -48,9 +50,20 @@ object LoginManager {
                                 it.resumeWithException(throwable)
                             })
                     )
+
+                }
+                val luboInfo = suspendCoroutine<LuBoInfo> {
+                    AVAHttpEngine.addQueryCommand(LuboInfoQuery(
+                        onResult = {queryResult ->
+                            it.resumeWith(Result.success(queryResult as LuBoInfo))
+                        }, onError = {throwable ->
+                            it.resumeWithException(throwable)
+                        }
+                    ))
                 }
                 mLogin = login
-                emitter.onNext(login)
+                mLogin?.rserverInfo = luboInfo.stun
+                emitter.onNext(mLogin?:login)
             }
         }
     }
@@ -92,8 +105,18 @@ object LoginManager {
                     )
                 }
                 Log.d(TAG, "loginEx: getLogin ${login.toString()}")
+                val luboInfo = suspendCoroutine<LuBoInfo> {
+                    AVAHttpEngine.addQueryCommand(LuboInfoQuery(
+                        onResult = {queryResult ->
+                            it.resumeWith(Result.success(queryResult as LuBoInfo))
+                        }, onError = {throwable ->
+                            it.resumeWithException(throwable)
+                        }
+                    ))
+                }
                 mLogin = login
-                emitter.onNext(login)
+                mLogin?.rserverInfo = luboInfo.stun
+                emitter.onNext(mLogin?:login)
 
             }
         }

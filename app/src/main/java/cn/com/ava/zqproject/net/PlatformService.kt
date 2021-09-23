@@ -5,6 +5,7 @@ import cn.com.ava.zqproject.vo.*
 import io.reactivex.Observable
 import retrofit2.http.*
 import retrofit2.http.Query
+import java.util.LinkedHashMap
 
 interface PlatformService {
 
@@ -25,7 +26,8 @@ interface PlatformService {
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_ADDRESS_LIST
         ),
-        @Query("pageIndex") pageIndex: Int = 1, @Query("pageSize") pageSize: Int = 1000,
+        @Query("searchKey") searchKey:String = "",
+        @Query("pageIndex") pageIndex: Int = 1, @Query("pageSize") pageSize: Int = 20,
     ): Observable<PlatformResponse<List<ContractUser>>>
 
 
@@ -91,8 +93,9 @@ interface PlatformService {
         ),
         @Field("initiatorName") initiator: String = "",
         @Field("meetingTitle") meetingTitle: String = "",
-        @Field("participantUserId") userId: String = ""
-    )
+        @Field("meetingNo") meetingNo:String = "",
+        @Field("participantUserId") userId: List<String>? = null
+    ):Observable<PlatformResponse<Any>>
 
 
     @GET("/{path}")
@@ -131,6 +134,16 @@ interface PlatformService {
         ),
         @Field("rsAcct") rsAcct: String = ""
     ): Observable<PlatformResponse<Any>>
+
+
+    @GET("/{path}")
+    fun queryCalledMeeting(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_CALL_MEETING
+        )
+    ):Observable<PlatformResponse<Any>>
+
+
 
 
 }

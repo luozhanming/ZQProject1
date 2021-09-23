@@ -18,27 +18,27 @@
             android:layout_width="92dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="32dp"
-            android:text="林建国"
+            android:text="@{member.user.nickname}"
             android:textColor="@color/color_333333"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView40"
-            android:layout_width="0dp"
-            android:layout_height="25dp"
-            android:ellipsize="end"
-            android:text="汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅..."
-            android:textColor="@color/color_888888"
-            android:textSize="20sp"
-            android:layout_marginRight="90dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/linearLayout7"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/textView38"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/textView40"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="25dp"-->
+<!--            android:ellipsize="end"-->
+<!--            android:text="汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅汉东省省委办公厅第十二会会长汉东省省委办公厅第十二会会长汉东省省委办公厅..."-->
+<!--            android:textColor="@color/color_888888"-->
+<!--            android:textSize="20sp"-->
+<!--            android:layout_marginRight="90dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/linearLayout7"-->
+<!--            app:layout_constraintHorizontal_bias="0.0"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/textView38"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <LinearLayout
             android:id="@+id/linearLayout7"

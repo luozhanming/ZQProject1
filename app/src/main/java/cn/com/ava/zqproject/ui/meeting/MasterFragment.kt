@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.common.extension.autoCleared
+import cn.com.ava.common.extension.sameTo
 import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
@@ -29,7 +30,6 @@ import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
-import java.util.*
 
 /**
  * 主讲界面
@@ -38,10 +38,13 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
     private val mMasterViewModel by viewModels<MasterViewModel>()
 
+    private val mMemberManagerViewModel by viewModels<MemeberManagerViewModel>()
+
     private var mExitMeetingDialog by autoCleared<ConfirmDialog>()
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
     private var mMeetingInfoWindow by autoCleared<MeetingInfoPopupWindow>()
     private var mComputerSourceWindow by autoCleared<ComputerSourcePopupWindow>()
+    private var mMemberManagerDialog by autoCleared<MemberManagerDialog>()
 
     //控制台动画相关
     private var topVisibleAnim by autoCleared<Animation>()
@@ -67,13 +70,40 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.startLoadMeetingInfo()
         mMasterViewModel.loopCurVideoSceneSources()
         mMasterViewModel.startLoopInteracInfo()
-
+        mMasterViewModel.startLoopMeetingInfoZQ()
+        mMasterViewModel.startLoopLinkUsers()
+        mMasterViewModel.startLoopMeetingState()
         //初始化发言列表
-        mApplySpeakUserAdapter = mApplySpeakUserAdapter?:ApplySpeakUserAdapter()
-        mBinding.rvRequestSpeakList.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,true)
+        mApplySpeakUserAdapter = mApplySpeakUserAdapter ?: ApplySpeakUserAdapter(object :ApplySpeakUserAdapter.Callback{
+            override fun onAgreeOrDisagree(user: ApplySpeakUser, agree: Boolean) {
+                mMasterViewModel.agreeRequestSpeak(user.numId,agree)
+            }
+
+            override fun expandMore() {
+
+            }
+
+            override fun shrinkMore() {
+
+            }
+
+        })
+        mBinding.rvRequestSpeakList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         mBinding.rvRequestSpeakList.adapter = mApplySpeakUserAdapter
-        mMasterViewModel.loadApplySpeakUsers()
+     //   mMasterViewModel.loadApplySpeakUsers()
         mMasterViewModel.startApplySpeakListen()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mMasterViewModel.startTimeCount()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMasterViewModel.stopTimeCount()
     }
 
 
@@ -120,13 +150,39 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 }
             }
         }
-        mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner){
+        mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner) {
             mBinding.videoTopView.changeSliceCount(it.size)
             mBinding.videoTopView.setUsersOnVideo(it)
         }
-        mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner){
+        mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner) {
             mApplySpeakUserAdapter?.setDatasWithDiff(it)
         }
+
+        mMasterViewModel.requestSpeakRet.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                mMasterViewModel.setVideoLayout(arrayListOf(1, it))
+            } else {
+                val preLayout = mMasterViewModel.preRequestSpeakLayout
+                preLayout?.apply {
+                    val map = map { it.number }
+                    mMasterViewModel.setVideoLayout(ArrayList(map))
+                }
+            }
+        }
+
+        mMasterViewModel.meetingState.observe(viewLifecycleOwner){
+            if(it.cameraCtrlState?.sameTo( mMemberManagerViewModel.memberCamState.value)==false){
+                mMemberManagerViewModel.memberCamState.value = it.cameraCtrlState
+            }
+            if(it.audioCtrlState?.sameTo( mMemberManagerViewModel.memberMicState.value)==false){
+                mMemberManagerViewModel.memberMicState.value = it.audioCtrlState
+            }
+        }
+
+        mMasterViewModel.linkUsers.observe(viewLifecycleOwner){
+            mMemberManagerViewModel.meetingMember.value = it
+        }
+
 
     }
 
@@ -175,7 +231,8 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         }
         mBinding.ivInfo.setOnClickListener {
             mMeetingInfoWindow = mMeetingInfoWindow ?: MeetingInfoPopupWindow(requireContext())
-            mMeetingInfoWindow?.setMeetingMasterInfo(mMasterViewModel.meetingInfo.value)
+            mMeetingInfoWindow?.setMeetingMasterInfo(mMasterViewModel.meetingInfoZq.value)
+            mMeetingInfoWindow?.setMasterUser(mMasterViewModel.linkUsers.value)
             mMeetingInfoWindow?.showAtLocation(
                 mBinding.ivInfo,
                 Gravity.TOP or Gravity.CENTER,
@@ -194,9 +251,16 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             dialog.show(childFragmentManager, "select_layout")
         }
         mBinding.llMemberManager.setOnClickListener {
-
+            mMemberManagerDialog = mMemberManagerDialog ?: MemberManagerDialog()
+            mMemberManagerDialog?.show(childFragmentManager, "member_manager")
         }
-        mBinding.videoTopView.setOnLabelDropListener(object :SliceVideoView.OnVideoCallback{
+        mBinding.llVolumeScene.setOnClickListener {
+            mMasterViewModel.toggleLocalVolumeAudio()
+        }
+        mBinding.btnExitSpeakMode.setOnClickListener {
+            mMasterViewModel.setRequestSpeakMode(0)
+        }
+        mBinding.videoTopView.setOnLabelDropListener(object : SliceVideoView.OnVideoCallback {
             override fun onReplaceVideo(userNum: String?, locateIndex: Int) {
 
             }
@@ -208,15 +272,25 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                         location.toString() + ""
                     )
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        mBinding.videoTopView.startDragAndDrop(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
-                    }else{
-                        mBinding.videoTopView.startDrag(clipData, DragShadowBuilder(mBinding.flDragTemp), null, 0)
+                        mBinding.videoTopView.startDragAndDrop(
+                            clipData,
+                            DragShadowBuilder(mBinding.flDragTemp),
+                            null,
+                            0
+                        )
+                    } else {
+                        mBinding.videoTopView.startDrag(
+                            clipData,
+                            DragShadowBuilder(mBinding.flDragTemp),
+                            null,
+                            0
+                        )
                     }
                 }, 200)
             }
 
             override fun onExchangeVideo(srcIndex: Int, dstIndex: Int) {
-                val layoutInfo= mMasterViewModel.onVideoWindow.value?: emptyList()
+                val layoutInfo = mMasterViewModel.onVideoWindow.value ?: emptyList()
                 val temp = arrayListOf<Int>()
                 val size = layoutInfo.size
                 for (i in 0 until size) {
@@ -311,7 +385,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 override fun notifyRemoteStop() {
                     logd("Video player notifyRemoteStop()")
                 }
-
             })
     }
 
@@ -328,5 +401,9 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mVideoPlayer?.stopPlay()
         mVideoPlayer?.release()
         mVideoPlayer = null
+    }
+
+    override fun onBackPressed(): Boolean {
+        return true
     }
 }

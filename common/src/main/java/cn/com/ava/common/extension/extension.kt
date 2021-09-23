@@ -5,6 +5,8 @@ import android.widget.PopupWindow
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import cn.com.ava.common.util.Extra
+import java.text.SimpleDateFormat
+import java.util.*
 
 inline fun Activity.bindExtras() {
     val clazz = this::class.java
@@ -72,9 +74,36 @@ fun Spinner.avoidDropdownFocus() {
     }
 }
 
+fun Long.toDateString(format: String): String {
+    val df = SimpleDateFormat(format)
+    val format1 = df.format(Date(this))
+    return format1
+}
+
+
+fun String.toTimeStamp(format: String):Long{
+    val df = SimpleDateFormat(format)
+    val format1 = df.parse(this)
+    return format1.time
+}
+
 
 fun Char.isChinese(): Boolean {
     return compareTo('\u4e00') >= 0 && compareTo('\u9fa5') <= 0
+}
+
+/**
+ * 判断两个列表是否元素相同
+ * */
+fun <T> List<T>.sameTo(other:List<T>?):Boolean{
+    if(this.size!=other?.size)return false
+    forEachIndexed { index, t ->
+        val otherItem = other[index]
+        if(otherItem!=this[index]){
+            return false
+        }
+    }
+    return true
 }
 
 

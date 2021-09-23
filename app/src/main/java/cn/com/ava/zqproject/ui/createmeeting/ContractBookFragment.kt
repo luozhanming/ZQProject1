@@ -33,7 +33,10 @@ class ContractBookFragment : BaseFragment<FragmentContractBookBinding>() {
     override fun initView() {
         super.initView()
         mBinding.refreshLayout.setOnRefreshListener {
-            mContractBookViewModel.getContractUserList()
+            mContractBookViewModel.getContractUserList(false)
+        }
+        mBinding.refreshLayout.setOnLoadMoreListener {
+            mContractBookViewModel.getContractUserList(true)
         }
         mBinding.refreshLayout.autoRefresh()
         if (mContractUserItemAdapter == null) {
@@ -88,6 +91,11 @@ class ContractBookFragment : BaseFragment<FragmentContractBookBinding>() {
         mContractBookViewModel.refreshState.observe(viewLifecycleOwner) { it ->
             if (it.isRefresh) {
                 mBinding.refreshLayout.finishRefresh(!it.hasError)
+            }
+        }
+        mContractBookViewModel.loadMoreState.observe(viewLifecycleOwner){
+            if(it.isLoadMore){
+                mBinding.refreshLayout.finishLoadMore(!it.hasError)
             }
         }
         mCreateMeetingViewModel.selectedUser.observe(viewLifecycleOwner) {

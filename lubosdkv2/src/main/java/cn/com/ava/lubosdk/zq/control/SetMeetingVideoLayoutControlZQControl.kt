@@ -1,4 +1,4 @@
-package cn.com.ava.lubosdk.zq
+package cn.com.ava.lubosdk.zq.control
 
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.IControl
@@ -21,7 +21,7 @@ class SetMeetingVideoLayoutControlZQControl(
         return linkedMapOf<String,String>().apply {
             this["action"] = "9"
             this["user"] = LoginManager.getLogin()?.username?:""
-            this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"")
+            this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"").lowercase()
             this["command"] = "1"
             val userString = StringBuffer()
             preLayout.forEachIndexed {i,it->

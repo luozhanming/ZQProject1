@@ -15,7 +15,9 @@ import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.widget.SpecialCharInputFilter
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.net.PlatformApi
-
+/**
+ * 创建会议弹出的对话框
+ * */
 class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : BaseDialog() {
 
     private var etMeetingTheme: EditText? = null

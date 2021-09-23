@@ -1,72 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-
-    <data>
-        <variable
-            name="joinMeetingViewModel"
-            type="cn.com.ava.zqproject.ui.joinmeeting.JoinMeetingViewModel" />
-    </data>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="0dp"
-            android:layout_height="254dp"
-            android:background="@mipmap/bg_join_meeting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="28dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_text_button_1"
-            android:src="@mipmap/ic_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView32"
-            style="@style/TitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/join_meeting"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_back"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/iv_back" />
-
-
-        <View
-            android:id="@+id/view16"
-            android:layout_width="443dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="46dp"
-            android:background="@drawable/bg_edittext_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView4" />
-
-        <ImageView
-            android:id="@+id/imageView5"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginLeft="15dp"
-            android:src="@mipmap/ic_meeting_num"
-            app:layout_constraintBottom_toBottomOf="@+id/view16"
-            app:layout_constraintStart_toStartOf="@+id/view16"
-            app:layout_constraintTop_toTopOf="@+id/view16" />
 
         <EditText
             android:id="@+id/editText7"
@@ -85,6 +25,131 @@
             app:layout_constraintStart_toEndOf="@+id/imageView5"
             app:layout_constraintTop_toTopOf="@+id/view16" />
 
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@null"
+            android:hint="@string/hint_meeting_psw"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:text="@={joinMeetingViewModel.meetingPsw}"
+            android:textColor="@color/color_222222"
+            android:textColorHint="@color/color_999999"
+            android:textSize="19sp"
+
+            app:layout_constraintBottom_toBottomOf="@+id/view17"
+            app:layout_constraintEnd_toEndOf="@+id/view17"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="@+id/view17" />
+
+        <EditText
+            android:id="@+id/editText8"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@null"
+            android:hint="@string/hint_meeting_nickname"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:text="@={joinMeetingViewModel.meetingNickname}"
+            android:textColor="@color/color_222222"
+            android:textColorHint="@color/color_999999"
+            android:textSize="19sp"
+            app:layout_constraintBottom_toBottomOf="@+id/view18"
+            app:layout_constraintEnd_toEndOf="@+id/view18"
+            app:layout_constraintStart_toEndOf="@+id/imageView7"
+            app:layout_constraintTop_toTopOf="@+id/view18" />
+
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="0dp"
+            android:layout_height="254dp"
+            android:background="@mipmap/bg_join_meeting"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="28dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_text_button_1"
+            android:src="@mipmap/ic_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="15dp"
+            android:src="@mipmap/ic_meeting_num"
+            app:layout_constraintBottom_toBottomOf="@+id/view16"
+            app:layout_constraintStart_toStartOf="@+id/view16"
+            app:layout_constraintTop_toTopOf="@+id/view16" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="15dp"
+            android:src="@mipmap/ic_meeting_psw"
+            app:layout_constraintBottom_toBottomOf="@+id/view17"
+            app:layout_constraintStart_toStartOf="@+id/view17"
+            app:layout_constraintTop_toTopOf="@+id/view17" />
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginLeft="15dp"
+            android:src="@mipmap/ic_meeting_nickname"
+            app:layout_constraintBottom_toBottomOf="@+id/view18"
+            app:layout_constraintStart_toStartOf="@+id/view18"
+            app:layout_constraintTop_toTopOf="@+id/view18" />
+
+
+        <TextView
+            android:id="@+id/textView32"
+            style="@style/TitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/join_meeting"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/iv_back" />
+
+        <TextView
+            android:id="@+id/btn_join"
+            android:layout_width="0dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="43dp"
+            android:background="@drawable/bg_button_1"
+            android:enabled="@{!TextUtils.isEmpty(joinMeetingViewModel.meetingPsw)&amp;&amp;!TextUtils.isEmpty(joinMeetingViewModel.meetingNum)&amp;&amp;!TextUtils.isEmpty(joinMeetingViewModel.meetingNickname)}"
+            android:gravity="center"
+            android:text="@string/join"
+            android:textColor="@color/white"
+            android:textSize="19sp"
+            app:layout_constraintEnd_toEndOf="@+id/view18"
+            app:layout_constraintStart_toStartOf="@+id/view18"
+            app:layout_constraintTop_toBottomOf="@+id/view18" />
+
+
+        <View
+            android:id="@+id/view16"
+            android:layout_width="443dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="46dp"
+            android:background="@drawable/bg_edittext_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+
+
         <View
             android:id="@+id/view17"
             android:layout_width="443dp"
@@ -95,88 +160,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view16" />
 
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="18dp"
-            android:layout_marginLeft="15dp"
-            android:layout_height="18dp"
-            android:src="@mipmap/ic_meeting_psw"
-            app:layout_constraintBottom_toBottomOf="@+id/view17"
-            app:layout_constraintStart_toStartOf="@+id/view17"
-            app:layout_constraintTop_toTopOf="@+id/view17" />
-
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@null"
-            android:hint="@string/hint_meeting_psw"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:textColor="@color/color_222222"
-            android:textColorHint="@color/color_999999"
-            android:textSize="19sp"
-            android:text="@={joinMeetingViewModel.meetingPsw}"
-
-            app:layout_constraintBottom_toBottomOf="@+id/view17"
-            app:layout_constraintEnd_toEndOf="@+id/view17"
-            app:layout_constraintStart_toEndOf="@+id/imageView6"
-            app:layout_constraintTop_toTopOf="@+id/view17" />
-
         <View
             android:id="@+id/view18"
             android:layout_width="443dp"
             android:layout_height="53dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/bg_edittext_1"
             app:layout_constraintEnd_toEndOf="@+id/view16"
-            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="@+id/view16"
             app:layout_constraintTop_toBottomOf="@+id/view17" />
 
 
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="18dp"
-            android:layout_marginLeft="15dp"
-            android:layout_height="18dp"
-            android:src="@mipmap/ic_meeting_nickname"
-            app:layout_constraintBottom_toBottomOf="@+id/view18"
-            app:layout_constraintStart_toStartOf="@+id/view18"
-            app:layout_constraintTop_toTopOf="@+id/view18" />
-
-
-        <EditText
-            android:id="@+id/editText8"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@null"
-            android:hint="@string/hint_meeting_nickname"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:textColor="@color/color_222222"
-            android:textColorHint="@color/color_999999"
-            android:textSize="19sp"
-            android:text="@={joinMeetingViewModel.meetingNickname}"
-            app:layout_constraintBottom_toBottomOf="@+id/view18"
-            app:layout_constraintEnd_toEndOf="@+id/view18"
-            app:layout_constraintStart_toEndOf="@+id/imageView7"
-            app:layout_constraintTop_toTopOf="@+id/view18" />
-
-        <TextView
-            android:id="@+id/btn_join"
-            android:layout_width="0dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="43dp"
-            android:text="@string/join"
-            android:textSize="19sp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:background="@drawable/bg_button_1"
-            app:layout_constraintEnd_toEndOf="@+id/view18"
-            app:layout_constraintStart_toStartOf="@+id/view18"
-            app:layout_constraintTop_toBottomOf="@+id/view18" />
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <data>
+
+        <import type="android.text.TextUtils" />
+
+        <variable
+            name="joinMeetingViewModel"
+            type="cn.com.ava.zqproject.ui.joinmeeting.JoinMeetingViewModel" />
+    </data>
 
 </layout>
