@@ -11,6 +11,7 @@ import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.manager.InteracManager
+import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.vo.LayoutSignalSelect
 import com.blankj.utilcode.util.ToastUtils
@@ -212,7 +213,7 @@ class SelectLayoutManagerViewModel : BaseViewModel() {
                 }
             }
             mDisposables.add(
-                InteracManager.setVideoLayout(windowCount, sendLayout)
+                ZQManager.setVideoLayout(windowCount, sendLayout)
                     .subscribeOn(Schedulers.io())
                     .subscribe({
                         layoutSure.postValue(OneTimeEvent(true))

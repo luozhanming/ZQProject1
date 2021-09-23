@@ -37,25 +37,31 @@ class MeetingMemberQuery(
         val list = arrayListOf<LinkedUser>()
         for(i in 3 until split.size){
             val item = split[i]
-            val split1 = item.split("=")
-            if("userId" in split1[0]){
-                user = LinkedUser()
-            }else if("username"==split1[0]){
-                user?.username = split1[1]
-            }else if("numberId" == split1[0]){
-                user?.number = split1[1].toInt()
-            }else if("shortNum"==split1[0]){
-                user?.shortNumer = split1[1]
-            }else if("nickname" == split1[0]){
-                user?.nickname = split1[1]
-            }else if("onlineState"==split1[0]){
-                user?.onlineState = split1[1].toInt()
-            }else if("sessionId" == split1[0]){
-                user?.sessionId = split1[1]
-            }else if("role"==split1[1]){
-                user?.role = split1[1]
-                list.add(user!!)
+            val split2 = item.split(",")
+            user = LinkedUser()
+            split2.forEach {
+                val split1 = it.split("=")
+
+                if("userIdx" in split1[0]){
+
+                }else if("username"==split1[0]){
+                    user?.username = split1[1]
+                }else if("numberId" == split1[0]){
+                    user?.number = split1[1].toInt()
+                }else if("shortNum"==split1[0]){
+                    user?.shortNumer = split1[1]
+                }else if("nickname" == split1[0]){
+                    user?.nickname = split1[1]
+                }else if("onlineState"==split1[0]){
+                    user?.onlineState = split1[1].toInt()
+                }else if("sessionId" == split1[0]){
+                    user?.sessionId = split1[1]
+                }else if("role"==split1[1]){
+                    user?.role = split1[1]
+                }
             }
+            list.add(user!!)
+
         }
         return ListWrapper(list)
     }

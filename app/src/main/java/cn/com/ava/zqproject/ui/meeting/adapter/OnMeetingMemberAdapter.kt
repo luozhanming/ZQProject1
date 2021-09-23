@@ -30,7 +30,7 @@ class OnMeetingMemberAdapter(val callback:ItemCallback?=null):BaseAdapter<Meetin
         viewType: Int,
         binding: ViewDataBinding
     ): BaseViewHolder<MeetingMember, ViewDataBinding> {
-        return MeetingMemberViewHolder(binding) as BaseViewHolder<MeetingMember, ViewDataBinding>
+        return MeetingMemberViewHolder(binding,callback) as BaseViewHolder<MeetingMember, ViewDataBinding>
     }
 
 

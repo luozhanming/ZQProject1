@@ -15,10 +15,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.common.extension.autoCleared
+import cn.com.ava.common.extension.sameTo
 import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
+import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
@@ -36,10 +38,13 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
     private val mMasterViewModel by viewModels<MasterViewModel>()
 
+    private val mMemberManagerViewModel by viewModels<MemeberManagerViewModel>()
+
     private var mExitMeetingDialog by autoCleared<ConfirmDialog>()
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
     private var mMeetingInfoWindow by autoCleared<MeetingInfoPopupWindow>()
     private var mComputerSourceWindow by autoCleared<ComputerSourcePopupWindow>()
+    private var mMemberManagerDialog by autoCleared<MemberManagerDialog>()
 
     //控制台动画相关
     private var topVisibleAnim by autoCleared<Animation>()
@@ -66,13 +71,39 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.loopCurVideoSceneSources()
         mMasterViewModel.startLoopInteracInfo()
         mMasterViewModel.startLoopMeetingInfoZQ()
+        mMasterViewModel.startLoopLinkUsers()
+        mMasterViewModel.startLoopMeetingState()
         //初始化发言列表
-        mApplySpeakUserAdapter = mApplySpeakUserAdapter ?: ApplySpeakUserAdapter()
+        mApplySpeakUserAdapter = mApplySpeakUserAdapter ?: ApplySpeakUserAdapter(object :ApplySpeakUserAdapter.Callback{
+            override fun onAgreeOrDisagree(user: ApplySpeakUser, agree: Boolean) {
+                mMasterViewModel.agreeRequestSpeak(user.numId,agree)
+            }
+
+            override fun expandMore() {
+
+            }
+
+            override fun shrinkMore() {
+
+            }
+
+        })
         mBinding.rvRequestSpeakList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         mBinding.rvRequestSpeakList.adapter = mApplySpeakUserAdapter
-        mMasterViewModel.loadApplySpeakUsers()
+     //   mMasterViewModel.loadApplySpeakUsers()
         mMasterViewModel.startApplySpeakListen()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mMasterViewModel.startTimeCount()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mMasterViewModel.stopTimeCount()
     }
 
 
@@ -126,9 +157,32 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.applySpeakUsers.observe(viewLifecycleOwner) {
             mApplySpeakUserAdapter?.setDatasWithDiff(it)
         }
-        mMasterViewModel.meetingInfoZq.observe(viewLifecycleOwner) {
 
+        mMasterViewModel.requestSpeakRet.observe(viewLifecycleOwner) {
+            if (it > 0) {
+                mMasterViewModel.setVideoLayout(arrayListOf(1, it))
+            } else {
+                val preLayout = mMasterViewModel.preRequestSpeakLayout
+                preLayout?.apply {
+                    val map = map { it.number }
+                    mMasterViewModel.setVideoLayout(ArrayList(map))
+                }
+            }
         }
+
+        mMasterViewModel.meetingState.observe(viewLifecycleOwner){
+            if(it.cameraCtrlState?.sameTo( mMemberManagerViewModel.memberCamState.value)==false){
+                mMemberManagerViewModel.memberCamState.value = it.cameraCtrlState
+            }
+            if(it.audioCtrlState?.sameTo( mMemberManagerViewModel.memberMicState.value)==false){
+                mMemberManagerViewModel.memberMicState.value = it.audioCtrlState
+            }
+        }
+
+        mMasterViewModel.linkUsers.observe(viewLifecycleOwner){
+            mMemberManagerViewModel.meetingMember.value = it
+        }
+
 
     }
 
@@ -178,6 +232,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mBinding.ivInfo.setOnClickListener {
             mMeetingInfoWindow = mMeetingInfoWindow ?: MeetingInfoPopupWindow(requireContext())
             mMeetingInfoWindow?.setMeetingMasterInfo(mMasterViewModel.meetingInfoZq.value)
+            mMeetingInfoWindow?.setMasterUser(mMasterViewModel.linkUsers.value)
             mMeetingInfoWindow?.showAtLocation(
                 mBinding.ivInfo,
                 Gravity.TOP or Gravity.CENTER,
@@ -196,7 +251,14 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             dialog.show(childFragmentManager, "select_layout")
         }
         mBinding.llMemberManager.setOnClickListener {
-
+            mMemberManagerDialog = mMemberManagerDialog ?: MemberManagerDialog()
+            mMemberManagerDialog?.show(childFragmentManager, "member_manager")
+        }
+        mBinding.llVolumeScene.setOnClickListener {
+            mMasterViewModel.toggleLocalVolumeAudio()
+        }
+        mBinding.btnExitSpeakMode.setOnClickListener {
+            mMasterViewModel.setRequestSpeakMode(0)
         }
         mBinding.videoTopView.setOnLabelDropListener(object : SliceVideoView.OnVideoCallback {
             override fun onReplaceVideo(userNum: String?, locateIndex: Int) {
@@ -323,7 +385,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 override fun notifyRemoteStop() {
                     logd("Video player notifyRemoteStop()")
                 }
-
             })
     }
 

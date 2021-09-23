@@ -26,7 +26,8 @@ interface PlatformService {
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_ADDRESS_LIST
         ),
-        @Query("pageIndex") pageIndex: Int = 1, @Query("pageSize") pageSize: Int = 1000,
+        @Query("searchKey") searchKey:String = "",
+        @Query("pageIndex") pageIndex: Int = 1, @Query("pageSize") pageSize: Int = 20,
     ): Observable<PlatformResponse<List<ContractUser>>>
 
 
@@ -133,6 +134,16 @@ interface PlatformService {
         ),
         @Field("rsAcct") rsAcct: String = ""
     ): Observable<PlatformResponse<Any>>
+
+
+    @GET("/{path}")
+    fun queryCalledMeeting(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_CALL_MEETING
+        )
+    ):Observable<PlatformResponse<Any>>
+
+
 
 
 }

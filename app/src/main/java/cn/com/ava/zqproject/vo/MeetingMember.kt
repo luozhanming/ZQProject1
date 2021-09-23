@@ -6,7 +6,6 @@ import cn.com.ava.lubosdk.entity.LinkedUser
  * */
 data class MeetingMember(
     val user: LinkedUser,
-    var meetingNickname: String,
     var isAudioEnable: Boolean,
     var isVideoEnable: Boolean
 )

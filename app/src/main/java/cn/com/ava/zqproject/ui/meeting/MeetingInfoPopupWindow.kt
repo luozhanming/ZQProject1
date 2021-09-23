@@ -6,22 +6,21 @@ import android.view.ViewGroup
 import android.widget.TextView
 import cn.com.ava.base.ui.BasePopupWindow
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.ListenerInfo
-import cn.com.ava.lubosdk.entity.MeetingInfo
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.R
-import cn.com.ava.zqproject.net.PlatformApi
 
 /**
  * 听课信息弹出窗口
  * */
 class MeetingInfoPopupWindow(context: Context) : BasePopupWindow(context) {
 
-    private var tvTheme:TextView? = null
-    private var tvMeetingNum:TextView? = null
-    private var tvMeetingPsw:TextView? = null
-    private var tvBeginTime:TextView? = null
-    private var tvMasterName:TextView? = null
+    private var tvTheme: TextView? = null
+    private var tvMeetingNum: TextView? = null
+    private var tvMeetingPsw: TextView? = null
+    private var tvBeginTime: TextView? = null
+    private var tvMasterName: TextView? = null
 
     override fun getWindowOptions(): WindowOptions {
         return WindowOptions(SizeUtils.dp2px(640), ViewGroup.LayoutParams.WRAP_CONTENT, true)
@@ -40,17 +39,31 @@ class MeetingInfoPopupWindow(context: Context) : BasePopupWindow(context) {
     }
 
 
-    fun setListenerInfo(info:ListenerInfo?){
+    fun setListenerInfo(info: ListenerInfo?) {
         tvTheme?.text = info?.meetingTheme
-        tvMeetingNum?.text = "${getResources().getString(R.string.meeting_num)}${info?.meetingNumber}"
-        tvMeetingPsw?.text = "${getResources().getString(R.string.meeting_psw)}${info?.meetingPassword}"
+        tvMeetingNum?.text =
+            "${getResources().getString(R.string.meeting_num)}${info?.meetingNumber}"
+        tvMeetingPsw?.text =
+            "${getResources().getString(R.string.meeting_psw)}${info?.meetingPassword}"
     }
 
-    fun setMeetingMasterInfo(info: MeetingInfoZQ?){
+    fun setMeetingMasterInfo(info: MeetingInfoZQ?) {
         tvTheme?.text = info?.confTheme
         tvMeetingNum?.text = "${getResources().getString(R.string.meeting_num)}${info?.confId}"
-        tvMeetingPsw?.text = "${getResources().getString(R.string.meeting_psw)}${info?.confpsw?:""}"
-        tvBeginTime?.text = "${getResources().getString(R.string.meeting_begin_time)}${info?.confStartTime?:""}"
-        tvMasterName?.text = "${getResources().getString(R.string.meeting_master_name)}${PlatformApi.getPlatformLogin()?.name}-${PlatformApi.getPlatformLogin()?.professionTitleName}"
+        tvMeetingPsw?.text =
+            "${getResources().getString(R.string.meeting_psw)}${info?.confpsw ?: ""}"
+        tvBeginTime?.text =
+            "${getResources().getString(R.string.meeting_begin_time)}${info?.confStartTime ?: ""}"
+    }
+
+    fun setMasterUser(value: List<LinkedUser>?) {
+        value?.apply {
+            if (value.isNotEmpty()) {
+
+                tvMasterName?.text =
+                    "${getResources().getString(R.string.meeting_master_name)}${value[0]?.nickname ?: ""}"
+            }
+        }
+
     }
 }

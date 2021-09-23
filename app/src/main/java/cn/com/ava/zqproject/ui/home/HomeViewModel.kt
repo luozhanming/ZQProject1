@@ -56,6 +56,7 @@ class HomeViewModel : BaseViewModel() {
     private var mLoadLuboInfoDisposable: Disposable? = null
     private var mSendHeartBeatDisposable:Disposable?=null
     private var mLoopMeetingInfoZQDisposable: Disposable?=null
+    private var mLoopMeetingInvitationDisposable:Disposable?=null
 
 
     fun startloadLuboInfo() {
@@ -74,6 +75,25 @@ class HomeViewModel : BaseViewModel() {
     fun stopLoadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
         mLoadLuboInfoDisposable = null
+    }
+
+
+    fun startLoopMeetingInvitation(){
+        mLoopMeetingInvitationDisposable?.dispose()
+        mLoopMeetingInvitationDisposable = Observable.interval(2000,TimeUnit.MILLISECONDS)
+            .flatMap {
+                PlatformApi.getService().queryCalledMeeting()
+                    .compose(PlatformApi.applySchedulers())
+            }.subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+                logPrint2File(it)
+            })
+    }
+
+    fun stopLoopMeetingInvitation(){
+        mLoopMeetingInvitationDisposable?.dispose()
     }
 
 

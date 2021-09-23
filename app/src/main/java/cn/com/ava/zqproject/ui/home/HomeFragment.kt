@@ -78,12 +78,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mHomeViewModel.preloadWindowAndLayout()
         //不停刷新token
         mHomeViewModel.loopRefreshToken()
+
     }
 
     override fun onStart() {
         super.onStart()
         mHomeViewModel.startloadLuboInfo()
         mHomeViewModel.startLoopMeetingInfoZQ()
+        mHomeViewModel.startLoopMeetingInvitation()
     }
 
 
@@ -91,6 +93,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onStop()
         mHomeViewModel.stopLoadLuboInfo()
         mHomeViewModel.stopLoopMeetingInfoZQ()
+        mHomeViewModel.stopLoopMeetingInvitation()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
