@@ -12,6 +12,7 @@ import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentCreateMeetingBinding
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.createmeeting.adpter.SelectedContractItemAdapter
 import cn.com.ava.zqproject.ui.createmeeting.dialog.CreateMeetingDialog
 import cn.com.ava.zqproject.vo.ContractUser
@@ -20,7 +21,7 @@ import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayoutMediator
 
 
-class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
+class CreateMeetingFragment : BaseLoadingFragment<FragmentCreateMeetingBinding>() {
 
 
     private val mCreateMeetingViewModel by viewModels<CreateMeetingViewModel>()
@@ -122,6 +123,13 @@ class CreateMeetingFragment : BaseFragment<FragmentCreateMeetingBinding>() {
     override fun observeVM() {
         mCreateMeetingViewModel.selectedUser.observe(viewLifecycleOwner) { data ->
             mSelectedUserAdapter?.setDatasWithDiff(data)
+        }
+        mCreateMeetingViewModel.goMeeting.observeOne(viewLifecycleOwner){data->
+            findNavController().navigate(R.id.action_createMeetingFragment_to_masterFragment)
+        }
+        mCreateMeetingViewModel.isLoading.observeOne(viewLifecycleOwner){
+            if(it)showLoading()
+            else hideLoading()
         }
     }
 

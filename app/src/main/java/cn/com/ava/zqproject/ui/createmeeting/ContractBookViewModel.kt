@@ -6,14 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.ui.common.CanLoadMore
 import cn.com.ava.zqproject.ui.common.CanRefresh
 import cn.com.ava.zqproject.vo.ContractUser
+import cn.com.ava.zqproject.vo.LoadMoreState
 import cn.com.ava.zqproject.vo.RefreshState
 import cn.com.ava.zqproject.vo.StatefulView
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
-class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
+class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoadMore{
 
 
     val contractUsers: MutableLiveData<List<StatefulView<ContractUser>>> by lazy {
@@ -28,35 +30,80 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
         MutableLiveData()
     }
 
+    override val loadMoreState: MutableLiveData<LoadMoreState> by lazy {
+        MutableLiveData()
+    }
+
     override val mSelectedUsers: MutableList<ContractUser> by lazy {
         arrayListOf()
     }
-
 
     val searchKey: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
+
+    var curPage: Int = 0
+
     val filterUser: MutableLiveData<List<StatefulView<ContractUser>>> by lazy {
         MediatorLiveData<List<StatefulView<ContractUser>>>().apply {
             value = arrayListOf()
             addSource(searchKey) { key ->
-                val list = contractUsers.value
-                val filter = list?.filter {
-                    val user = it.obj
-                    return@filter (!TextUtils.isEmpty(user.userName) && user.userName.contains(key)) ||
-                            (!TextUtils.isEmpty(user.professionTitleName) && user.professionTitleName.contains(
-                                key
-                            ))
+                if (key.isNotEmpty()) {
+                    searchKey()
                 }
-                postValue(filter)
             }
         }
     }
 
 
-    fun getContractUserList() {
-        mDisposables.add(PlatformApi.getService().getContractUsers()
+    fun getContractUserList(isLoadMore: Boolean) {
+        var page = 1
+        if (isLoadMore) {
+            page = curPage + 1
+        }
+        mDisposables.add(PlatformApi.getService().getContractUsers(pageIndex = page)
+            .compose(PlatformApi.applySchedulers())
+            .map {
+                //更新页面
+                curPage = it.query.pageIndex
+                val statefuls = arrayListOf<StatefulView<ContractUser>>()
+                it.data.forEach {
+                    val stateful = StatefulView(it)
+                    stateful.isSelected = mSelectedUsers.contains(it)
+                    statefuls.add(stateful)
+                }
+                statefuls
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+                if(!isLoadMore){
+                   contractUsers.postValue(it)
+                    refreshState.postValue(RefreshState(true, false))
+                }else{
+                    loadMoreState.postValue(LoadMoreState(true, false))
+                    val list = mutableListOf<StatefulView<ContractUser>>()
+                    list.addAll(contractUsers.value?: emptyList())
+                    list.addAll(it)
+                    contractUsers.postValue(list)
+                }
+            }, {
+                logPrint2File(it)
+                if(isLoadMore){
+                    loadMoreState.postValue(LoadMoreState(true, true))
+                }else{
+                    refreshState.postValue(RefreshState(true, true))
+                }
+
+            })
+        )
+    }
+
+
+    fun searchKey() {
+        mDisposables.add(PlatformApi.getService()
+            .getContractUsers(searchKey = searchKey.value ?: "", pageSize = 100)
             .compose(PlatformApi.applySchedulers())
             .map {
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
@@ -70,7 +117,7 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
             .subscribeOn(Schedulers.io())
             .subscribe({
                 refreshState.postValue(RefreshState(true, false))
-                contractUsers.postValue(it)
+                filterUser.postValue(it)
             }, {
                 logPrint2File(it)
                 refreshState.postValue(RefreshState(true, true))
@@ -104,9 +151,11 @@ class ContractBookViewModel : BaseViewModel() ,CanRefresh,SelectedUser{
                 .subscribe({
 
 
-                },{
+                }, {
                     logPrint2File(it)
                 })
         )
     }
+
+
 }

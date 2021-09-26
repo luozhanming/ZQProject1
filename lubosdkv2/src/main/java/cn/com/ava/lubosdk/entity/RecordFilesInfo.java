@@ -65,6 +65,16 @@ public class RecordFilesInfo implements QueryResult {
         private int uploadState;
         // 上传进度
         private String uploadProgress;
+        // 上传用到的UUID
+        private String uploadUUID;
+
+        public String getUploadUUID() {
+            return uploadUUID;
+        }
+
+        public void setUploadUUID(String uploadUUID) {
+            this.uploadUUID = uploadUUID;
+        }
 
         public RecordFile() {
 
@@ -102,6 +112,7 @@ public class RecordFilesInfo implements QueryResult {
             this.uploadState = file.getUploadState();
             this.uploadProgress = file.getUploadProgress();
             this.transmissionType = file.getTransmissionType();
+            this.uploadUUID = file.getUploadUUID();
         }
 
         public int getUploadState() {
@@ -402,7 +413,8 @@ public class RecordFilesInfo implements QueryResult {
                     ", downloadProgress=" + downloadProgress +
                     ", downloadDstPath='" + downloadDstPath + '\'' +
                     ", uploadState=" + uploadState +
-                    ", uploadProgress=" + uploadProgress +
+                    ", uploadProgress='" + uploadProgress + '\'' +
+                    ", uploadUUID='" + uploadUUID + '\'' +
                     ", transmissionType=" + transmissionType +
                     '}';
         }

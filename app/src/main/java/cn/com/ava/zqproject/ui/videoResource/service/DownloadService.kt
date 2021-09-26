@@ -12,6 +12,7 @@ import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.lubosdk.entity.TransmissionProgressEntity
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.manager.VideoResourceManager
+import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.ui.videoResource.VideoPreference
@@ -168,8 +169,13 @@ class DownloadService : Service() {
         val decryptStr = AESUtils.decrypt(ftpInfo, AESUtils.PASSWORD_CRYPT_KEY)
         logd("decrypt ftpInfo = $decryptStr")
 
+        val uuid = "0_${PlatformApi.getPlatformLogin()?.id}_${System.currentTimeMillis()}"
+        val dstFile = uuid + "${data.recordRawBeginTime}.mp4"
+//        val dstFile = "1.mp4"
+        data.uploadUUID = uuid
+        logd("uuid = $uuid, recid = ${data.recordRawBeginTime}, dstFile = $dstFile")
         mDisposables.add(
-            VideoResourceManager.uploadRecordFile2(json2Map(decryptStr) ?: HashMap(), data)
+            VideoResourceManager.uploadRecordFile2(json2Map(decryptStr) ?: HashMap(), data, dstFile)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -196,14 +202,20 @@ class DownloadService : Service() {
      * 保存FTP中的视频文件
      * */
     fun saveVideoFromFTP(data: RecordFilesInfo.RecordFile) {
-        val uuid = "0_${LoginManager.getLogin()?.key}_${System.currentTimeMillis()}"
-
+        val uuid = data.uploadUUID
+        val fileName = data.recordRawBeginTime + ".mp4"
+        val title = data.downloadFileName
+        val period = data.rawDuration.toInt()
+        logd("fileName = $fileName, period = $period, uuid = $uuid")
         mDisposables.add(
             PlatformApi.getService()
-                .saveVideoFromFTP(fileName = data.downloadFileName, title = data.downloadFileName, period = data.rawDuration.toInt(), uuid = uuid)
-                .compose(PlatformApi.applySchedulers()).subscribeOn(Schedulers.io()).subscribe({
-
+                .saveVideoFromFTP(fileName = fileName, title = title, period = period, uuid = uuid)
+                .compose(PlatformApi.applySchedulers())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    logd("保存FTP中的视频文件 success")
                 }, {
+                    logd("保存FTP中的视频文件 error ${it.message}")
                     logPrint2File(it)
                 })
         )

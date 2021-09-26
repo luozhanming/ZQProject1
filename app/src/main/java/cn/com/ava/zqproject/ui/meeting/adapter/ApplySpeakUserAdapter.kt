@@ -23,7 +23,7 @@ class ApplySpeakUserAdapter(val callback: Callback? = null) : BaseAdapter<ApplyS
     init {
         mCallback = object : Callback {
             override fun onAgreeOrDisagree(user: ApplySpeakUser, agree: Boolean) {
-
+                callback?.onAgreeOrDisagree(user,agree)
             }
 
             override fun expandMore() {
@@ -92,7 +92,7 @@ class ApplySpeakUserAdapter(val callback: Callback? = null) : BaseAdapter<ApplyS
             binding.btnAgree.setOnClickListener {
                 callback?.onAgreeOrDisagree(mData!!, true)
             }
-            binding.btnAgree.setOnClickListener {
+            binding.btnDisagree.setOnClickListener {
                 callback?.onAgreeOrDisagree(mData!!, false)
             }
             binding.ivMore.setOnClickListener {
@@ -102,6 +102,5 @@ class ApplySpeakUserAdapter(val callback: Callback? = null) : BaseAdapter<ApplyS
                 callback?.shrinkMore()
             }
         }
-
     }
 }

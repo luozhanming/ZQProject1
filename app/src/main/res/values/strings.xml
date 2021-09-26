@@ -176,12 +176,14 @@
     <string name="join">加入</string>
     <string name="all_remove">全部移出</string>
     <string name="lock_meeting">锁定会议</string>
+    <string name="unlock_meeting">解除锁定</string>
     <string name="all_silent">全体静音</string>
     <string name="all_accept">全部准入</string>
     <string name="has_enter">已入会</string>
     <string name="waitingroom">等候室</string>
     <string name="accept_enter">准入</string>
     <string name="no_signal">无信号</string>
+    <string name="exit_speak_mode">退出发言模式</string>
 
     <string name="set_meeting_layout_failed">切换布局失败</string>
 
@@ -190,7 +192,7 @@
     <string name="title_record_upload">已录制视频文件归档选择</string>
     <string name="record_upload_msg">（归档至平台：归档成功后请前往平台个人空间查看）</string>
     <string name="upload_to_platform">归档至平台</string>
-    <string name="format_apply_speak">%s—%s请求发言</string>
+    <string name="format_apply_speak">%s请求发言</string>
     <string name="agree">同意</string>
     <string name="disagree">不同意</string>
     <string name="app_jihuo">应用激活</string>
@@ -203,4 +205,9 @@
     <string name="format_device_code">设备码：%s</string>
     <string name="reject">拒绝</string>
     <string name="accept_call">接听</string>
+    <string name="create_meeting_failed">创建会议失败</string>
+    <string name="create_meeting_success">创建会议成功</string>
+
+    <string name="set_success">设置成功</string>
+    <string name="set_failed">设置失败</string>
 </resources>

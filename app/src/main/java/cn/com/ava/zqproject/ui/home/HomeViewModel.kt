@@ -2,12 +2,16 @@ package cn.com.ava.zqproject.ui.home
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.manager.GeneralManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
+import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.PlatformLogin
@@ -27,6 +31,7 @@ import java.util.concurrent.TimeUnit
 class HomeViewModel : BaseViewModel() {
 
 
+
     val luboInfo: MutableLiveData<LuBoInfo> by lazy {
         MutableLiveData()
     }
@@ -41,8 +46,17 @@ class HomeViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+    /**
+     * 会议信息
+     * */
+    val meetingInfoZq:OneTimeLiveData<MeetingInfoZQ> by lazy {
+        OneTimeLiveData()
+    }
+
     private var mLoadLuboInfoDisposable: Disposable? = null
     private var mSendHeartBeatDisposable:Disposable?=null
+    private var mLoopMeetingInfoZQDisposable: Disposable?=null
+    private var mLoopMeetingInvitationDisposable:Disposable?=null
 
 
     fun startloadLuboInfo() {
@@ -61,6 +75,25 @@ class HomeViewModel : BaseViewModel() {
     fun stopLoadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
         mLoadLuboInfoDisposable = null
+    }
+
+
+    fun startLoopMeetingInvitation(){
+        mLoopMeetingInvitationDisposable?.dispose()
+        mLoopMeetingInvitationDisposable = Observable.interval(2000,TimeUnit.MILLISECONDS)
+            .flatMap {
+                PlatformApi.getService().queryCalledMeeting()
+                    .compose(PlatformApi.applySchedulers())
+            }.subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+                logPrint2File(it)
+            })
+    }
+
+    fun stopLoopMeetingInvitation(){
+        mLoopMeetingInvitationDisposable?.dispose()
     }
 
 
@@ -139,6 +172,26 @@ class HomeViewModel : BaseViewModel() {
                     logPrint2File(it)
                 })
         )
+    }
+
+    fun startLoopMeetingInfoZQ(){
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingInfo()
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                meetingInfoZq.postValue(OneTimeEvent(it))
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+
+    fun stopLoopMeetingInfoZQ(){
+        mLoopMeetingInfoZQDisposable?.dispose()
+
     }
 
 

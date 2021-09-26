@@ -1,11 +1,13 @@
 package cn.com.ava.zqproject.ui.meeting
 
+import android.text.TextUtils
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.mvvm.OneTimeEvent
 import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
+import cn.com.ava.common.util.DateUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.InteraInfo
@@ -16,14 +18,17 @@ import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.RecordManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
+import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
+import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
 import cn.com.ava.zqproject.common.ApplySpeakManager
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.vo.InteractComputerSource
 import cn.com.ava.zqproject.vo.InteractComputerSources
+import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
 class MasterViewModel : BaseViewModel() {
@@ -48,10 +53,17 @@ class MasterViewModel : BaseViewModel() {
 
     private var mLoopInteracInfoDisposable: Disposable? = null
 
+    private var mLoopMeetingInfoZQDisposable: Disposable? = null
+
+    private var mLoopMeetingStateZQDisposable: Disposable? = null
+
+    private var mApplySpeakListenLoopDisposable:Disposable?= null
+
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
+
     /**
      * 会议信息
      * */
@@ -103,8 +115,9 @@ class MasterViewModel : BaseViewModel() {
      * */
     val exitMeeting: MediatorLiveData<Boolean> by lazy {
         MediatorLiveData<Boolean>().apply {
-            addSource(meetingInfo) {
-                if (meetingInfo.value?.interaMode != Constant.INTERAC_MODE_CONFERENCE) {
+            addSource(meetingInfoZq) {
+                val value = "created" != meetingInfoZq.value?.confStatus
+                if (value) {
                     postValue(true)
                 }
             }
@@ -132,12 +145,14 @@ class MasterViewModel : BaseViewModel() {
             }
         }
     }
+
     /**
      * 互动信息
      * */
     val interacInfo: MutableLiveData<InteraInfo> by lazy {
         MutableLiveData()
     }
+
     /**
      * 画面上的用户
      * */
@@ -147,7 +162,7 @@ class MasterViewModel : BaseViewModel() {
                 val layout = it.layout
                 layout.removeAt(0)
                 val onlineList = it.onlineList
-                if(onlineList==null)return@addSource
+                if (onlineList == null) return@addSource
                 val onVideoWindowList = onlineList.filter {
                     it.number in layout
                 }
@@ -155,35 +170,36 @@ class MasterViewModel : BaseViewModel() {
                     it.isOnVideo = true
                 }
                 val windowOnVideo = arrayListOf<LinkedUser>()
-                for(i in layout.indices){
-                    var userOnVideo:LinkedUser?=null
+                for (i in layout.indices) {
+                    var userOnVideo: LinkedUser? = null
                     userOnVideo = onVideoWindowList.firstOrNull { it.number == layout[i] }
-                    if(userOnVideo==null){
+                    if (userOnVideo == null) {
                         userOnVideo = LinkedUser()
                         userOnVideo?.number = -1
                         windowOnVideo.add(userOnVideo)
-                    }else{
+                    } else {
                         windowOnVideo.add(userOnVideo)
                     }
                 }
                 //只有不同的时候才更新
                 var hasChanged = false
-                if (windowOnVideo.size==value?.size ?: 0 ) {
+                if (windowOnVideo.size == value?.size ?: 0) {
                     for (i in windowOnVideo.indices) {
-                        if(windowOnVideo[i] != value?.get(i)){
+                        if (windowOnVideo[i] != value?.get(i)) {
                             hasChanged = true
                             break
                         }
                     }
-                }else{
+                } else {
                     hasChanged = true
                 }
-                if(hasChanged){
+                if (hasChanged) {
                     postValue(windowOnVideo)
                 }
             }
         }
     }
+
     /**
      * 画面布局数
      * */
@@ -191,24 +207,80 @@ class MasterViewModel : BaseViewModel() {
         MediatorLiveData<Int>().apply {
             addSource(interacInfo) {
                 val layout = it.layout
-                if(layout.size>0){
-                    if(layout[0]!=value){
+                if (layout.size > 0) {
+                    if (layout[0] != value) {
                         postValue(layout[0])
                     }
                 }
             }
         }
     }
+
+
+
     /**
      * 申请发言用户
      * */
-    val applySpeakUsers:MutableLiveData<List<ApplySpeakUser>> by lazy {
+    val applySpeakUsers: MutableLiveData<List<ApplySpeakUser>> by lazy {
         MutableLiveData()
     }
+
+
     /**
-     *
-     */
-    var mApplySpeakListenLoopDisposable:Disposable?=null
+     * 会议信息
+     * */
+    val meetingInfoZq: MutableLiveData<MeetingInfoZQ> by lazy {
+        MutableLiveData()
+    }
+
+    /**
+     * 会议成员
+     * */
+    val linkUsers: MutableLiveData<List<LinkedUser>> by lazy {
+        MutableLiveData()
+    }
+
+    /**
+     * 会议时间
+     * */
+    val meetingTime: MutableLiveData<String> by lazy {
+        MutableLiveData()
+    }
+
+    /**
+     * 会议状态
+     * */
+    val meetingState: MutableLiveData<MeetingStateInfoZQ> by lazy {
+        MutableLiveData()
+    }
+
+    /**
+     * 申请发言模式状态
+     * */
+    val requestSpeakRet: MediatorLiveData<Int> by lazy {
+        MediatorLiveData<Int>().apply {
+            value = 0
+            addSource(meetingState) {
+                it.apply {
+                    if (this.requestSpeakMode != value) {
+                        if (requestSpeakMode > 0&&requestSpeakRet.value==0) {   //申请发言前处理一下保存当前画面
+                            preRequestSpeakLayout = onVideoWindow.value
+                        }
+                        postValue(this.requestSpeakMode)
+                    }
+                }
+            }
+        }
+    }
+
+
+    var preRequestSpeakLayout: List<LinkedUser>? = null
+        get() = field
+
+
+    var mLoopLinkUserDisposable: Disposable? = null
+
+    private var mTimeCountDisposable: Disposable? = null
 
 
     /**
@@ -249,6 +321,64 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
+    fun startLoopMeetingInfoZQ() {
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingInfo()
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                meetingInfoZq.postValue(it)
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+    fun startLoopLinkUsers() {
+        mLoopLinkUserDisposable?.dispose()
+        mLoopLinkUserDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingMember()
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                linkUsers.postValue(it)
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+    fun startLoopMeetingState() {
+        mLoopMeetingStateZQDisposable?.dispose()
+        mLoopMeetingStateZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingState()
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+                meetingState.postValue(it)
+                //处理申请发言的列表数据源
+                it.requestSpeakStatus?.apply {
+                    forEach { numId->
+                        linkUsers.value?.apply {
+                            val findUser = firstOrNull { user ->
+                                user.number == numId
+                            }
+                            if(findUser!=null){
+                                ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(numId,findUser.username,"",findUser.nickname))
+                            }
+                        }
+                    }
+                }
+                ToastUtils.showShort(it.toString())
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+
     fun toggleComputer() {
         var postIndex = 1
         if (isPluginComputer.value == true) {
@@ -269,7 +399,7 @@ class MasterViewModel : BaseViewModel() {
 
     fun overMeeting() {
         mDisposables.add(
-            InteracManager.exitInteraction()
+            ZQManager.exitMeeting()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                 }, {
@@ -279,23 +409,23 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
-    fun loadApplySpeakUsers(){
-        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(1,"悟空","撒亚人"))
-        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(2,"悟饭","撒亚人"))
-        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(3,"悟天","撒亚人"))
-        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(4,"比达","撒亚人"))
+    fun loadApplySpeakUsers() {
+//        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(1, "悟空", "撒亚人"))
+//        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(2, "悟饭", "撒亚人"))
+//        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(3, "悟天", "撒亚人"))
+//        ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(4, "比达", "撒亚人"))
     }
 
     /**
      * 开启申请发言列表监听
      * */
-    fun startApplySpeakListen(){
+    fun startApplySpeakListen() {
         mApplySpeakListenLoopDisposable?.dispose()
-        mApplySpeakListenLoopDisposable = Observable.interval(1000,TimeUnit.MILLISECONDS)
+        mApplySpeakListenLoopDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .subscribe({
                 val users = ApplySpeakManager.getApplySpeakUsers()
                 applySpeakUsers.postValue(users)
-            },{
+            }, {
                 logPrint2File(it)
             })
     }
@@ -303,7 +433,7 @@ class MasterViewModel : BaseViewModel() {
     /**
      * 停止申请发言列表监听
      * */
-    fun stopApplySpeakListen(){
+    fun stopApplySpeakListen() {
         mApplySpeakListenLoopDisposable?.dispose()
     }
 
@@ -416,18 +546,119 @@ class MasterViewModel : BaseViewModel() {
         mLoopCurSceneSourcesDisposable?.dispose()
         mLoopInteracInfoDisposable?.dispose()
         mApplySpeakListenLoopDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopLinkUserDisposable?.dispose()
+        mLoopMeetingStateZQDisposable?.dispose()
     }
 
 
     fun setVideoLayout(usersOnVideo: List<Int>) {
         mDisposables.add(
-            InteracManager.setVideoLayout(usersOnVideo.size,usersOnVideo)
+            ZQManager.setVideoLayout(usersOnVideo.size, usersOnVideo)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
-                },{
+                }, {
                     logPrint2File(it)
                 })
         )
     }
+
+    /**
+     * 开启会议计时
+     * */
+    fun startTimeCount() {
+        mTimeCountDisposable?.dispose()
+        mTimeCountDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+            .subscribe({
+                meetingInfoZq.value?.apply {
+                    if (!TextUtils.isEmpty(confStartTime)) {
+                        val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
+                        val now = System.currentTimeMillis()
+                        val diff = now - begin
+                        val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
+                        meetingTime.postValue(toDateString)
+                    }
+                }
+            }, {
+                logPrint2File(it)
+            })
+    }
+
+    /**
+     * 停止会议计时
+     * */
+    fun stopTimeCount() {
+        mTimeCountDisposable?.dispose()
+    }
+
+    /**
+     * 开关本地音画
+     * */
+    fun toggleLocalVolumeAudio() {
+        meetingState.value?.apply {
+            mDisposables.add(Observable.zip(
+                ZQManager.setLocalCam(localCameraCtrl),
+                ZQManager.setLocalAudio(localCameraCtrl),
+                { t1, t2 ->
+                    return@zip t1 && t2
+                }).subscribeOn(Schedulers.io())
+                .subscribe({
+
+                }, {
+                    logPrint2File(it)
+                })
+            )
+        }
+    }
+
+    /**
+    * 设置发言状态
+    * */
+    fun setRequestSpeakMode(number: Int) {
+        mDisposables.add(
+            ZQManager.setRequestSpeakMode(number)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+
+                }, {
+                    logPrint2File(it)
+                })
+        )
+    }
+
+    /**
+     * 是否同意发言
+     * */
+    fun agreeRequestSpeak(numId: Int, agree: Boolean) {
+        mDisposables.add(
+            ZQManager.setRequestSpeakRet(numId,agree)
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+
+                }, {
+                    logPrint2File(it)
+                })
+        )
+    }
+
+    /**
+     * 切换锁定会议
+     * */
+    fun toggleLockMeeting() {
+        meetingState.value?.apply {
+            mDisposables.add(
+                ZQManager.lockMeeting(!lockConference)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({
+
+                    },{
+                        logPrint2File(it)
+                    })
+            )
+        }
+
+    }
+
+
 }

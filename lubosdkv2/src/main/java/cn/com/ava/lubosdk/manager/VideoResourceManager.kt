@@ -282,7 +282,7 @@ object VideoResourceManager {
     /*
     * 上传视频资源
     * */
-    fun uploadRecordFile2(ftpInfo: HashMap<String, Any>, data: RecordFilesInfo.RecordFile): Observable<Boolean> {
+    fun uploadRecordFile2(ftpInfo: HashMap<String, Any>, data: RecordFilesInfo.RecordFile, dstFile: String): Observable<Boolean> {
         logd("待上传的视频 = ${data.toString()}")
 
         val params: MutableMap<String, String> = LinkedHashMap()
@@ -296,9 +296,10 @@ object VideoResourceManager {
         val serverIp = ftpInfo["ftpUrl"]
         val serverPort = ftpInfo["ftpPort"]
         val filename = data.rawFileName
-        val dstFile = "0"
+        val encode_dstFile = URLHexEncodeDecodeUtil.stringToHexEncode(dstFile, "GBK")
+        logd("encode_dstFile = $encode_dstFile")
         val tempData = "ftp_uploadFileByName_username=$username,password=$password,targetPath=$targetPath,serverIp=$serverIp," +
-                "serverPort=$serverPort,filename=$filename,dstFile=$dstFile"
+                "serverPort=$serverPort,filename=$filename,dstFile=$encode_dstFile"
         logd("data = $tempData")
         params["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(tempData, "GBK")
         logd("上传视频的params: ${params.toString()}")

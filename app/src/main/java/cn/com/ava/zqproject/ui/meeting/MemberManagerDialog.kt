@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.base.ui.BaseDialogV2
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.DialogMemeberManagerBinding
 import cn.com.ava.zqproject.ui.meeting.adapter.OnMeetingMemberAdapter
@@ -22,6 +23,8 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
     TabLayout.OnTabSelectedListener {
 
     private val mMemberManagerViewModel by viewModels<MemeberManagerViewModel>({ requireParentFragment() })
+
+    private val mMasterViewModel by viewModels<MasterViewModel>({requireParentFragment()})
 
     private var mOnMeetingMemberAdapter by autoCleared<OnMeetingMemberAdapter>()
 
@@ -63,24 +66,43 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
         mBinding.rvHasEnter.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         mOnMeetingMemberAdapter = OnMeetingMemberAdapter(object :OnMeetingMemberAdapter.ItemCallback{
             override fun onAudioButtonClicked(member: MeetingMember, audioEnable: Boolean) {
-
+                mMemberManagerViewModel.setMemberMicEnable(member.user.number,audioEnable)
             }
 
             override fun onVideoButtonClicked(member: MeetingMember, videoEnable: Boolean) {
-
+                mMemberManagerViewModel.setMemberCamEnable(member.user.number,videoEnable)
             }
 
             override fun onRemoveButtonClicked(member: MeetingMember) {
-
+                mMemberManagerViewModel.removeMemberToWaiting(member.user.number)
             }
         })
+
         mBinding.rvHasEnter.adapter = mOnMeetingMemberAdapter
 
         mBinding.rvWaiting.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
-        mWaitingRoomMemberAdapter = WaitingRoomMemberAdapter()
+        mWaitingRoomMemberAdapter = WaitingRoomMemberAdapter(object :WaitingRoomMemberAdapter.ItemCallback{
+            override fun onAcceptButtonClicked(member: LinkedUser) {
+                mMemberManagerViewModel.acceptMemberToMeeting(member.number)
+            }
+        })
         mBinding.rvWaiting.adapter = mWaitingRoomMemberAdapter
-        mMemberManagerViewModel.getOnMeetingMembers()
-        mMemberManagerViewModel.getWaitingMembers()
+
+
+        mBinding.btnLockMeeting.setOnClickListener {
+            //TODO 这里需要改，不应该用MasterViewModel
+            mMasterViewModel.toggleLockMeeting()
+        }
+        mBinding.btnAllAccept.setOnClickListener {
+            mMemberManagerViewModel.acceptAllMemberToMeeting()
+        }
+        mBinding.btnAllRemove.setOnClickListener {
+            mMemberManagerViewModel.removeAllMemberToWaiting()
+        }
+        mBinding.btnAllSilent.setOnClickListener {
+            mMemberManagerViewModel.silentAllMembers()
+        }
+
     }
 
     override fun getLayoutId(): Int {
@@ -88,7 +110,7 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
     }
 
     override fun onBindViewModel2Layout(binding: DialogMemeberManagerBinding) {
-
+        binding.masterViewModel = mMasterViewModel
     }
 
     override fun onDestroyView() {
@@ -98,10 +120,10 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
 
     override fun observeVM() {
         mMemberManagerViewModel.onMeetingMembers.observe(this) {
-            mOnMeetingMemberAdapter?.setDatas(it)
+            mOnMeetingMemberAdapter?.setDatasWithDiff(it)
         }
         mMemberManagerViewModel.onWaitingMembers.observe(this){
-            mWaitingRoomMemberAdapter?.setDatas(it)
+            mWaitingRoomMemberAdapter?.setDatasWithDiff(it)
         }
     }
 
