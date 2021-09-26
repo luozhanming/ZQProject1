@@ -23,6 +23,7 @@ import cn.com.ava.zqproject.ui.splash.SplashFragment
 import cn.com.ava.zqproject.ui.videoResource.pop.VRManageMenuWindow
 import cn.com.ava.zqproject.ui.videoResource.pop.VideoResourceSortMenuWindow
 import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
+import cn.com.ava.zqproject.ui.videoResource.util.AESUtils
 import cn.com.ava.zqproject.usb.UsbHelper
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.tabs.TabLayout
@@ -180,7 +181,14 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
     }
 
     override fun onDestroyView() {
-        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(mVideoManageViewModel.cacheVideos))
+        logd("videoManagerFragment onDestroyView")
+        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
         super.onDestroyView()
+    }
+
+    override fun onPause() {
+        logd("videoManagerFragment onPause")
+        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
+        super.onPause()
     }
 }

@@ -45,6 +45,20 @@ interface AVAServerService {
     @POST("cgi-bin/delFile.cgi")
     fun deleteVideoResource(@FieldMap params: Map<String, String>): Call<ResponseBody>
 
+    @FormUrlEncoded
+    @POST("cgi-bin/plat.cgi")
+    fun uploadVideoResource(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
+    @FormUrlEncoded
+    @POST("cgi-bin/plat.cgi")
+    fun deleteRecordFile(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
     @GET("cgi-bin/plat.cgi")
-    fun uploadVideoResource(@QueryMap params: Map<String, String>): Call<ResponseBody>
+    fun getFtpUploadStatus(@QueryMap queryMap: Map<String, String>): Call<ResponseBody>
+
+    @GET("cgi-bin/plat.cgi")
+    fun getFtpUploadList(@QueryMap queryMap: Map<String, String>): Call<ResponseBody>
+
+    @GET("cgi-bin/plat.cgi")
+    fun getRecordFileList(@QueryMap queryMap: Map<String, String>): Call<ResponseBody>
 }

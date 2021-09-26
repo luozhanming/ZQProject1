@@ -53,6 +53,13 @@
     <string name="sort_by_size">按文件大小</string>
     <string name="sort_by_time">按录制时间</string>
     <string name="batch_manage">批量管理</string>
+    <string name="tip_download_exist">该视频已在下载队列</string>
+    <string name="tip_upload_exist">该视频已在上传队列</string>
+    <string name="tip_upload_done">该视频已上传</string>
+    <string name="tip_upload_uploading">该视频正在上传中</string>
+    <string name="tip_upload_success">已上传完成</string>
+    <string name="tip_upload_failed">上传失败</string>
+    <string name="tip_delete_video">您确定要删除该视频吗？</string>
 
     <string name="tip">提示</string>
     <string name="cancel">取消</string>

@@ -135,6 +135,20 @@ interface PlatformService {
         @Field("rsAcct") rsAcct: String = ""
     ): Observable<PlatformResponse<Any>>
 
+    /**
+     * 保存FTP中的视频文件
+     * */
+    @FormUrlEncoded
+    @POST("/{path}")
+    fun saveVideoFromFTP(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_SAVE_FTP_VIDEO
+        ),
+        @Field("fileName") fileName: String = "",
+        @Field("title") title: String = "",
+        @Field("period") period: Int = 0,
+        @Field("uuid") uuid: String = "",
+    ): Observable<PlatformResponse<Any>>
 
     @GET("/{path}")
     fun queryCalledMeeting(
@@ -142,8 +156,5 @@ interface PlatformService {
             PlatformApiManager.PATH_CALL_MEETING
         )
     ):Observable<PlatformResponse<Any>>
-
-
-
 
 }

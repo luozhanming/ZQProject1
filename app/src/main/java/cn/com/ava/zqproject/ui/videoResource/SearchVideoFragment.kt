@@ -27,7 +27,9 @@ import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentSearchVideoBinding
 import cn.com.ava.zqproject.ui.videoResource.adapter.VideoResourceListItemAdapter
+import cn.com.ava.zqproject.ui.videoResource.dialog.DeleteVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.dialog.SelectDiskDialog
+import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.usb.UsbHelper
 import cn.com.ava.zqproject.vo.StatefulView
@@ -41,8 +43,6 @@ import kotlin.concurrent.schedule
 class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
 
     private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
-
-    private var mVideoResourceListItemAdapter by autoCleared<VideoResourceListItemAdapter>()
 
     private var mSearchVideoItemAdapter by autoCleared<VideoResourceListItemAdapter>()
 
@@ -58,12 +58,6 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
         object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 mDownloadService = p1?.let { (it as DownloadService.DownloadBinder).service }
-                logd("下载服务")
-//                mDownloadService?.registerDownloadCallback(object : DownloadService.DownloadCallback {
-//                    override fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
-//                        mVideoManageViewModel.refreshDownloadProgress(info)
-//                    }
-//                })
             }
             override fun onServiceDisconnected(p0: ComponentName?) {
                 mDownloadService = null
@@ -92,10 +86,10 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
 //        val videos: String = arguments?.get("videos").toString()
 //        val list = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(videos, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
 //        mVideoManageViewModel.videoResources.value = list
-
 //        logd("搜索视频size: ${mSearchVideoViewModel.videoResources.value?.size}")
 
         mBinding.btnCancel.setOnClickListener {
+            mBinding.etSearch.setText("")
             findNavController().navigateUp()
         }
 
@@ -118,9 +112,11 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
 
                 override fun onDownload(data: StatefulView<RecordFilesInfo.RecordFile>?) {
                     logd("下载")
+                    val video = RecordFilesInfo.RecordFile(data?.obj!!)
+                    video.transmissionType = 1
                     // 检测是否有下载缓存
-                    if (mVideoManageViewModel.checkCacheResult(data?.obj!!)) {
-                        ToastUtils.showShort("该视频已在下载队列")
+                    if (mVideoManageViewModel.checkCacheResult(video)) {
+                        ToastUtils.showShort(getString(R.string.tip_download_exist))
                         return
                     }
 
@@ -138,23 +134,40 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             uDiskStorageVolume = UsbHelper.getUDiskStorageVolume()
                             if (uDiskStorageVolume != null) {
-                                mTempRecordFile = data?.obj!!
+                                mTempRecordFile = video
                                 val accessIntent = uDiskStorageVolume.createAccessIntent(null)
                                 startActivityForResult(accessIntent, 3)
                             }
                         }
                         return
                     } else {
-                        showSelectDiskDialog(data?.obj!!)
+                        showSelectDiskDialog(video)
                     }
                 }
 
                 override fun onUpload(data: StatefulView<RecordFilesInfo.RecordFile>?) {
                     logd("上传")
+                    val video = RecordFilesInfo.RecordFile(data?.obj!!)
+                    video.transmissionType = 2
+                    // 检测是否有上传缓存
+                    if (mVideoManageViewModel.checkCacheResult(video)) {
+                        ToastUtils.showShort(getString(R.string.tip_upload_exist))
+                        return
+                    }
+                    val dialog = UploadVideoDialog({
+                        logd("视频信息： $it")
+                        mDownloadService?.uploadVideo(video, it)
+                    })
+                    dialog.show(childFragmentManager, "")
                 }
 
                 override fun onDelete(data: StatefulView<RecordFilesInfo.RecordFile>?) {
                     logd("删除")
+                    val dialog = DeleteVideoDialog(getString(R.string.tip_delete_video), {
+                        logd("删除")
+                        mVideoManageViewModel.deleteVideo(data?.obj!!)
+                    })
+                    dialog.show(childFragmentManager, "")
                 }
             })
         }
@@ -178,6 +191,7 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
 
     // 下载视频
     fun downloadVideo(data: RecordFilesInfo.RecordFile) {
+        data.transmissionType = 1
 
         mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
 

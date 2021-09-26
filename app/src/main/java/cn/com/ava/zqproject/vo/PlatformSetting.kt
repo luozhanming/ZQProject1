@@ -19,7 +19,8 @@ data class PlatformSetting(
     val platformId: String,
     val recentCallUrl: String,
     val refreshTokenUrl: String,
-    val logoutUrl:String
+    val logoutUrl:String,
+    val saveFTPVideoUrl:String
 )
 
 

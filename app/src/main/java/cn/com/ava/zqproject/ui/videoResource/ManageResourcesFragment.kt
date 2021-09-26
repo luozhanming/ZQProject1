@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentMap
 class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
     private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
-//    private val mManageResourcesViewModel by viewModels<ManageResourcesViewModel>()
 
     private var mManageResourceItemAdapter by autoCleared<ManageResourceItemAdapter>()
 
@@ -68,16 +67,6 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
         startService()
         bindService()
 
-//        val videos: String = arguments?.get("videos").toString()
-//        val list = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(videos, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
-//
-//        val statefuls = arrayListOf<StatefulView<RecordFilesInfo.RecordFile>>()
-//        for (video in list) {
-//            val stateful = StatefulView(video)
-//            statefuls.add(stateful)
-//        }
-//        mManageResourcesViewModel.videoResources.value = statefuls
-//
         logd("视频size: ${mVideoManageViewModel.videoResources.value?.size}")
 
         mBinding.ivBack.setOnClickListener {
@@ -104,6 +93,7 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
             var hasCache = false
             mVideoManageViewModel.mSelectedVideos.forEach {
+                it.transmissionType = 1
                 if (mVideoManageViewModel.checkCacheResult(it)) {
                     hasCache = true
                 }
@@ -185,10 +175,11 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
     // 下载视频
     fun downloadVideo() {
         logd("下载视频")
-        mVideoManageViewModel.saveCacheVideo(mVideoManageViewModel.mSelectedVideos)
         mVideoManageViewModel.mSelectedVideos.forEach {
+            it.transmissionType = 1
             mDownloadService?.downloadVideo(it)
         }
+        mVideoManageViewModel.saveCacheVideo(mVideoManageViewModel.mSelectedVideos)
     }
 
     override fun observeVM() {
