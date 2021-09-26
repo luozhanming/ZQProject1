@@ -8,6 +8,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+
+        <View
+            android:id="@+id/view16"
+            android:layout_width="443dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="46dp"
+            android:background="@drawable/bg_edittext_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+
+
+        <View
+            android:id="@+id/view17"
+            android:layout_width="443dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_edittext_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view16" />
+
+        <View
+            android:id="@+id/view18"
+            android:layout_width="443dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_edittext_1"
+            app:layout_constraintEnd_toEndOf="@+id/view16"
+            app:layout_constraintStart_toStartOf="@+id/view16"
+            app:layout_constraintTop_toBottomOf="@+id/view17" />
+
         <EditText
             android:id="@+id/editText7"
             android:layout_width="0dp"
@@ -139,36 +172,6 @@
             app:layout_constraintTop_toBottomOf="@+id/view18" />
 
 
-        <View
-            android:id="@+id/view16"
-            android:layout_width="443dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="46dp"
-            android:background="@drawable/bg_edittext_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView4" />
-
-
-        <View
-            android:id="@+id/view17"
-            android:layout_width="443dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_edittext_1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view16" />
-
-        <View
-            android:id="@+id/view18"
-            android:layout_width="443dp"
-            android:layout_height="53dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/bg_edittext_1"
-            app:layout_constraintEnd_toEndOf="@+id/view16"
-            app:layout_constraintStart_toStartOf="@+id/view16"
-            app:layout_constraintTop_toBottomOf="@+id/view17" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

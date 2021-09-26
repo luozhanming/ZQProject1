@@ -56,7 +56,7 @@ class MeetingMemberQuery(
                     user?.onlineState = split1[1].toInt()
                 }else if("sessionId" == split1[0]){
                     user?.sessionId = split1[1]
-                }else if("role"==split1[1]){
+                }else if("role"==split1[0]){
                     user?.role = split1[1]
                 }
             }

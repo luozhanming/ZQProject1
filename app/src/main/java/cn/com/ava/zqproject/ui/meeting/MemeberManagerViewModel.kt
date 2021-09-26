@@ -22,7 +22,7 @@ class MemeberManagerViewModel : BaseViewModel() {
         MediatorLiveData<List<MeetingMember>>().apply {
             addSource(meetingMember) {
                 val listeners = it.filter { user ->
-                    user.role != "4" && user.onlineState == 1
+                    user.role == "1" && user.onlineState == 1
                 }
                 val list = arrayListOf<MeetingMember>()
                 listeners.forEach {
@@ -43,7 +43,7 @@ class MemeberManagerViewModel : BaseViewModel() {
         MediatorLiveData<List<LinkedUser>>().apply {
             addSource(meetingMember) {
                 val listeners = it.filter { user ->
-                    user.role == "4"
+                    user.role == "3"
                 }
                 value = listeners
             }
@@ -109,8 +109,8 @@ class MemeberManagerViewModel : BaseViewModel() {
     /**
      * 成员移除
      * */
-    fun removeMemberToWaiting(numId: Int) {
-        mDisposables.add(ZQManager.memberGoToWaiting(arrayOf(numId.toString()), true)
+    fun removeMemberToWaiting(username: String) {
+        mDisposables.add(ZQManager.memberGoToWaiting(arrayOf(username), true)
             .subscribeOn(Schedulers.io())
             .subscribe({
 
@@ -128,7 +128,7 @@ class MemeberManagerViewModel : BaseViewModel() {
     fun removeAllMemberToWaiting() {
         val list = onMeetingMembers.value ?: emptyList()
         val numbers = list.map {
-            it.user.number.toString()
+            it.user.username
         }.toTypedArray()
         mDisposables.add(ZQManager.memberGoToWaiting(numbers, true)
             .subscribeOn(Schedulers.io())
@@ -145,8 +145,8 @@ class MemeberManagerViewModel : BaseViewModel() {
     /**
      * 准入
      * */
-    fun acceptMemberToMeeting(numId: Int){
-        mDisposables.add(ZQManager.memberGoToWaiting(arrayOf(numId.toString()), false)
+    fun acceptMemberToMeeting(username: String){
+        mDisposables.add(ZQManager.memberGoToWaiting(arrayOf(username), false)
             .subscribeOn(Schedulers.io())
             .subscribe({
 
@@ -165,7 +165,7 @@ class MemeberManagerViewModel : BaseViewModel() {
     fun acceptAllMemberToMeeting(){
         val list = onWaitingMembers.value ?: emptyList()
         val numbers = list.map {
-            it.number.toString()
+            it.username.toString()
         }.toTypedArray()
         mDisposables.add(ZQManager.memberGoToWaiting(numbers, false)
             .subscribeOn(Schedulers.io())
@@ -192,7 +192,6 @@ class MemeberManagerViewModel : BaseViewModel() {
                 ZQManager.setRemoteAudio(it.toInt(),true)
             }.subscribeOn(Schedulers.io())
             .subscribe({
-                ToastUtils.showShort( getResources().getString(R.string.set_success))
 
             },{
                 logPrint2File(it)

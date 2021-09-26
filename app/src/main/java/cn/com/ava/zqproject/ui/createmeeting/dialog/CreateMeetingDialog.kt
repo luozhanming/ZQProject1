@@ -83,7 +83,7 @@ class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : 
             if(TextUtils.isEmpty(professionTitleName)){
                 etMeetingNickname?.setText("${name}")
             }else{
-                etMeetingNickname?.setText("${name}-${professionTitleName}")
+                etMeetingNickname?.setText("${name}_${professionTitleName}")
             }
         }
     }

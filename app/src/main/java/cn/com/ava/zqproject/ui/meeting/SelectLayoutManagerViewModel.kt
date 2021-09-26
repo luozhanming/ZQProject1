@@ -48,6 +48,15 @@ class SelectLayoutManagerViewModel : BaseViewModel() {
     }
 
     /**
+     * 间隔周期
+     * */
+    val patrolPeriod:MutableLiveData<String> by lazy {
+        MutableLiveData<String>().apply {
+            value = "10"
+        }
+    }
+
+    /**
      * 选择第几个布局
      * */
     val layoutSelect: MutableLiveData<Int> by lazy {

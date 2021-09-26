@@ -74,7 +74,7 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
             }
 
             override fun onRemoveButtonClicked(member: MeetingMember) {
-                mMemberManagerViewModel.removeMemberToWaiting(member.user.number)
+                mMemberManagerViewModel.removeMemberToWaiting(member.user.username)
             }
         })
 
@@ -83,7 +83,7 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
         mBinding.rvWaiting.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         mWaitingRoomMemberAdapter = WaitingRoomMemberAdapter(object :WaitingRoomMemberAdapter.ItemCallback{
             override fun onAcceptButtonClicked(member: LinkedUser) {
-                mMemberManagerViewModel.acceptMemberToMeeting(member.number)
+                mMemberManagerViewModel.acceptMemberToMeeting(member.username)
             }
         })
         mBinding.rvWaiting.adapter = mWaitingRoomMemberAdapter

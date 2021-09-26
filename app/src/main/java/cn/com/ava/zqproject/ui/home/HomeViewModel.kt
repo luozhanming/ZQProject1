@@ -15,8 +15,6 @@ import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.PlatformLogin
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -29,7 +27,6 @@ import java.util.concurrent.TimeUnit
  *
  */
 class HomeViewModel : BaseViewModel() {
-
 
 
     val luboInfo: MutableLiveData<LuBoInfo> by lazy {
@@ -49,14 +46,14 @@ class HomeViewModel : BaseViewModel() {
     /**
      * 会议信息
      * */
-    val meetingInfoZq:OneTimeLiveData<MeetingInfoZQ> by lazy {
+    val meetingInfoZq: OneTimeLiveData<MeetingInfoZQ> by lazy {
         OneTimeLiveData()
     }
 
     private var mLoadLuboInfoDisposable: Disposable? = null
-    private var mSendHeartBeatDisposable:Disposable?=null
-    private var mLoopMeetingInfoZQDisposable: Disposable?=null
-    private var mLoopMeetingInvitationDisposable:Disposable?=null
+    private var mSendHeartBeatDisposable: Disposable? = null
+    private var mLoopMeetingInfoZQDisposable: Disposable? = null
+    private var mLoopMeetingInvitationDisposable: Disposable? = null
 
 
     fun startloadLuboInfo() {
@@ -78,21 +75,21 @@ class HomeViewModel : BaseViewModel() {
     }
 
 
-    fun startLoopMeetingInvitation(){
+    fun startLoopMeetingInvitation() {
         mLoopMeetingInvitationDisposable?.dispose()
-        mLoopMeetingInvitationDisposable = Observable.interval(2000,TimeUnit.MILLISECONDS)
+        mLoopMeetingInvitationDisposable = Observable.interval(5000, TimeUnit.MILLISECONDS)
             .flatMap {
                 PlatformApi.getService().queryCalledMeeting()
-                    .compose(PlatformApi.applySchedulers())
             }.subscribeOn(Schedulers.io())
             .subscribe({
+                //TODO 没响应
 
-            },{
+            }, {
                 logPrint2File(it)
             })
     }
 
-    fun stopLoopMeetingInvitation(){
+    fun stopLoopMeetingInvitation() {
         mLoopMeetingInvitationDisposable?.dispose()
     }
 
@@ -100,11 +97,11 @@ class HomeViewModel : BaseViewModel() {
     /**
      * 开始发送心跳
      * */
-    fun startHeartBeat(){
+    fun startHeartBeat() {
         mSendHeartBeatDisposable?.dispose()
-        mSendHeartBeatDisposable = Observable.interval(0,20, TimeUnit.SECONDS)
+        mSendHeartBeatDisposable = Observable.interval(0, 20, TimeUnit.SECONDS)
             .flatMap {
-               PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr?:"")
+                PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr ?: "")
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
                 it.toString()
@@ -118,7 +115,7 @@ class HomeViewModel : BaseViewModel() {
     /**
      * 停止发送心跳
      * */
-    fun stopHeartBeat(){
+    fun stopHeartBeat() {
         mSendHeartBeatDisposable?.dispose()
     }
 
@@ -129,14 +126,16 @@ class HomeViewModel : BaseViewModel() {
 
             }, {
                 logPrint2File(it)
-            }))
+            })
+        )
         mDisposables.add(WindowLayoutManager.getLayoutButtonInfo()
             .subscribeOn(Schedulers.io())
             .subscribe({
 
             }, {
                 logPrint2File(it)
-            }))
+            })
+        )
         ComputerModeManager.getComputerIndex()
     }
 
@@ -174,7 +173,7 @@ class HomeViewModel : BaseViewModel() {
         )
     }
 
-    fun startLoopMeetingInfoZQ(){
+    fun startLoopMeetingInfoZQ() {
         mLoopMeetingInfoZQDisposable?.dispose()
         mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
@@ -189,7 +188,7 @@ class HomeViewModel : BaseViewModel() {
     }
 
 
-    fun stopLoopMeetingInfoZQ(){
+    fun stopLoopMeetingInfoZQ() {
         mLoopMeetingInfoZQDisposable?.dispose()
 
     }

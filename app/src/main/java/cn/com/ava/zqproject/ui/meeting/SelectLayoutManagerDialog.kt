@@ -15,6 +15,8 @@ import cn.com.ava.zqproject.ui.meeting.adapter.AutoPatrolMemberAdapter
 import cn.com.ava.zqproject.ui.meeting.adapter.SelectLayoutSignalAdapter
 import cn.com.ava.zqproject.vo.LayoutSignalSelect
 import cn.com.ava.zqproject.vo.StatefulView
+import com.blankj.utilcode.util.ToastUtils
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
 
@@ -25,6 +27,8 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
     private var mSelectSignalPopupWindow by autoCleared<SignalSelectPopupWindow>()
 
     private var mAutoPatrolMemberAdapter by autoCleared<AutoPatrolMemberAdapter>()
+
+    private val mMasterViewModel by viewModels<MasterViewModel>({requireParentFragment()})
 
 
 
@@ -93,11 +97,19 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
             mSelectSignalPopupWindow?.dismiss()
         }
         mBinding.btnSure.setOnClickListener {
-            val layoutMode = mSelectLayoutViewModel?.layoutSelect.value?:-1
+            val layoutMode = mSelectLayoutViewModel.layoutSelect.value?:-1
+            val period = mSelectLayoutViewModel.patrolPeriod.value?:"10"
             if(layoutMode==SelectLayoutManagerViewModel.LAYOUT_AUTO){
-                mSelectLayoutViewModel.patrolSure(mAutoPatrolMemberAdapter?.getSelectedUser()?: emptyList())
+             //   mSelectLayoutViewModel.patrolSure(mAutoPatrolMemberAdapter?.getSelectedUser()?: emptyList())
+                if(mAutoPatrolMemberAdapter?.getSelectedUser()?.isEmpty()==true){
+                    ToastUtils.showShort("请先选择需要轮播的成员")
+                    return@setOnClickListener
+                }
+                mMasterViewModel.beginPatrol(mAutoPatrolMemberAdapter?.getSelectedUser(),period.toInt())
+                dismiss()
             }else{
                 mSelectLayoutViewModel.layoutSure()
+                mMasterViewModel.cancelPatrol()
             }
 
         }

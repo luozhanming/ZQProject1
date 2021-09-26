@@ -26,7 +26,7 @@ class SpecialCharInputFilter:InputFilter {
         replace1?.iterator()?.apply {
             while (hasNext()){
                 val char = nextChar()
-                if(!char.isChinese() && !char.isLetterOrDigit() &&char !='-'){  //是特殊字符
+                if(!char.isChinese() && !char.isLetterOrDigit() &&char !='_'){  //是特殊字符
                     specialChars.add(char)
                 }
             }

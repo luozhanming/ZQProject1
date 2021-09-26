@@ -9,6 +9,7 @@ import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.DateUtil
 import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.InteraInfo
 import cn.com.ava.lubosdk.entity.LinkedUser
@@ -27,6 +28,7 @@ import cn.com.ava.zqproject.vo.InteractComputerSource
 import cn.com.ava.zqproject.vo.InteractComputerSources
 import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
@@ -59,6 +61,8 @@ class MasterViewModel : BaseViewModel() {
 
     private var mApplySpeakListenLoopDisposable:Disposable?= null
 
+    private var mPatrolManager:PatrolManager?=null
+
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
@@ -79,6 +83,8 @@ class MasterViewModel : BaseViewModel() {
             value = true
         }
     }
+
+
 
     /**
      * 电脑索引
@@ -549,6 +555,8 @@ class MasterViewModel : BaseViewModel() {
         mLoopMeetingInfoZQDisposable?.dispose()
         mLoopLinkUserDisposable?.dispose()
         mLoopMeetingStateZQDisposable?.dispose()
+        mPatrolManager?.cancel()
+        mPatrolManager = null
     }
 
 
@@ -657,6 +665,75 @@ class MasterViewModel : BaseViewModel() {
                     })
             )
         }
+
+    }
+
+    fun beginPatrol(selectedUser: List<LinkedUser>?, period: Int) {
+        selectedUser?.apply {
+            mPatrolManager = mPatrolManager?: PatrolManager(object :PatrolManager.PatrolCallback{
+                override fun onBegin() {
+
+                }
+
+                override fun onCancel() {
+
+                }
+
+                override fun onChanged(user: LinkedUser) {
+                    logd("onChanged")
+                    setVideoLayout(listOf(user.number))
+                }
+
+            })
+            mPatrolManager?.begin(selectedUser,period.toLong())
+        }
+    }
+
+    fun cancelPatrol() {
+        mPatrolManager?.cancel()
+    }
+
+
+    class PatrolManager(val callback:PatrolCallback?=null){
+
+        interface PatrolCallback{
+
+            fun onBegin()
+            fun onCancel()
+            fun onChanged(user:LinkedUser)
+        }
+
+
+        private var patrolUsers= arrayListOf<LinkedUser>()
+
+        private var timer:Disposable? = null
+
+        private var curPos = 0
+
+
+
+        fun begin(users:List<LinkedUser>,period:Long){
+            curPos = 0
+            timer?.dispose()
+            patrolUsers.clear()
+            patrolUsers.addAll(users)
+            timer = Observable.interval(period,TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    val size = patrolUsers.size
+                    curPos %= size
+                    callback?.onChanged(patrolUsers[curPos])
+                    curPos++
+                },{
+                    logPrint2File(it)
+                })
+        }
+
+        fun cancel(){
+            timer?.dispose()
+            callback?.onCancel()
+        }
+
 
     }
 

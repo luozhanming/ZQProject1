@@ -119,7 +119,7 @@ object ZQManager {
 
     /**
      * 听课/旁听角色切换
-     * @param users 用户
+     * @param users 用户名数组
      * @param goToWaiting 去等候室
      * */
     fun memberGoToWaiting(users:Array<String>,goToWaiting:Boolean):Observable<Boolean>{
