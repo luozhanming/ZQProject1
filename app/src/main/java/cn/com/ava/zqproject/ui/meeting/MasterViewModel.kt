@@ -688,23 +688,24 @@ class MasterViewModel : BaseViewModel() {
                 .flatMap {
                     if (!it) {  //不成功
                         return@flatMap Observable.just(false)
-                    } else if (agree) {
+                    } else if (agree) {  //设置发言状态
                         return@flatMap ZQManager.setRequestSpeakMode(numId)
                     } else {
                         return@flatMap ZQManager.setRequestSpeakMode(0)
                     }
-                }.flatMap { it1 -> //关闭所有
-                    val requestNum = meetingState.value?.requestSpeakStatus ?: emptyList()
-                    return@flatMap Observable.fromIterable(requestNum)
-                        .flatMap {
-                            if (numId != it) {
-                                return@flatMap ZQManager.setRequestSpeakRet(it, false)
-                            } else {
-                                return@flatMap Observable.just(it1)
-                            }
-                        }
-
                 }
+//                .flatMap { it1 -> //关闭所有
+//                    val requestNum = meetingState.value?.requestSpeakStatus ?: emptyList()
+//                    return@flatMap Observable.fromIterable(requestNum)
+//                        .flatMap {
+//                            if (numId != it) {
+//                                return@flatMap ZQManager.setRequestSpeakRet(it, false)
+//                            } else {
+//                                return@flatMap Observable.just(it1)
+//                            }
+//                        }
+//
+//                }
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
