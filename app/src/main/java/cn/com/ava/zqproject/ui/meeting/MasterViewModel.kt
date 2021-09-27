@@ -11,15 +11,9 @@ import cn.com.ava.common.util.DateUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.Constant
-import cn.com.ava.lubosdk.entity.InteraInfo
-import cn.com.ava.lubosdk.entity.LinkedUser
-import cn.com.ava.lubosdk.entity.LocalVideoStream
-import cn.com.ava.lubosdk.entity.MeetingInfo
+import cn.com.ava.lubosdk.entity.*
 import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
-import cn.com.ava.lubosdk.manager.InteracManager
-import cn.com.ava.lubosdk.manager.RecordManager
-import cn.com.ava.lubosdk.manager.WindowLayoutManager
-import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
 import cn.com.ava.zqproject.common.ApplySpeakManager
@@ -31,6 +25,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MasterViewModel : BaseViewModel() {
@@ -59,9 +54,9 @@ class MasterViewModel : BaseViewModel() {
 
     private var mLoopMeetingStateZQDisposable: Disposable? = null
 
-    private var mApplySpeakListenLoopDisposable:Disposable?= null
+    private var mApplySpeakListenLoopDisposable: Disposable? = null
 
-    private var mPatrolManager:PatrolManager?=null
+    private var mPatrolManager: PatrolManager? = null
 
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
@@ -83,7 +78,6 @@ class MasterViewModel : BaseViewModel() {
             value = true
         }
     }
-
 
 
     /**
@@ -148,8 +142,16 @@ class MasterViewModel : BaseViewModel() {
                 if (isRecording != newRecording) {
                     value = newRecording
                 }
+
             }
         }
+    }
+
+    /**
+     * 弹出录制结束归档对话框
+     * */
+    val showUpload: OneTimeLiveData<RecordFilesInfo.RecordFile> by lazy {
+        OneTimeLiveData()
     }
 
     /**
@@ -167,8 +169,7 @@ class MasterViewModel : BaseViewModel() {
             addSource(interacInfo) {
                 val layout = it.layout
                 layout.removeAt(0)
-                val onlineList = it.onlineList
-                if (onlineList == null) return@addSource
+                val onlineList = it.onlineList ?: return@addSource
                 val onVideoWindowList = onlineList.filter {
                     it.number in layout
                 }
@@ -181,7 +182,7 @@ class MasterViewModel : BaseViewModel() {
                     userOnVideo = onVideoWindowList.firstOrNull { it.number == layout[i] }
                     if (userOnVideo == null) {
                         userOnVideo = LinkedUser()
-                        userOnVideo?.number = -1
+                        userOnVideo.number = -1
                         windowOnVideo.add(userOnVideo)
                     } else {
                         windowOnVideo.add(userOnVideo)
@@ -221,7 +222,6 @@ class MasterViewModel : BaseViewModel() {
             }
         }
     }
-
 
 
     /**
@@ -269,7 +269,7 @@ class MasterViewModel : BaseViewModel() {
             addSource(meetingState) {
                 it.apply {
                     if (this.requestSpeakMode != value) {
-                        if (requestSpeakMode > 0&&requestSpeakRet.value==0) {   //申请发言前处理一下保存当前画面
+                        if (requestSpeakMode > 0 && requestSpeakRet.value == 0) {   //申请发言前处理一下保存当前画面
                             preRequestSpeakLayout = onVideoWindow.value
                         }
                         postValue(this.requestSpeakMode)
@@ -304,12 +304,40 @@ class MasterViewModel : BaseViewModel() {
                     .subscribeOn(Schedulers.io())
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
+                if (it.recordState == Constant.RECORD_STOP && meetingInfo.value?.recordState != Constant.RECORD_STOP && meetingInfo.value != null) {
+                    loadLatestRecordFile()
+                }
                 isShowLoading.postValue(OneTimeEvent(false))
                 meetingInfo.postValue(it)
+
             }, {
                 isShowLoading.postValue(OneTimeEvent(false))
                 logPrint2File(it)
             })
+    }
+
+    private fun loadLatestRecordFile() {
+        isShowLoading.postValue(OneTimeEvent(true))
+        mDisposables.add(VideoResourceManager.getRecordFileList()
+            .map {
+                Collections.sort(it) { t1, t2 ->
+
+                    return@sort (t2.recordRawBeginTime.replace("\"", "")
+                        .toLong() - t1.recordRawBeginTime.replace("\"", "").toLong()).toInt()
+                }
+                it
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                isShowLoading.postValue(OneTimeEvent(false))
+                if (it.isNotEmpty()) {
+                    showUpload.postValue(OneTimeEvent(it[0]))
+                }
+            }, {
+                isShowLoading.postValue(OneTimeEvent(false))
+                logPrint2File(it)
+            })
+        )
     }
 
     fun startLoopInteracInfo() {
@@ -349,7 +377,7 @@ class MasterViewModel : BaseViewModel() {
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({
-                linkUsers.postValue(it)
+                linkUsers.postValue(it.datas)
             }, {
                 logPrint2File(it)
             })
@@ -366,18 +394,33 @@ class MasterViewModel : BaseViewModel() {
 
                 meetingState.postValue(it)
                 //处理申请发言的列表数据源
+                val applySpeakUser = arrayListOf<ApplySpeakUser>()
                 it.requestSpeakStatus?.apply {
-                    forEach { numId->
+                    forEach { numId ->
                         linkUsers.value?.apply {
                             val findUser = firstOrNull { user ->
                                 user.number == numId
                             }
-                            if(findUser!=null){
-                                ApplySpeakManager.addApplySpeakUser(ApplySpeakUser(numId,findUser.username,"",findUser.nickname))
+                            if (findUser != null) {
+//                                ApplySpeakManager.addApplySpeakUser(
+//                                    ApplySpeakUser(
+//                                        numId,
+//                                        findUser.username,
+//                                        "",
+//                                        findUser.nickname
+//                                    )
+//                                )
+                                applySpeakUser.add( ApplySpeakUser(
+                                        numId,
+                                        findUser.username,
+                                        "",
+                                        findUser.nickname
+                                    ))
                             }
                         }
                     }
                 }
+                applySpeakUsers.postValue(applySpeakUser)
                 ToastUtils.showShort(it.toString())
             }, {
                 logPrint2File(it)
@@ -426,14 +469,14 @@ class MasterViewModel : BaseViewModel() {
      * 开启申请发言列表监听
      * */
     fun startApplySpeakListen() {
-        mApplySpeakListenLoopDisposable?.dispose()
-        mApplySpeakListenLoopDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
-            .subscribe({
-                val users = ApplySpeakManager.getApplySpeakUsers()
-                applySpeakUsers.postValue(users)
-            }, {
-                logPrint2File(it)
-            })
+//        mApplySpeakListenLoopDisposable?.dispose()
+//        mApplySpeakListenLoopDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+//            .subscribe({
+//                val users = ApplySpeakManager.getApplySpeakUsers()
+//                applySpeakUsers.postValue(users)
+//            }, {
+//                logPrint2File(it)
+//            })
     }
 
     /**
@@ -583,7 +626,7 @@ class MasterViewModel : BaseViewModel() {
                     if (!TextUtils.isEmpty(confStartTime)) {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
-                        val diff = now - begin
+                        val diff = now - begin - 30360 * 1000
                         val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
                         meetingTime.postValue(toDateString)
                     }
@@ -605,24 +648,25 @@ class MasterViewModel : BaseViewModel() {
      * */
     fun toggleLocalVolumeAudio() {
         meetingState.value?.apply {
-            mDisposables.add(Observable.zip(
-                ZQManager.setLocalCam(localCameraCtrl),
-                ZQManager.setLocalAudio(localCameraCtrl),
-                { t1, t2 ->
-                    return@zip t1 && t2
-                }).subscribeOn(Schedulers.io())
-                .subscribe({
+            mDisposables.add(
+                Observable.zip(
+                    ZQManager.setLocalCam(localCameraCtrl),
+                    ZQManager.setLocalAudio(localCameraCtrl),
+                    { t1, t2 ->
+                        return@zip t1 && t2
+                    }).subscribeOn(Schedulers.io())
+                    .subscribe({
 
-                }, {
-                    logPrint2File(it)
-                })
+                    }, {
+                        logPrint2File(it)
+                    })
             )
         }
     }
 
     /**
-    * 设置发言状态
-    * */
+     * 设置发言状态
+     * */
     fun setRequestSpeakMode(number: Int) {
         mDisposables.add(
             ZQManager.setRequestSpeakMode(number)
@@ -640,7 +684,27 @@ class MasterViewModel : BaseViewModel() {
      * */
     fun agreeRequestSpeak(numId: Int, agree: Boolean) {
         mDisposables.add(
-            ZQManager.setRequestSpeakRet(numId,agree)
+            ZQManager.setRequestSpeakRet(numId, agree)
+                .flatMap {
+                    if (!it) {  //不成功
+                        return@flatMap Observable.just(false)
+                    } else if (agree) {
+                        return@flatMap ZQManager.setRequestSpeakMode(numId)
+                    } else {
+                        return@flatMap ZQManager.setRequestSpeakMode(0)
+                    }
+                }.flatMap { it1 -> //关闭所有
+                    val requestNum = meetingState.value?.requestSpeakStatus ?: emptyList()
+                    return@flatMap Observable.fromIterable(requestNum)
+                        .flatMap {
+                            if (numId != it) {
+                                return@flatMap ZQManager.setRequestSpeakRet(it, false)
+                            } else {
+                                return@flatMap Observable.just(it1)
+                            }
+                        }
+
+                }
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
@@ -660,7 +724,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribeOn(Schedulers.io())
                     .subscribe({
 
-                    },{
+                    }, {
                         logPrint2File(it)
                     })
             )
@@ -670,7 +734,7 @@ class MasterViewModel : BaseViewModel() {
 
     fun beginPatrol(selectedUser: List<LinkedUser>?, period: Int) {
         selectedUser?.apply {
-            mPatrolManager = mPatrolManager?: PatrolManager(object :PatrolManager.PatrolCallback{
+            mPatrolManager = mPatrolManager ?: PatrolManager(object : PatrolManager.PatrolCallback {
                 override fun onBegin() {
 
                 }
@@ -685,7 +749,7 @@ class MasterViewModel : BaseViewModel() {
                 }
 
             })
-            mPatrolManager?.begin(selectedUser,period.toLong())
+            mPatrolManager?.begin(selectedUser, period.toLong())
         }
     }
 
@@ -694,42 +758,41 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
-    class PatrolManager(val callback:PatrolCallback?=null){
+    class PatrolManager(val callback: PatrolCallback? = null) {
 
-        interface PatrolCallback{
+        interface PatrolCallback {
 
             fun onBegin()
             fun onCancel()
-            fun onChanged(user:LinkedUser)
+            fun onChanged(user: LinkedUser)
         }
 
 
-        private var patrolUsers= arrayListOf<LinkedUser>()
+        private var patrolUsers = arrayListOf<LinkedUser>()
 
-        private var timer:Disposable? = null
+        private var timer: Disposable? = null
 
         private var curPos = 0
 
 
-
-        fun begin(users:List<LinkedUser>,period:Long){
+        fun begin(users: List<LinkedUser>, period: Long) {
             curPos = 0
             timer?.dispose()
             patrolUsers.clear()
             patrolUsers.addAll(users)
-            timer = Observable.interval(period,TimeUnit.SECONDS)
+            timer = Observable.interval(period, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     val size = patrolUsers.size
                     curPos %= size
                     callback?.onChanged(patrolUsers[curPos])
                     curPos++
-                },{
+                }, {
                     logPrint2File(it)
                 })
         }
 
-        fun cancel(){
+        fun cancel() {
             timer?.dispose()
             callback?.onCancel()
         }

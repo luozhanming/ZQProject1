@@ -134,6 +134,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 }
             }
         }
+        mHomeViewModel.invitationInfo.observeOne(viewLifecycleOwner){
+            val args = Bundle()
+            args.putSerializable("invitationInfo",it)
+            findNavController().navigate(R.id.action_homeFragment_to_receiveCallFragment,args)
+        }
     }
 
 }

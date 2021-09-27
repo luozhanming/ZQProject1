@@ -16,7 +16,7 @@ public class MeetingInfo implements QueryResult{
     //互动状态
     private String interaMode;
     //录制状态
-    private int recordState;
+    private int recordState = Constant.RECORD_STOP;
     //是否直播中
     private boolean isLiving;
     //当前导播布局

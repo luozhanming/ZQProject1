@@ -155,6 +155,14 @@
             app:popEnterAnim="@anim/pop_enter"
             app:popExitAnim="@anim/pop_exit"
             app:destination="@id/joinMeetingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_receiveCallFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:launchSingleTop="true"
+            app:destination="@id/receiveCallFragment" />
     </fragment>
     <fragment
         android:id="@+id/recordFragment"
@@ -267,4 +275,8 @@
             app:popUpTo="@id/joinMeetingFragment"
             app:destination="@id/listenerFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/receiveCallFragment"
+        android:name="cn.com.ava.zqproject.ui.joinmeeting.ReceiveCallFragment"
+        android:label="ReceiveCallFragment" />
 </navigation>

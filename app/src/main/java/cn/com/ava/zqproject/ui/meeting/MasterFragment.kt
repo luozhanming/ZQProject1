@@ -1,9 +1,15 @@
 package cn.com.ava.zqproject.ui.meeting
 
+import android.app.Service
 import android.content.ClipData
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.RectF
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.View
@@ -28,8 +34,12 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentMasterBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
+import cn.com.ava.zqproject.ui.common.recordupload.RecordUploadDialog
 import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
+import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
+import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
+import com.blankj.utilcode.util.ToastUtils
 
 /**
  * 主讲界面
@@ -46,6 +56,8 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     private var mComputerSourceWindow by autoCleared<ComputerSourcePopupWindow>()
     private var mMemberManagerDialog by autoCleared<MemberManagerDialog>()
 
+    private var mUploadDialog by autoCleared<RecordUploadDialog>()
+
     //控制台动画相关
     private var topVisibleAnim by autoCleared<Animation>()
 
@@ -58,6 +70,10 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     private var breatheAnim by autoCleared<Animation>()
 
     private var mApplySpeakUserAdapter by autoCleared<ApplySpeakUserAdapter>()
+
+    private var mServiceConnection:ServiceConnection? = null
+
+    private var mDownloadBinder by autoCleared<DownloadService.DownloadBinder>()
 
 
     override fun getLayoutId(): Int {
@@ -107,6 +123,29 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mServiceConnection = mServiceConnection?:object :ServiceConnection{
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                mDownloadBinder = service as? DownloadService.DownloadBinder
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+
+            }
+
+        }
+        requireContext().bindService(Intent(requireContext(),DownloadService::class.java),mServiceConnection,Service.BIND_AUTO_CREATE)
+    }
+
+    override fun onDestroy() {
+        //解绑
+        requireContext().unbindService(mServiceConnection)
+        mServiceConnection = null
+        super.onDestroy()
+    }
+
+
     override fun observeVM() {
         mMasterViewModel.isShowLoading.observeOne(viewLifecycleOwner) {
             if (it)
@@ -149,6 +188,14 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                     mBinding.ivDot.clearAnimation()
                 }
             }
+        }
+        mMasterViewModel.showUpload.observeOne(viewLifecycleOwner){
+            mUploadDialog = mUploadDialog?: RecordUploadDialog{
+                mDownloadBinder?.service?.uploadVideo(it,"")
+                ToastUtils.showShort(getString(R.string.upload_set))
+                mUploadDialog?.dismiss()
+            }
+            mUploadDialog?.show(childFragmentManager,"upload")
         }
         mMasterViewModel.onVideoWindow.observe(viewLifecycleOwner) {
             mBinding.videoTopView.changeSliceCount(it.size)
@@ -210,7 +257,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mBinding.llComputer.setOnClickListener {
             mMasterViewModel.toggleComputer()
         }
-        mBinding.llVolumeScene.setOnClickListener { }
         mBinding.llExitMeeting.setOnClickListener {
             mExitMeetingDialog = ConfirmDialog(getString(R.string.tip_confirm_exit_meeting), true, {
                 mMasterViewModel.overMeeting()

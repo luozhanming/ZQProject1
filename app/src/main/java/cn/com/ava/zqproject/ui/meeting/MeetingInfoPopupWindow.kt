@@ -59,7 +59,6 @@ class MeetingInfoPopupWindow(context: Context) : BasePopupWindow(context) {
     fun setMasterUser(value: List<LinkedUser>?) {
         value?.apply {
             if (value.isNotEmpty()) {
-
                 tvMasterName?.text =
                     "${getResources().getString(R.string.meeting_master_name)}${value[0]?.nickname ?: ""}"
             }

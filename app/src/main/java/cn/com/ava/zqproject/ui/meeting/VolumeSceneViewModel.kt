@@ -36,8 +36,8 @@ class VolumeSceneViewModel : BaseViewModel() {
                             it.isCurrentOutput = it.index==curOutput?.windowIndex?:-1
                         }
                         val info = CamPreviewInfo(
-                            if (it.size <= 5) 1 else 2,
-                            if (it.size <= 5) it.size else 5,
+                            if (windows.size <= 6) 1 else 2,
+                            if (windows.size <= 6) windows.size else 5,
                             cams.size,
                             cams,
                             curOutput?.windowIndex ?: -1

@@ -34,6 +34,8 @@ class MeetingStateInfoQuery(
                             }
                         }
                         info.requestSpeakStatus = list
+                    }else{
+                        info.requestSpeakStatus = emptyList()
                     }
                 }
                 "requestSpeakRetStatus" -> {
@@ -55,6 +57,8 @@ class MeetingStateInfoQuery(
                             }
                         }
                         info.cameraCtrlState = list
+                    }else{
+                        info.cameraCtrlState = emptyList()
                     }
                 }
                 "audioCtrlState" -> {
@@ -66,7 +70,9 @@ class MeetingStateInfoQuery(
                                 list.add(it.toInt())
                             }
                         }
-                        info.cameraCtrlState = list
+                        info.audioCtrlState = list
+                    }else{
+                        info.audioCtrlState = emptyList()
                     }
                 }
             }

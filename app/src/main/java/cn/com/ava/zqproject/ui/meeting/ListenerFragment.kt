@@ -58,11 +58,15 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
         }
         mBinding.topBar.setOnClickListener { }
         mBinding.bottomBar.setOnClickListener { }
-        mBinding.llApplySpeak.setOnClickListener { }
+        mBinding.llApplySpeak.setOnClickListener {
+            mListenerViewModel.applySpeak()
+        }
         mBinding.llComputer.setOnClickListener {
             mListenerViewModel.toggleComputer()
         }
-        mBinding.llVolumeScene.setOnClickListener { }
+        mBinding.llVolumeScene.setOnClickListener {
+            mListenerViewModel.toggleLocalVolumeAudio()
+        }
         mBinding.llExitMeeting.setOnClickListener {
             mExitMeetingDialog = ConfirmDialog(getString(R.string.tip_confirm_exit_meeting), true, {
                 mListenerViewModel.exitMeeting()
@@ -81,9 +85,11 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
                 dialog.show(childFragmentManager, "volume_scene")
             }
         }
+
         mBinding.ivInfo.setOnClickListener {
             mMeetingInfoWindow = mMeetingInfoWindow ?: MeetingInfoPopupWindow(requireContext())
-            mMeetingInfoWindow?.setListenerInfo(mListenerViewModel.listenerInfo.value)
+            mMeetingInfoWindow?.setMeetingMasterInfo(mListenerViewModel.meetingInfoZQ.value)
+            mMeetingInfoWindow?.setMasterUser(mListenerViewModel.meetingMembers.value)
             mMeetingInfoWindow?.showAtLocation(
                 mBinding.ivInfo,
                 Gravity.TOP or Gravity.CENTER,
@@ -93,7 +99,10 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
         }
 
         mListenerViewModel.loopCurVideoSceneSources()
-        mListenerViewModel.loopLoadListenerInfo()
+        mListenerViewModel.startLoopMeetingInfoZQ()
+        mListenerViewModel.loadMeetingMember()
+        mListenerViewModel.startTimeCount()
+        mListenerViewModel.startLoopMeetingState()
     }
 
     override fun observeVM() {
@@ -222,6 +231,10 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
         mVideoPlayer?.stopPlay()
         mVideoPlayer?.release()
         mVideoPlayer = null
+    }
+
+    override fun onBackPressed(): Boolean {
+        return true
     }
 
 

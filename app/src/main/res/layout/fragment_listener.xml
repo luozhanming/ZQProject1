@@ -36,6 +36,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="23dp"
                 android:padding="5dp"
+                android:visibility="gone"
                 android:background="@drawable/bg_text_button_2"
                 android:src="@mipmap/ic_back_2"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -58,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="32dp"
-                android:text="00:30:00"
+                android:text="@{listenerViewModel.meetingTime}"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -70,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@{listenerViewModel.listenerInfo.meetingTheme}"
+                android:text="@{listenerViewModel.meetingInfoZQ.confTheme}"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -194,6 +195,7 @@
                 android:layout_marginLeft="60dp"
                 android:background="@drawable/bg_text_button_2"
                 android:orientation="vertical"
+                android:selected="@{listenerViewModel.meetingState.localCameraCtrl}"
 
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/iv_volume_scene_menu"
@@ -213,7 +215,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
-                    android:text="关闭音画"
+                    android:text='@{listenerViewModel.meetingState.localCameraCtrl?"关闭音画":"开启音画"}'
                     android:textColor="@drawable/selector_color_1"
                     android:textSize="13sp" />
 

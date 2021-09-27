@@ -2,10 +2,15 @@ package cn.com.ava.zqproject.ui.joinmeeting
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
+import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.vo.InvitationInfo
+import io.reactivex.schedulers.Schedulers
 
 class ReceiveCallViewModel:BaseViewModel() {
-
 
     /**
      * 步骤
@@ -14,6 +19,11 @@ class ReceiveCallViewModel:BaseViewModel() {
         MutableLiveData<Int>().apply {
             value = 1
         }
+    }
+
+
+    val invitationInfo:MutableLiveData<InvitationInfo> by lazy {
+        MutableLiveData()
     }
 
 
@@ -31,6 +41,14 @@ class ReceiveCallViewModel:BaseViewModel() {
         MutableLiveData()
     }
 
+    val isLoading:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
+    val joinSuccess:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
 
     /**
      * 我的入会昵称
@@ -38,7 +56,31 @@ class ReceiveCallViewModel:BaseViewModel() {
     val myNickname:MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             val platformLogin = PlatformApi.getPlatformLogin()
-            value = "${platformLogin?.name}-${platformLogin?.professionTitleName}"
+            if(platformLogin?.professionTitleName?.isNotEmpty()==true){
+                value = "${platformLogin?.name}_${platformLogin?.professionTitleName}"
+            }else{
+                value = "${platformLogin?.name}"
+            }
         }
+    }
+
+
+    fun joinMeeting() {
+        isLoading.postValue(OneTimeEvent(true))
+        val value = invitationInfo.value
+        value?.apply {
+            mDisposables.add(ZQManager.joinMeeting(value.confNo,"",value.ticket,myNickname.value?:"")
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    if(it){
+                        isLoading.postValue(OneTimeEvent(false))
+                        joinSuccess.postValue(OneTimeEvent(true))
+                    }
+                },{
+                    isLoading.postValue(OneTimeEvent(false))
+                    logPrint2File(it)
+                }))
+        }
+
     }
 }

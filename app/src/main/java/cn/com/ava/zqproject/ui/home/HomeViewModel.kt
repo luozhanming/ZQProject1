@@ -14,6 +14,7 @@ import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.vo.InvitationInfo
 import cn.com.ava.zqproject.vo.PlatformLogin
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -23,8 +24,6 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 任务：1.轮询录播查询当前互动状态，如果是会议中的，弹出弹框提示，让其跳入会议（重启TP9场景)
- *
- *
  */
 class HomeViewModel : BaseViewModel() {
 
@@ -47,6 +46,17 @@ class HomeViewModel : BaseViewModel() {
      * 会议信息
      * */
     val meetingInfoZq: OneTimeLiveData<MeetingInfoZQ> by lazy {
+        OneTimeLiveData()
+    }
+
+    val isLoading:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
+    /**
+     * 振铃信息
+     * */
+    val invitationInfo: OneTimeLiveData<InvitationInfo> by lazy {
         OneTimeLiveData()
     }
 
@@ -83,6 +93,12 @@ class HomeViewModel : BaseViewModel() {
             }.subscribeOn(Schedulers.io())
             .subscribe({
                 //TODO 没响应
+                if (it.success) {
+                    //振铃了，立刻到振铃界面
+                    if (it.data.isNotEmpty()) {
+                        invitationInfo.postValue(OneTimeEvent(it.data[0]))
+                    }
+                }
 
             }, {
                 logPrint2File(it)
@@ -120,21 +136,23 @@ class HomeViewModel : BaseViewModel() {
     }
 
     fun preloadWindowAndLayout() {
-        mDisposables.add(WindowLayoutManager.getPreviewWindowInfo()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
+        mDisposables.add(
+            WindowLayoutManager.getPreviewWindowInfo()
+                .subscribeOn(Schedulers.io())
+                .subscribe({
 
-            }, {
-                logPrint2File(it)
-            })
+                }, {
+                    logPrint2File(it)
+                })
         )
-        mDisposables.add(WindowLayoutManager.getLayoutButtonInfo()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
+        mDisposables.add(
+            WindowLayoutManager.getLayoutButtonInfo()
+                .subscribeOn(Schedulers.io())
+                .subscribe({
 
-            }, {
-                logPrint2File(it)
-            })
+                }, {
+                    logPrint2File(it)
+                })
         )
         ComputerModeManager.getComputerIndex()
     }
@@ -178,6 +196,19 @@ class HomeViewModel : BaseViewModel() {
         mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 ZQManager.loadMeetingInfo()
+                    .flatMap {info->
+                        if(info.confMode=="cloudCtrlMode"){
+                         return@flatMap   ZQManager.loadMeetingMember()
+                                .map {
+                                    if(it.localRole!=4){
+                                        info.confMode = "classMode"
+                                    }
+                                    return@map info
+                                }
+                        }else{
+                            return@flatMap Observable.just(info)
+                        }
+                    }
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({

@@ -1,11 +1,11 @@
 package cn.com.ava.zqproject.net
 
+import cn.com.ava.zqproject.vo.InvitationInfo
 import cn.com.ava.zqproject.net.PlatformApiManager.PATH_GET_INTERFACE
 import cn.com.ava.zqproject.vo.*
 import io.reactivex.Observable
 import retrofit2.http.*
 import retrofit2.http.Query
-import java.util.LinkedHashMap
 
 interface PlatformService {
 
@@ -155,6 +155,6 @@ interface PlatformService {
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
             PlatformApiManager.PATH_CALL_MEETING
         )
-    ):Observable<PlatformResponse<Any>>
+    ):Observable<PlatformResponse<List<InvitationInfo>>>
 
 }

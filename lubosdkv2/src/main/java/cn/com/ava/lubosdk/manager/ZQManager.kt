@@ -3,6 +3,7 @@ package cn.com.ava.lubosdk.manager
 import cn.com.ava.lubosdk.AVAHttpEngine
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.ListWrapper
+import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.zq.control.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
@@ -116,6 +117,25 @@ object ZQManager {
     }
 
 
+    /**
+     * 申请发言
+     * */
+    fun requestSpeak(): Observable<Boolean> {
+        return Observable.create<Boolean> { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        RequestSpeakZQControl(
+                            onResult = { result -> it.resumeWith(Result.success(result)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(result)
+            }
+        }
+    }
+
+
 
     /**
      * 听课/旁听角色切换
@@ -159,20 +179,21 @@ object ZQManager {
     /**
      * 加载会议成员
      * */
-    fun loadMeetingMember():Observable<List<LinkedUser>>{
+    fun loadMeetingMember():Observable<MeetingMemberInfo>{
         return Observable.create { emitter ->
             runBlocking {
-                val result = suspendCoroutine<ListWrapper<LinkedUser>> {
+                val result = suspendCoroutine<MeetingMemberInfo> {
                     AVAHttpEngine.requestSPQuery(
                         MeetingMemberQuery(
-                            onResult = { result -> it.resumeWith(Result.success(result as ListWrapper<LinkedUser>)) },
+                            onResult = { result -> it.resumeWith(Result.success(result as MeetingMemberInfo)) },
                             onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
-                emitter.onNext(result.datas)
+                emitter.onNext(result)
             }
         }
     }
+
 
 
     /**

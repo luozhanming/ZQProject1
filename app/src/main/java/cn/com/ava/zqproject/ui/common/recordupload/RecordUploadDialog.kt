@@ -3,14 +3,15 @@ package cn.com.ava.zqproject.ui.common.recordupload
 import android.view.View
 import android.view.ViewGroup
 import cn.com.ava.base.ui.BaseDialogV2
+import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.DialogRecordUploadBinding
 /**
  * 录制归档询问对话框
  * */
-class RecordUploadDialog:BaseDialogV2<DialogRecordUploadBinding>() {
+class RecordUploadDialog(val uploadSure:(()->Unit)?=null):BaseDialogV2<DialogRecordUploadBinding>() {
     override fun getWindowOptions(): WindowOptions {
-        return WindowOptions(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT)
+        return WindowOptions(SizeUtils.dp2px(648),SizeUtils.dp2px(268))
     }
 
     override fun initView(root: View) {
@@ -19,6 +20,9 @@ class RecordUploadDialog:BaseDialogV2<DialogRecordUploadBinding>() {
         }
         mBinding.btnCancel.setOnClickListener {
             dismiss()
+        }
+        mBinding.btnUpload.setOnClickListener {
+            uploadSure?.invoke()
         }
     }
 

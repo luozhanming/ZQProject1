@@ -5,6 +5,7 @@ import cn.com.ava.lubosdk.ISPQuery
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.ListWrapper
 import cn.com.ava.lubosdk.entity.QueryResult
+import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.util.EncryptUtil
 import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
@@ -14,7 +15,7 @@ import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
 class MeetingMemberQuery(
     override var onResult: (QueryResult) -> Unit,
     override var onError: ((Throwable) -> Unit)? = null
-) :ISPQuery<ListWrapper<LinkedUser>> {
+) :ISPQuery<MeetingMemberInfo> {
     override val name: String
         get() = "MeetingMemberQuery"
 
@@ -30,11 +31,24 @@ class MeetingMemberQuery(
         }
     }
 
-    override fun build(response: String): ListWrapper<LinkedUser> {
+    override fun build(response: String): MeetingMemberInfo {
         val data = response.replace("getParam_userListInfo_ret=","")
         val split = data.split("&")
         var user:LinkedUser?=null
         val list = arrayListOf<LinkedUser>()
+        var usrCount = 0
+        var localNumId = 0
+        var localRole = 4
+        for (i in 0 until 3){
+            val split1 = split[i].split("=")
+            when(split1[0]){
+                "userCnt"->usrCount = split1[1].toInt()
+                "localNumberId"->localNumId = split1[1].toInt()
+                "localRole"->localRole = split1[1].toInt()
+            }
+        }
+
+
         for(i in 3 until split.size){
             val item = split[i]
             val split2 = item.split(",")
@@ -63,6 +77,6 @@ class MeetingMemberQuery(
             list.add(user!!)
 
         }
-        return ListWrapper(list)
+        return MeetingMemberInfo(list,usrCount,localNumId,localRole)
     }
 }
