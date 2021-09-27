@@ -66,7 +66,7 @@ object VideoResourceManager {
         if (split[0] == "0" || split[0] == "-1") return info
 
         info.files = arrayListOf()
-        for (i in 8 until split.size) {
+        for (i in 1 until split.size - 1) {
             val file = RecordFilesInfo.RecordFile()
             val split1 = split[i].split("-").toTypedArray()
             if (split1.size == 1) continue

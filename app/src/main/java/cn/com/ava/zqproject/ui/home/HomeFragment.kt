@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentHomeBinding
@@ -18,6 +19,7 @@ import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
 import cn.com.ava.zqproject.ui.meeting.MemberManagerDialog
+import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
@@ -30,6 +32,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun getLayoutId(): Int = R.layout.fragment_home
 
     override fun initView() {
+        initData()
         mBinding.btnCreateMeeting.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_createMeetingFragment)
         }
@@ -79,6 +82,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         //不停刷新token
         mHomeViewModel.loopRefreshToken()
 
+    }
+
+    fun initData() {
+        logd("实例化单例")
+        VideoSingleton.getInstance()
     }
 
     override fun onStart() {

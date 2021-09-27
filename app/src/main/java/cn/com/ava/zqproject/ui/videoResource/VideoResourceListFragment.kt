@@ -28,6 +28,7 @@ import cn.com.ava.zqproject.ui.videoResource.dialog.DeleteVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.dialog.SelectDiskDialog
 import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
+import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 import cn.com.ava.zqproject.usb.UsbHelper
 import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
@@ -67,13 +68,15 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                     ) {
                         ToastUtils.showShort(msg)
                         if (isSuccess) { // 提交上传成功
-                            mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
+                            mVideoManageViewModel.transmissionVideos.value = VideoSingleton.cacheVideos
+//                            mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
                         }
                     }
 
                     override fun onUploadStateChanged(info: ConcurrentMap<String, TransmissionProgressEntity>) {
                         logd("onUploadStateChanged thread = ${Thread.currentThread()}")
-                        mVideoManageViewModel.refreshUploadProgress(info)
+                        mVideoManageViewModel.transmissionVideos.postValue(VideoSingleton.cacheVideos)
+//                        mVideoManageViewModel.refreshUploadProgress(info)
                     }
                 })
             }
