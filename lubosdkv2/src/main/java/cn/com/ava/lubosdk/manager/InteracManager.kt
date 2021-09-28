@@ -1084,6 +1084,34 @@ object InteracManager {
     }
 
 
+    /**
+     * 设置录课音频
+     **/
+    fun setRecordVolumeChannels(channelName:String,channelLevel:Int):Observable<Boolean>{
+        return Observable.create { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<ListWrapper<String>> {
+                    AVAHttpEngine.addQueryCommand(RawQuery(
+                        arrayOf(AVATable.ARM_EXTVOL_N),
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<String>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
+                    ))
+                }
+                val raw = result.datas[0]
+                val isSuccess = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        RecordVolumeControl(
+                            channelName,channelLevel,raw,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(isSuccess)
+            }
+        }
+    }
+
+
 
 
 }

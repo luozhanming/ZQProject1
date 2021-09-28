@@ -368,7 +368,6 @@ class ListenerViewModel : BaseViewModel() {
             .subscribe({
                 meetingState.postValue(it)
                 //处理申请发言的列表数据源
-                ToastUtils.showShort(it.toString())
             }, {
                 logPrint2File(it)
             })

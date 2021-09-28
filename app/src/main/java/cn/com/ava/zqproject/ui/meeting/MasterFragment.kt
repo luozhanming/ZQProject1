@@ -31,12 +31,12 @@ import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
+import cn.com.ava.zqproject.common.RecordUploadManager
 import cn.com.ava.zqproject.databinding.FragmentMasterBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.recordupload.RecordUploadDialog
 import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
-import cn.com.ava.zqproject.ui.videoResource.dialog.UploadVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
 import com.blankj.utilcode.util.ToastUtils
@@ -71,9 +71,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
     private var mApplySpeakUserAdapter by autoCleared<ApplySpeakUserAdapter>()
 
-    private var mServiceConnection:ServiceConnection? = null
 
-    private var mDownloadBinder by autoCleared<DownloadService.DownloadBinder>()
 
 
     override fun getLayoutId(): Int {
@@ -123,27 +121,8 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     }
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mServiceConnection = mServiceConnection?:object :ServiceConnection{
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                mDownloadBinder = service as? DownloadService.DownloadBinder
-            }
 
-            override fun onServiceDisconnected(name: ComponentName?) {
 
-            }
-
-        }
-        requireContext().bindService(Intent(requireContext(),DownloadService::class.java),mServiceConnection,Service.BIND_AUTO_CREATE)
-    }
-
-    override fun onDestroy() {
-        //解绑
-        requireContext().unbindService(mServiceConnection)
-        mServiceConnection = null
-        super.onDestroy()
-    }
 
 
     override fun observeVM() {
@@ -191,7 +170,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         }
         mMasterViewModel.showUpload.observeOne(viewLifecycleOwner){
             mUploadDialog = mUploadDialog?: RecordUploadDialog{
-                mDownloadBinder?.service?.uploadVideo(it,"")
+                RecordUploadManager.addLatestUpload()
                 ToastUtils.showShort(getString(R.string.upload_set))
                 mUploadDialog?.dismiss()
             }
@@ -312,11 +291,13 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             }
 
             override fun onVideoLongPress(user: LinkedUser?, location: Int, rect: RectF?) {
+                mBinding.tvDragText.text = user?.nickname
                 Handler().postDelayed({
                     val clipData = ClipData.newPlainText(
                         SliceVideoView.DRAG_VIDEO,
                         location.toString() + ""
                     )
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         mBinding.videoTopView.startDragAndDrop(
                             clipData,

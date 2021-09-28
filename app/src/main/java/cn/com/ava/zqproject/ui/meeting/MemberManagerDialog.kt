@@ -102,6 +102,9 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
         mBinding.btnAllSilent.setOnClickListener {
             mMemberManagerViewModel.silentAllMembers()
         }
+        mBinding.ivClose.setOnClickListener {
+            dismiss()
+        }
 
     }
 

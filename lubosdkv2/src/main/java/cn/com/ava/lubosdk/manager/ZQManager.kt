@@ -378,6 +378,23 @@ object ZQManager {
     }
 
 
+    fun setRecordState(control:Int):Observable<Boolean>{
+        return Observable.create { emitter ->
+            runBlocking {
+                val isSuccess = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        RecordZQControl(
+                            control,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(isSuccess)
+            }
+        }
+    }
+
+
 
     
 

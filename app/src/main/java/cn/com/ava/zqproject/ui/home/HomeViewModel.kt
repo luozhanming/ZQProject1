@@ -2,6 +2,8 @@ package cn.com.ava.zqproject.ui.home
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.http.ResponseThrowable
+import cn.com.ava.common.http.ServerException
 import cn.com.ava.common.mvvm.OneTimeEvent
 import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
@@ -12,10 +14,12 @@ import cn.com.ava.lubosdk.manager.GeneralManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
+import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.InvitationInfo
 import cn.com.ava.zqproject.vo.PlatformLogin
+import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -57,6 +61,10 @@ class HomeViewModel : BaseViewModel() {
      * 振铃信息
      * */
     val invitationInfo: OneTimeLiveData<InvitationInfo> by lazy {
+        OneTimeLiveData()
+    }
+
+    val backToLogin:OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
@@ -118,10 +126,17 @@ class HomeViewModel : BaseViewModel() {
         mSendHeartBeatDisposable = Observable.interval(0, 20, TimeUnit.SECONDS)
             .flatMap {
                 PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr ?: "")
-            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+                    .compose(PlatformApi.applySchedulers())
+            }
             .subscribe({
                 it.toString()
             }, {
+                if(it is ServerException){  //有人异地登录
+                    if(it.code==10004){
+                        ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
+                        backToLogin.postValue(OneTimeEvent(true))
+                    }
+                }
                 logPrint2File(it)
                 //发送心跳错误
             })

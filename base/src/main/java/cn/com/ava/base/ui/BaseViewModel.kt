@@ -19,6 +19,7 @@ open class BaseViewModel: ViewModel() {
         logd("onCleared()")
         super.onCleared()
         mDisposables.dispose()
+        mDisposables.clear()
     }
 
 

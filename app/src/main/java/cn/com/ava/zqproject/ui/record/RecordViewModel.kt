@@ -11,6 +11,7 @@ import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.RecordInfo
 import cn.com.ava.lubosdk.entity.VolumeChannel
 import cn.com.ava.lubosdk.manager.GeneralManager
+import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.RecordManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.zqproject.common.ComputerModeManager
@@ -209,7 +210,7 @@ class RecordViewModel : BaseViewModel() {
     }
 
     fun changeVolume(volume: Int) {
-        mDisposables.add(GeneralManager.setMasterChannelVolume(volume)
+        mDisposables.add(InteracManager.setRecordVolumeChannels("MASTER",volume)
             .subscribeOn(Schedulers.io())
             .subscribe({
 

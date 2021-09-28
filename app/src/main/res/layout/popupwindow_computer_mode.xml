@@ -119,13 +119,14 @@
 
 
         <TextView
+            android:id="@+id/textView40"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/color_C6D0DE"
-            android:gravity="bottom"
-            android:paddingLeft="20dp"
-            android:paddingBottom="15dp"
-            android:text="@string/live_scene"
+            android:background="@color/color_E4E9F0"
+            android:paddingTop="15dp"
+            android:paddingLeft="60dp"
+
+            android:text="@string/computer_scene"
             android:textColor="@color/color_666666"
             android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -137,14 +138,14 @@
             android:id="@+id/view14"
             android:layout_width="66dp"
             android:layout_height="37dp"
-            android:background="@color/color_E4E9F0"
+            android:background="@color/color_C6D0DE"
             android:gravity="center"
 
-            android:text="@string/computer_scene"
+            android:text="@string/live_scene"
             android:textColor="@color/color_666666"
             android:textSize="13sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@+id/textView40"
+            app:layout_constraintStart_toStartOf="@+id/textView40" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

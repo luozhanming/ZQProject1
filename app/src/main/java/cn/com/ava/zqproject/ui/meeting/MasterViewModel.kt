@@ -16,11 +16,11 @@ import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
-import cn.com.ava.zqproject.common.ApplySpeakManager
 import cn.com.ava.zqproject.common.ComputerModeManager
+import cn.com.ava.zqproject.common.RecordUploadManager
+import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.InteractComputerSource
 import cn.com.ava.zqproject.vo.InteractComputerSources
-import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -57,6 +57,8 @@ class MasterViewModel : BaseViewModel() {
     private var mApplySpeakListenLoopDisposable: Disposable? = null
 
     private var mPatrolManager: PatrolManager? = null
+
+    private var isModifyTheme:Boolean = false
 
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
@@ -150,7 +152,7 @@ class MasterViewModel : BaseViewModel() {
     /**
      * 弹出录制结束归档对话框
      * */
-    val showUpload: OneTimeLiveData<RecordFilesInfo.RecordFile> by lazy {
+    val showUpload: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
@@ -316,28 +318,32 @@ class MasterViewModel : BaseViewModel() {
             })
     }
 
+    /**
+     * 添加最新的录制文件到上传队列
+     * */
     private fun loadLatestRecordFile() {
-        isShowLoading.postValue(OneTimeEvent(true))
-        mDisposables.add(VideoResourceManager.getRecordFileList()
-            .map {
-                Collections.sort(it) { t1, t2 ->
-
-                    return@sort (t2.recordRawBeginTime.replace("\"", "")
-                        .toLong() - t1.recordRawBeginTime.replace("\"", "").toLong()).toInt()
-                }
-                it
-            }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                isShowLoading.postValue(OneTimeEvent(false))
-                if (it.isNotEmpty()) {
-                    showUpload.postValue(OneTimeEvent(it[0]))
-                }
-            }, {
-                isShowLoading.postValue(OneTimeEvent(false))
-                logPrint2File(it)
-            })
-        )
+      showUpload.postValue(OneTimeEvent(true))
+//        isShowLoading.postValue(OneTimeEvent(true))
+//        mDisposables.add(VideoResourceManager.getRecordFileList()
+//            .map {
+//                Collections.sort(it) { t1, t2 ->
+//
+//                    return@sort (t2.recordRawBeginTime
+//                        .toLong() - t1.recordRawBeginTime.toLong()).toInt()
+//                }
+//                it
+//            }
+//            .subscribeOn(Schedulers.io())
+//            .subscribe({
+//                isShowLoading.postValue(OneTimeEvent(false))
+//                if (it.isNotEmpty()) {
+//                    showUpload.postValue(OneTimeEvent(it[0]))
+//                }
+//            }, {
+//                isShowLoading.postValue(OneTimeEvent(false))
+//                logPrint2File(it)
+//            })
+//        )
     }
 
     fun startLoopInteracInfo() {
@@ -364,9 +370,28 @@ class MasterViewModel : BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 meetingInfoZq.postValue(it)
+                if(!isModifyTheme){
+                    modifyTheme()
+                }
             }, {
                 logPrint2File(it)
             })
+    }
+
+    private fun modifyTheme() {
+        meetingInfoZq.value?.apply {
+            mDisposables.add(
+                RecordManager.setClassInfo(confTheme, PlatformApi.getPlatformLogin()?.name?:"")
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({
+
+                    },{
+                        logPrint2File(it)
+                    })
+            )
+
+        }
+
     }
 
     fun startLoopLinkUsers() {
@@ -421,7 +446,6 @@ class MasterViewModel : BaseViewModel() {
                     }
                 }
                 applySpeakUsers.postValue(applySpeakUser)
-                ToastUtils.showShort(it.toString())
             }, {
                 logPrint2File(it)
             })
@@ -537,11 +561,11 @@ class MasterViewModel : BaseViewModel() {
     fun toggleRecord() {
         val curState = meetingInfo.value?.recordState ?: Constant.RECORD_STOP
         var nextState = when (curState) {
-            Constant.RECORD_STOP -> Constant.RECORD_RECORDING
-            else -> Constant.RECORD_STOP
+            Constant.RECORD_STOP -> 1
+            else ->0
         }
         mDisposables.add(
-            RecordManager.controlRecord(nextState)
+            ZQManager.setRecordState(nextState)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
 
@@ -781,7 +805,7 @@ class MasterViewModel : BaseViewModel() {
             timer?.dispose()
             patrolUsers.clear()
             patrolUsers.addAll(users)
-            timer = Observable.interval(period, TimeUnit.SECONDS)
+            timer = Observable.interval(0,period, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     val size = patrolUsers.size
