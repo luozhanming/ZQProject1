@@ -25,9 +25,12 @@ class ManageResourceItemAdapter(private val mCallback: ManageResourceCallback? =
         }
 
         override fun setListenerToBinding(binding: ItemManageResourceListBinding) {
-            binding.btnCheckBox.setOnClickListener {
+            binding.root.setOnClickListener {
                 callback?.onSelectVideo(mData!!, !mData!!.isSelected)
             }
+//            binding.btnCheckBox.setOnClickListener {
+//                callback?.onSelectVideo(mData!!, !mData!!.isSelected)
+//            }
         }
     }
 

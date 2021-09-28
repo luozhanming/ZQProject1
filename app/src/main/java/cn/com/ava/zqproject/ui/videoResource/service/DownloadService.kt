@@ -13,6 +13,7 @@ import cn.com.ava.lubosdk.entity.TransmissionProgressEntity
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.manager.VideoResourceManager
 import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
+import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.ui.videoResource.VideoPreference
@@ -61,6 +62,21 @@ class DownloadService : Service() {
             .subscribe {
                 uploadInfo.put(data.rawFileName, it)
                 try {
+                    // 更新本地缓存进度
+                    VideoSingleton.cacheVideos.forEach {
+                        if (uploadInfo.containsKey(it.rawFileName) && it.transmissionType == 2) {
+                            it.uploadState = uploadInfo.get(it.rawFileName)!!.state
+                            it.uploadProgress = uploadInfo.get(it.rawFileName)!!.progress
+                            logd("上传进度：${it.uploadProgress}")
+                            if (it.uploadState == 1) { // 上传成功
+                                ToastUtils.showShort(it.downloadFileName + getResources().getString(
+                                    R.string.tip_upload_success))
+                            } else if (it.uploadState == 3) { // 上传失败
+                                ToastUtils.showShort(it.downloadFileName + getResources().getString(
+                                    R.string.tip_upload_failed))
+                            }
+                        }
+                    }
                     mCallback?.onUploadStateChanged(uploadInfo)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -163,6 +179,9 @@ class DownloadService : Service() {
     * 上传视频
     * */
     fun uploadVideo(data: RecordFilesInfo.RecordFile, desc: String) {
+        val video = RecordFilesInfo.RecordFile(data)
+        video.transmissionType = 2
+
         val ftpInfo = PlatformApiManager.getApiPath(PlatformApiManager.PATH_FTP_INFO)
         logd("ftpInfo = $ftpInfo")
         // AES解密
@@ -170,30 +189,35 @@ class DownloadService : Service() {
         logd("decrypt ftpInfo = $decryptStr")
 
         val uuid = "0_${PlatformApi.getPlatformLogin()?.id}_${System.currentTimeMillis()}"
-        val dstFile = uuid + "${data.recordRawBeginTime}.mp4"
+        val dstFile = uuid + "${video.recordRawBeginTime}.mp4"
 //        val dstFile = "1.mp4"
-        data.uploadUUID = uuid
-        logd("uuid = $uuid, recid = ${data.recordRawBeginTime}, dstFile = $dstFile")
+        video.uploadUUID = uuid
+        logd("uuid = $uuid, recid = ${video.recordRawBeginTime}, dstFile = $dstFile")
         mDisposables.add(
-            VideoResourceManager.uploadRecordFile2(json2Map(decryptStr) ?: HashMap(), data, dstFile)
+            VideoResourceManager.uploadRecordFile2(json2Map(decryptStr) ?: HashMap(), video, dstFile)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
+
                     if (result == true) {
                         logd("提交上传视频资源接口成功")
-                        mCallback?.onSubmitUploadCallback(true, "正在上传" + data.downloadFileName, data)
+                        // 把上传记录保存在本地
+                        VideoSingleton.cacheVideos.addAll(0, arrayListOf(video))
+                        VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
 
-                        if (uploadVideos?.contains(data) == false) {
-                            uploadVideos.add(0, data)
+                        mCallback?.onSubmitUploadCallback(true, "正在上传" + video.downloadFileName, video)
+
+                        if (uploadVideos?.contains(video) == false) {
+                            uploadVideos.add(0, video)
                         }
                     } else {
-                        mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", data)
+                        mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", video)
                     }
                 }, {
                     logd("提交上传视频资源接口出错")
                     logPrint2File(it)
-                    mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", data)
+                    mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", video)
                 })
         )
     }

@@ -37,8 +37,6 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
 //        if (cacheStr != null && cacheStr.length != 0) {
 //            cacheVideos = Gson().fromJson<ArrayList<RecordFilesInfo.RecordFile>>(cacheStr, object : TypeToken<ArrayList<RecordFilesInfo.RecordFile>>(){}.type)
 //        }
-        // 调用之前，先实例化一次，保证初始化数据了
-        VideoSingleton.getInstance()
 //        // 获取本地缓存视频记录
         transmissionVideos.value = VideoSingleton.cacheVideos
     }
