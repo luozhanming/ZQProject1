@@ -59,7 +59,6 @@ class CreateGroupFragment : BaseFragment<FragmentCreateGroupBinding>() {
                 })
         }
         mBinding.rvContractUser.adapter = mContractUserItemAdapter
-        mCreateGroupViewModel.getContractUser()
         mBinding.ivClose.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -69,6 +68,13 @@ class CreateGroupFragment : BaseFragment<FragmentCreateGroupBinding>() {
             }
             dialog.show(childFragmentManager,"")
         }
+        mBinding.refreshLayout.setOnRefreshListener {
+            mCreateGroupViewModel.getContractUserList(false)
+        }
+        mBinding.refreshLayout.setOnLoadMoreListener {
+            mCreateGroupViewModel.getContractUserList(true)
+        }
+        mBinding.refreshLayout.autoRefresh()
     }
 
 
@@ -89,6 +95,16 @@ class CreateGroupFragment : BaseFragment<FragmentCreateGroupBinding>() {
         mCreateGroupViewModel.createdGroup.observe(viewLifecycleOwner){it->
             //跳回到上一层
             findNavController().popBackStack()
+        }
+        mCreateGroupViewModel.refreshState.observe(viewLifecycleOwner) { it ->
+            if (it.isRefresh) {
+                mBinding.refreshLayout.finishRefresh(!it.hasError)
+            }
+        }
+        mCreateGroupViewModel.loadMoreState.observe(viewLifecycleOwner){
+            if(it.isLoadMore){
+                mBinding.refreshLayout.finishLoadMore(!it.hasError)
+            }
         }
     }
 

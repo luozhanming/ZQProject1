@@ -67,10 +67,13 @@ object RecordUploadManager {
             it.dispose()
         }
         prepareUploadRecordFile.clear()
+        disposables.clear()
+        uploadDisposable = null
     }
 
 
     fun startUpload(callback: (List<RecordFilesInfo.RecordFile>) -> Unit) {
+        if(disposables.isEmpty())return
         uploadDisposable =
             Observable.create<Boolean> {
                 while (disposables.isNotEmpty() && disposables.all { it.isDisposed }) {

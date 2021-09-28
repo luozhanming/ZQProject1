@@ -274,6 +274,11 @@ class DownloadService : Service() {
         mCallback = callback
     }
 
+    // 注册下载回调
+    fun unRegisterDownloadCallback() {
+        mCallback = null
+    }
+
     interface DownloadCallback {
         fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>)
         fun onSubmitUploadCallback(isSuccess: Boolean, msg: String, data: RecordFilesInfo.RecordFile)

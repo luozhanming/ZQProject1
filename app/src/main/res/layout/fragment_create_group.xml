@@ -108,8 +108,9 @@
             app:layout_constraintStart_toStartOf="@+id/view6"
             app:layout_constraintTop_toTopOf="@+id/view6" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_contract_user"
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/refreshLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginLeft="277dp"
@@ -118,8 +119,24 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view6"
-            tools:listitem="@layout/item_contract" />
+            app:layout_constraintTop_toBottomOf="@+id/view6">
+
+            <com.scwang.smartrefresh.layout.header.ClassicsHeader
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_contract_user"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:listitem="@layout/item_contract" />
+
+            <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

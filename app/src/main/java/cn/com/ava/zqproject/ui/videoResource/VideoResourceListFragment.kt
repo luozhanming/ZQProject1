@@ -51,44 +51,22 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
     // 下载服务
     private var mDownloadService: DownloadService? = null
 
-    private val mDownloadServiceConnection by lazy {
-        object : ServiceConnection {
-            override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                mDownloadService = p1?.let { (it as DownloadService.DownloadBinder).service }
-                logd("下载服务")
-                mDownloadService?.registerDownloadCallback(object : DownloadService.DownloadCallback {
-                    override fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
-                        mVideoManageViewModel.refreshDownloadProgress(info)
-                    }
+    private var mDownloadServiceConnection :ServiceConnection? =null
 
-                    override fun onSubmitUploadCallback(
-                        isSuccess: Boolean,
-                        msg: String,
-                        data: RecordFilesInfo.RecordFile
-                    ) {
-                        ToastUtils.showShort(msg)
-                        if (isSuccess) { // 提交上传成功
-                            mVideoManageViewModel.transmissionVideos.value = VideoSingleton.cacheVideos
-//                            mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
-                        }
-                    }
 
-                    override fun onUploadStateChanged(info: ConcurrentMap<String, TransmissionProgressEntity>) {
-                        logd("onUploadStateChanged thread = ${Thread.currentThread()}")
-                        mVideoManageViewModel.transmissionVideos.postValue(VideoSingleton.cacheVideos)
-//                        mVideoManageViewModel.refreshUploadProgress(info)
-                    }
-                })
-            }
-            override fun onServiceDisconnected(p0: ComponentName?) {
-                mDownloadService = null
-            }
-        }
-    }
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_video_resource_list
     }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
+
+
 
     override fun onResume() {
         super.onResume()
@@ -255,6 +233,38 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
     // 绑定下载服务
     private fun bindService() {
         try {
+            mDownloadServiceConnection =  mDownloadServiceConnection?:  object : ServiceConnection {
+                override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+                    mDownloadService = p1?.let { (it as DownloadService.DownloadBinder).service }
+                    logd("下载服务")
+                    mDownloadService?.registerDownloadCallback(object : DownloadService.DownloadCallback {
+                        override fun onDownloadStateChanged(info: ConcurrentMap<String, RecordFilesInfo.RecordFile>) {
+                            mVideoManageViewModel.refreshDownloadProgress(info)
+                        }
+
+                        override fun onSubmitUploadCallback(
+                            isSuccess: Boolean,
+                            msg: String,
+                            data: RecordFilesInfo.RecordFile
+                        ) {
+                            ToastUtils.showShort(msg)
+                            if (isSuccess) { // 提交上传成功
+                                mVideoManageViewModel.transmissionVideos.value = VideoSingleton.cacheVideos
+//                            mVideoManageViewModel.saveCacheVideo(arrayListOf(data))
+                            }
+                        }
+
+                        override fun onUploadStateChanged(info: ConcurrentMap<String, TransmissionProgressEntity>) {
+                            logd("onUploadStateChanged thread = ${Thread.currentThread()}")
+                            mVideoManageViewModel.transmissionVideos.postValue(VideoSingleton.cacheVideos)
+//                        mVideoManageViewModel.refreshUploadProgress(info)
+                        }
+                    })
+                }
+                override fun onServiceDisconnected(p0: ComponentName?) {
+
+                }
+            }
             requireActivity().bindService(
                 Intent(requireContext(), DownloadService::class.java),
                 mDownloadServiceConnection,
@@ -269,6 +279,9 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
     private fun unbindService() {
         try {
             requireActivity().unbindService(mDownloadServiceConnection)
+            mDownloadServiceConnection=null
+            mDownloadService?.unRegisterDownloadCallback()
+            mDownloadService = null
         } catch (e: Exception) {
             e.printStackTrace()
         }
