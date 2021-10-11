@@ -78,7 +78,7 @@ class ReceiveCallViewModel:BaseViewModel() {
                     }
                 },{
                     isLoading.postValue(OneTimeEvent(false))
-                    logPrint2File(it)
+                    logPrint2File(it,"ReceiveCallViewModel#joinMeeting")
                 }))
         }
 

@@ -49,7 +49,7 @@ object ComputerModeManager {
                 logd("获取电脑窗口索引：${it}")
                 addCommands(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ComputerModeManager#getComputerIndex")
             })
     }
 

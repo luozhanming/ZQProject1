@@ -83,7 +83,7 @@ class HomeViewModel : BaseViewModel() {
             }.subscribe({
                 luboInfo.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"HomeViewModel#startloadLuboInfo")
             })
     }
 
@@ -109,7 +109,7 @@ class HomeViewModel : BaseViewModel() {
                 }
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"HomeViewModel#startLoopMeetingInvitation")
             })
     }
 
@@ -137,7 +137,7 @@ class HomeViewModel : BaseViewModel() {
                         backToLogin.postValue(OneTimeEvent(true))
                     }
                 }
-                logPrint2File(it)
+                logPrint2File(it,"HomeViewModel#startHeartBeat")
                 //发送心跳错误
             })
     }
@@ -157,7 +157,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"HomeViewModel#preloadWindowAndLayout1")
                 })
         )
         mDisposables.add(
@@ -166,7 +166,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"HomeViewModel#preloadWindowAndLayout2")
                 })
         )
         ComputerModeManager.getComputerIndex()
@@ -182,7 +182,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
                     PlatformApi.logout()
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"HomeViewModel#logout")
                 })
         )
     }
@@ -201,7 +201,7 @@ class HomeViewModel : BaseViewModel() {
                     PlatformApi.refreshLoginToken(it.data)
                     logd(it.toString())
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"HomeViewModel#loopRefreshToken")
                 })
         )
     }
@@ -229,7 +229,7 @@ class HomeViewModel : BaseViewModel() {
             .subscribe({
                 meetingInfoZq.postValue(OneTimeEvent(it))
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"HomeViewModel#startLoopMeetingInfoZQ")
             })
     }
 

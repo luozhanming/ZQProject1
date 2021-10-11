@@ -5,6 +5,9 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
 }
 
+Properties properties = new Properties();
+properties.load(new FileInputStream(file("signing.properties")))
+
 android {
     compileSdkVersion compile_sdk_version
     buildToolsVersion build_tool_version
@@ -25,10 +28,21 @@ android {
         multiDexEnabled true
     }
 
+    signingConfigs {
+        release {
+            keyAlias properties['KEY_ALIAS']
+            keyPassword properties['KEY_PASSWORD']
+            storeFile file(properties['KEYSTORE_FILE'])
+            storePassword properties['KEYSTORE_PASSWORD']
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -42,6 +56,16 @@ android {
 
     buildFeatures {
         dataBinding = true
+    }
+
+    applicationVariants.all{variant ->
+        def date = new Date().format("yyyy-MM-ddHHmm", TimeZone.getTimeZone("GMT+08"))
+        def buildSuffix = variant.buildType.name.equals('release') ? "release" : "debug"
+        variant.outputs.all {
+            if (buildSuffix.equals('release')) {
+                outputFileName = "政企录播V${versionName}-${buildSuffix}-${date}.apk"
+            }
+        }
     }
 
 

@@ -44,7 +44,7 @@ class ComputerSourcePopupWindow(context: Context) : BasePopupWindow(context) {
                 .subscribe({
 
                 },{
-                    logPrint2File(it)
+                    logPrint2File(it,"ComputerSourcePopupWindow#initView")
                 })
 
             dismiss()

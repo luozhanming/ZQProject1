@@ -31,7 +31,7 @@ class JoinMeetingViewModel : BaseViewModel() {
         val platformLogin = PlatformApi.getPlatformLogin()
         platformLogin?.apply {
             value = if (professionTitleName?.isNotEmpty() == true) {
-                "${this.name}-${this.professionTitleName}"
+                "${this.name}_${this.professionTitleName}"
             } else {
                 "${this.name}"
             }
@@ -60,7 +60,7 @@ class JoinMeetingViewModel : BaseViewModel() {
                 goListener.postValue(OneTimeEvent(true))
             }, {
                 isLoading.postValue(OneTimeEvent(false))
-                logPrint2File(it)
+                logPrint2File(it,"JoinMeetingViewModel#joinMeeting")
             })
         )
 

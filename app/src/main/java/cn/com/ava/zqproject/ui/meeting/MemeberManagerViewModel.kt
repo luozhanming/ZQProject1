@@ -82,7 +82,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#setMemberCamEnable")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
 
             })
@@ -99,7 +99,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#setMemberMicEnable")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
 
             })
@@ -115,7 +115,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#removeMemberToWaiting")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
 
             })
@@ -135,7 +135,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
                 ToastUtils.showShort( getResources().getString(R.string.set_success))
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#removeAllMemberToWaiting")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
 
             })
@@ -151,7 +151,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#acceptMemberToMeeting")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
 
             })
@@ -172,9 +172,8 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
                 ToastUtils.showShort( getResources().getString(R.string.set_success))
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#acceptAllMemberToMeeting")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
-
             })
         )
     }
@@ -194,7 +193,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             .subscribe({
 
             },{
-                logPrint2File(it)
+                logPrint2File(it,"MemberManagerViewModel#silentAllMembers")
                 ToastUtils.showShort( getResources().getString(R.string.set_failed))
             }))
     }

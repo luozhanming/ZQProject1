@@ -49,6 +49,10 @@
             android:hint="@string/hint_meeting_num"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
+            android:singleLine="true"
+            android:textCursorDrawable="@null"
+            android:imeOptions="actionNext"
+            android:nextFocusForward="@id/et_password"
             android:text="@={joinMeetingViewModel.meetingNum}"
             android:textColor="@color/color_222222"
             android:textColorHint="@color/color_999999"
@@ -60,6 +64,7 @@
 
 
         <EditText
+            android:id="@+id/et_password"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@null"
@@ -70,7 +75,10 @@
             android:textColor="@color/color_222222"
             android:textColorHint="@color/color_999999"
             android:textSize="19sp"
-
+            android:singleLine="true"
+            android:imeOptions="actionNext"
+            android:textCursorDrawable="@null"
+            android:nextFocusForward="@id/editText8"
             app:layout_constraintBottom_toBottomOf="@+id/view17"
             app:layout_constraintEnd_toEndOf="@+id/view17"
             app:layout_constraintStart_toEndOf="@+id/imageView6"
@@ -83,6 +91,8 @@
             android:background="@null"
             android:hint="@string/hint_meeting_nickname"
             android:paddingLeft="12dp"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
             android:paddingRight="12dp"
             android:text="@={joinMeetingViewModel.meetingNickname}"
             android:textColor="@color/color_222222"

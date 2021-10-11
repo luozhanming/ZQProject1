@@ -105,7 +105,6 @@ public class IjkVideoPlayer implements VideoPlayer {
                                 disposable.dispose();
                                 mCallback.notifyRemoteStop();
                                 stopThreshold = 0;
-                                ToastUtils.showShort("啦啦啦");
                                 startPlay(url,mCallback);
                             }
                         }

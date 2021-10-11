@@ -50,6 +50,11 @@ class LuBoSettingFragment : BaseLoadingFragment<FragmentLuboSettingBinding>() {
         observeVM()
         logd("tabIndex:${mTabIndex}")
         mLuboSettingViewModel.loadInitData()
+        if(mTabIndex==0){
+            mBinding.tvTabLubo.performClick()
+        }else{
+            mBinding.tvTabPlat.performClick()
+        }
     }
 
     override fun onBindViewModel2Layout(binding: FragmentLuboSettingBinding) {

@@ -216,7 +216,7 @@ class DownloadService : Service() {
                     }
                 }, {
                     logd("提交上传视频资源接口出错")
-                    logPrint2File(it)
+                    logPrint2File(it,"DownloadService#uploadVideo")
                     mCallback?.onSubmitUploadCallback(false, "上传失败，请重试", video)
                 })
         )
@@ -240,7 +240,7 @@ class DownloadService : Service() {
                     logd("保存FTP中的视频文件 success")
                 }, {
                     logd("保存FTP中的视频文件 error ${it.message}")
-                    logPrint2File(it)
+                    logPrint2File(it,"DownloadService#saveVideoFromFTP")
                 })
         )
 

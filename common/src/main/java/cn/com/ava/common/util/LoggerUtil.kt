@@ -45,7 +45,7 @@ inline fun Any.logi(message: String){
     Logger.t(this.javaClass.simpleName).i(message)
 }
 
-inline fun Any.logPrint2File(throwable: Throwable){
+inline fun Any.logPrint2File(throwable: Throwable,tag:String=""){
     if(BuildConfig.DEBUG){
         throwable.printStackTrace()
     }
@@ -55,7 +55,7 @@ inline fun Any.logPrint2File(throwable: Throwable){
                 Date(),
                 "yyyyMMddHHmmss"
             )
-        }.txt"
+        }_${tag}.txt"
     )
     if (!file.parentFile.exists() && !file.parentFile.mkdirs()) {
         return

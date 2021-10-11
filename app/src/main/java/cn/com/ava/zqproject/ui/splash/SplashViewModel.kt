@@ -104,7 +104,7 @@ class SplashViewModel : BaseViewModel() {
                         }
                     }, {
                         logd("录播登录失败..")
-                        logPrint2File(it)
+                        logPrint2File(it,"SplashViewModel#login")
                         goWhere.postValue(OneTimeEvent(WHERE_LUBO_SETTING))
                     })
             )
@@ -135,7 +135,7 @@ class SplashViewModel : BaseViewModel() {
                     ToastUtils.showShort(
                         Utils.getApp().getString(R.string.toast_platform_link_failed)
                     )
-                    logPrint2File(it)
+                    logPrint2File(it,"SplashViewModel#loadCanEnterHome")
                     goWhere.postValue(OneTimeEvent(WHERE_PLATFORM_SETTING))
                 })
         )
@@ -165,7 +165,7 @@ class SplashViewModel : BaseViewModel() {
                         goWhere.postValue(OneTimeEvent(WHERE_GO_HOME))
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"SplashViewModel#checkCanGoHomeDirect")
                     goWhere.postValue(OneTimeEvent(WHERE_PLATFORM_LOGIN))
                 })
         )
@@ -186,7 +186,7 @@ class SplashViewModel : BaseViewModel() {
                 login()
             }, {
                 isShowLoading.postValue(false)
-                logPrint2File(it)
+                logPrint2File(it,"SplashViewModel#wakeupMachine")
                 goWhere.postValue(OneTimeEvent(WHERE_LUBO_SETTING))
             })
         )

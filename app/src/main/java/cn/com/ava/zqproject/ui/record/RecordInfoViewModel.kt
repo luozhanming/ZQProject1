@@ -64,7 +64,7 @@ class RecordInfoViewModel : BaseViewModel() {
                 .subscribe({
                     machineInfo.postValue(it)
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordInfoViewModel#getMahineInfo")
                 })
         )
     }
@@ -79,7 +79,7 @@ class RecordInfoViewModel : BaseViewModel() {
                     isEditingTheme.postValue(false)
                 }, {
                     ToastUtils.showShort(Utils.getApp().getString(R.string.modify_theme_failed))
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordInfoViewModel#changeTheme")
                 })
         )
     }

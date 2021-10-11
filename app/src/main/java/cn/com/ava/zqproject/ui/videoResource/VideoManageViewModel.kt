@@ -79,7 +79,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
     var sortIndex = 1
 
     // 搜索过滤后的视频
-    val filterVideos: MutableLiveData<List<StatefulView<RecordFilesInfo.RecordFile>>> by lazy {
+    val filterVideos: MediatorLiveData<List<StatefulView<RecordFilesInfo.RecordFile>>> by lazy {
         MediatorLiveData<List<StatefulView<RecordFilesInfo.RecordFile>>>().apply {
             //value = arrayListOf()
             addSource(searchKey) { key ->
@@ -90,6 +90,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
                 }
                 postValue(filter)
             }
+
         }
     }
 
@@ -145,7 +146,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
                         sortByFileSize()
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VideoManageViewModel#getVideoResourceList")
                     logd("视频资源请求失败")
                     refreshState.postValue(RefreshState(true, true))
                 })
@@ -213,7 +214,7 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
                         logd("删除视频资源失败")
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VideoManageViewModel#deleteVideo")
                     logd("删除视频资源接口出错")
                 })
         )
@@ -352,10 +353,17 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VideoManageViewModel#getUploadList")
                     logd("获取上传列表接口出错")
                 })
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        filterVideos.removeSource(searchKey)
+        filterVideos.value = null
+        videoResources.value = null
     }
 
 

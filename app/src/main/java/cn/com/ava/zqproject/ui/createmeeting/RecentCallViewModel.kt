@@ -50,7 +50,7 @@ class RecentCallViewModel : BaseViewModel(),CanRefresh,SelectedUser {
                 refreshState.postValue(RefreshState(true, false))
                 recentContract.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"RecentCallViewModel#getRecentContracts")
                 refreshState.postValue(RefreshState(true, true))
             })
         )
@@ -72,7 +72,7 @@ class RecentCallViewModel : BaseViewModel(),CanRefresh,SelectedUser {
                 .subscribeOn(Schedulers.computation())
                 .subscribe({
                 },{
-                    logPrint2File(it)
+                    logPrint2File(it,"RecentCallViewModel#setSelectedUsers")
                 })
         )
     }

@@ -135,7 +135,6 @@ class LuBoSettingViewModel : BaseViewModel() {
             showLoading.postValue(OneTimeEvent(true))
             mDisposables.add(
                 LoginManager.newLogin(username.value ?: "", password.value ?: "")
-                    .timeout(2000,TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
                         showLoading.postValue(OneTimeEvent(false))
@@ -169,7 +168,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                     }, {
                         showLoading.postValue(OneTimeEvent(false))
                         logd("录播登录失败..")
-                        logPrint2File(it)
+                        logPrint2File(it,"LuboSettingViewModel#login")
                         toastMsg.postValue(
                             OneTimeEvent(
                                 Utils.getApp().getString(R.string.toast_lubo_login_failed)
@@ -199,7 +198,6 @@ class LuBoSettingViewModel : BaseViewModel() {
         showLoading.postValue(OneTimeEvent(true))
         mDisposables.add(
             PlatformApi.getService(addr).getInterface()
-                .timeout(2000,TimeUnit.MILLISECONDS)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -216,7 +214,7 @@ class LuBoSettingViewModel : BaseViewModel() {
 
                 }, {
                     showLoading.postValue(OneTimeEvent(false))
-                    logPrint2File(it)
+                    logPrint2File(it,"LuboSettingViewModel#loadPlatformInterface")
                     it.toServerException()?.apply {
                         toastMsg.postValue(OneTimeEvent(message?:""))
                     } ?: toastMsg.postValue(

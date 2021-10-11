@@ -163,7 +163,7 @@ class SelectLayoutManagerViewModel : BaseViewModel() {
             .subscribe({
                 linkUsers.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"SelectLayoutManagerViewModel#getInteracMemberInfo")
             })
         )
     }
@@ -228,7 +228,7 @@ class SelectLayoutManagerViewModel : BaseViewModel() {
                         layoutSure.postValue(OneTimeEvent(true))
                     }, {
                         ToastUtils.showShort(getResources().getString(R.string.set_meeting_layout_failed))
-                        logPrint2File(it)
+                        logPrint2File(it,"SelectLayoutManagerViewModel#layoutSure")
                     })
             )
         }

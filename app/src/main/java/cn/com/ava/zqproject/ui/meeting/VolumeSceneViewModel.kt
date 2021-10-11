@@ -22,6 +22,27 @@ class VolumeSceneViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+    val tabIndex:MutableLiveData<Int> by lazy {
+        MutableLiveData()
+    }
+
+    /**
+     * 是否有Mic3
+     * */
+    val isVolumein5Visible:MediatorLiveData<Boolean> by lazy {
+        MediatorLiveData<Boolean>().apply {
+            addSource(volumeChannels){
+                if(it.size<6){
+                    postValue(false)
+                }else{
+                    val hasMic3 = it[5].channelName.isNotEmpty()
+                    postValue(hasMic3&&tabIndex.value==1)
+                }
+            }
+
+        }
+    }
+
 
 
     fun loadCamPreviewInfo() {
@@ -57,7 +78,15 @@ class VolumeSceneViewModel : BaseViewModel() {
             InteracManager.getInteracVolumeChannels()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    volumeChannels.postValue(it)
+                    val filter = mutableListOf<VolumeChannel>()
+                    val array = arrayOf("MASTER","LINEIN1","LINEIN2","MICIN1","MICIN2","MICIN3")
+                    filter.addAll( it.filter {
+                        it.channelName in array
+                    })
+                    if(filter.size<6){   //没有MICIN3
+                        filter.add(VolumeChannel())
+                    }
+                    volumeChannels.postValue(filter)
                 },{
                     logPrint2File(it)
                 })
@@ -86,5 +115,10 @@ class VolumeSceneViewModel : BaseViewModel() {
                     logPrint2File(it)
                 })
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        isVolumein5Visible.removeSource(volumeChannels)
     }
 }

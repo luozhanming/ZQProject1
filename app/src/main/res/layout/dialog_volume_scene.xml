@@ -7,6 +7,7 @@
         <variable
             name="volumeSceneViewModel"
             type="cn.com.ava.zqproject.ui.meeting.VolumeSceneViewModel" />
+        <import type="android.view.View"/>
     </data>
 
 
@@ -74,13 +75,12 @@
             android:id="@+id/linearLayout2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="112dp"
             android:gravity="center"
-            app:layout_constraintVertical_chainStyle="packed"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frameLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/tabLayout">
 
             <ImageView
                 android:id="@+id/cb_silent1"
@@ -90,7 +90,6 @@
                 android:padding="5dp"
                 android:selected="@{!volumeSceneViewModel.volumeChannels.get(1).silent}"
                 android:src="@drawable/checkbox_1" />
-
             <TextView
                 android:layout_width="85dp"
                 android:layout_height="wrap_content"
@@ -104,13 +103,12 @@
                 android:layout_width="312dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:enabled= "@{!volumeSceneViewModel.volumeChannels.get(1).isSilent()}"
+                android:enabled="@{!volumeSceneViewModel.volumeChannels.get(1).isSilent()}"
                 android:max="@{volumeSceneViewModel.volumeChannels.get(1).max}"
                 android:progress="@{volumeSceneViewModel.volumeChannels.get(1).adapteVolumeLevel}"
                 android:progressTint="@color/color_318EF8"
                 android:splitTrack="false"
-                android:thumb="@mipmap/ic_seekbar_thumb"
-               />
+                android:thumb="@mipmap/ic_seekbar_thumb" />
 
 
 
@@ -128,12 +126,10 @@
             android:id="@+id/linearLayout3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="112dp"
-            android:layout_marginTop="35dp"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout2"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
 
@@ -141,8 +137,8 @@
                 android:id="@+id/cb_silent2"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
-                android:padding="5dp"
                 android:background="@drawable/bg_text_button_1"
+                android:padding="5dp"
                 android:selected="@{!volumeSceneViewModel.volumeChannels.get(2).silent}"
                 android:src="@drawable/checkbox_1" />
 
@@ -167,6 +163,8 @@
                 android:thumb="@mipmap/ic_seekbar_thumb" />
 
 
+
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -182,12 +180,10 @@
             android:id="@+id/linearLayout4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="112dp"
-            android:layout_marginTop="35dp"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout3"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
 
@@ -196,12 +192,11 @@
 
                 android:layout_width="34dp"
                 android:layout_height="34dp"
+                android:background="@drawable/bg_text_button_1"
                 android:padding="5dp"
                 android:selected="@{!volumeSceneViewModel.volumeChannels.get(3).silent}"
-                android:background="@drawable/bg_text_button_1"
 
                 android:src="@drawable/checkbox_1" />
-
 
             <TextView
                 android:layout_width="85dp"
@@ -213,17 +208,18 @@
 
 
             <SeekBar
+                android:id="@+id/sb_audio3"
                 android:layout_width="312dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:enabled = "@{!volumeSceneViewModel.volumeChannels.get(3).isSilent()}"
-                android:progress="@{volumeSceneViewModel.volumeChannels.get(3).adapteVolumeLevel}"
-                android:id="@+id/sb_audio3"
+                android:enabled="@{!volumeSceneViewModel.volumeChannels.get(3).isSilent()}"
                 android:max="@{volumeSceneViewModel.volumeChannels.get(3).max}"
+                android:progress="@{volumeSceneViewModel.volumeChannels.get(3).adapteVolumeLevel}"
                 android:progressTint="@color/color_318EF8"
                 android:splitTrack="false"
-                android:thumb="@mipmap/ic_seekbar_thumb"
-                />
+                android:thumb="@mipmap/ic_seekbar_thumb" />
+
+
 
 
 
@@ -241,12 +237,10 @@
             android:id="@+id/linearLayout5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="112dp"
-            android:layout_marginTop="35dp"
             android:gravity="center"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/btn_close"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout7"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout4"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
 
 
@@ -254,11 +248,10 @@
                 android:id="@+id/cb_silent4"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
-                android:padding="5dp"
                 android:background="@drawable/bg_text_button_1"
+                android:padding="5dp"
                 android:selected="@{!volumeSceneViewModel.volumeChannels.get(4).silent}"
                 android:src="@drawable/checkbox_1" />
-
 
             <TextView
                 android:layout_width="85dp"
@@ -268,18 +261,19 @@
                 android:textColor="@color/color_222222"
                 android:textSize="20sp" />
 
+
             <SeekBar
+                android:id="@+id/sb_audio4"
                 android:layout_width="312dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:enabled = "@{!volumeSceneViewModel.volumeChannels.get(4).isSilent()}"
+                android:enabled="@{!volumeSceneViewModel.volumeChannels.get(4).isSilent()}"
                 android:max="@{volumeSceneViewModel.volumeChannels.get(4).max}"
                 android:progress="@{volumeSceneViewModel.volumeChannels.get(4).adapteVolumeLevel}"
                 android:progressTint="@color/color_318EF8"
                 android:splitTrack="false"
-                android:id="@+id/sb_audio4"
-                android:thumb="@mipmap/ic_seekbar_thumb"
-/>
+                android:thumb="@mipmap/ic_seekbar_thumb" />
+
 
 
 
@@ -292,13 +286,67 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/linearLayout7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="@{volumeSceneViewModel.isVolumein5Visible?View.VISIBLE:View.GONE}"
+            app:layout_constraintBottom_toTopOf="@+id/btn_close"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
+
+
+            <ImageView
+                android:id="@+id/cb_silent5"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_text_button_1"
+                android:padding="5dp"
+                android:selected="@{!volumeSceneViewModel.volumeChannels.get(5).silent}"
+                android:src="@drawable/checkbox_1" />
+
+            <TextView
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="@{volumeSceneViewModel.volumeChannels.get(5).channelName}"
+                android:textColor="@color/color_222222"
+                android:textSize="20sp" />
+
+
+            <SeekBar
+                android:id="@+id/sb_audio5"
+                android:layout_width="312dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:enabled="@{!volumeSceneViewModel.volumeChannels.get(5).isSilent()}"
+                android:max="@{volumeSceneViewModel.volumeChannels.get(5).max}"
+                android:progress="@{volumeSceneViewModel.volumeChannels.get(5).adapteVolumeLevel}"
+                android:progressTint="@color/color_318EF8"
+                android:splitTrack="false"
+                android:thumb="@mipmap/ic_seekbar_thumb" />
+
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="18dp"
+                android:text='@{(int)((float)volumeSceneViewModel.volumeChannels.get(5).adapteVolumeLevel/volumeSceneViewModel.volumeChannels.get(4).max*100)+"%"}'
+                android:textColor="@color/color_666666"
+                android:textSize="16sp" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/linearLayout6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_marginTop="35dp"
+            android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -314,7 +362,6 @@
                 android:selected="@{!volumeSceneViewModel.volumeChannels.get(0).silent}"
                 android:src="@drawable/checkbox_1" />
 
-
             <TextView
                 android:layout_width="85dp"
                 android:layout_height="wrap_content"
@@ -322,6 +369,7 @@
                 android:text="@{volumeSceneViewModel.volumeChannels.get(0).channelName}"
                 android:textColor="@color/color_222222"
                 android:textSize="20sp" />
+
 
             <SeekBar
                 android:id="@+id/sb_master"
@@ -382,23 +430,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:constraint_referenced_ids="linearLayout2,linearLayout3,linearLayout4,linearLayout5" />
+            app:constraint_referenced_ids="linearLayout2,linearLayout3,linearLayout4,linearLayout5,linearLayout7" />
 
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="linearLayout6"
-            />
+            android:visibility="gone"
+            app:constraint_referenced_ids="linearLayout6" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="140dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="150dp"
+            android:layout_marginRight="140dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

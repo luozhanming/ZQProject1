@@ -37,7 +37,7 @@ class VideoPlayViewModel : BaseViewModel() {
             .subscribe({
 
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"VideoPlayViewModel#changeVolume")
             })
         )
     }
@@ -55,7 +55,7 @@ class VideoPlayViewModel : BaseViewModel() {
                     masterVolume.postValue(it)
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"VideoPlayViewModel#getVolumeInfo")
             })
         )
     }

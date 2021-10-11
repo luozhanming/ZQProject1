@@ -75,7 +75,7 @@ class ContractGroupViewModel : BaseViewModel(), CanRefresh, SelectedUser {
                     contractGroups.postValue(it)
                 }, {
                     refreshState.postValue(RefreshState(true, true))
-                    logPrint2File(it)
+                    logPrint2File(it,"ContactGroupViewModel#getContractGroups")
                 })
         )
     }
@@ -111,7 +111,7 @@ class ContractGroupViewModel : BaseViewModel(), CanRefresh, SelectedUser {
                     .subscribeOn(Schedulers.computation())
                     .subscribe({
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"ContactGroupViewModel#setSelectedUser")
                     })
                 )
             }

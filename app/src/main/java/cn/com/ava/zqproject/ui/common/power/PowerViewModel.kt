@@ -34,7 +34,7 @@ class PowerViewModel:BaseViewModel() {
                 ToastUtils.showShort("${getResources().getString(R.string.reload_machine)}${getResources().getString(R.string.success)}")
             },{
                 ToastUtils.showShort("${getResources().getString(R.string.reload_machine)}${getResources().getString(R.string.failed)}")
-                logPrint2File(it)
+                logPrint2File(it,"PowerViewModel#reloadMachine")
             })
     }
 
@@ -46,7 +46,7 @@ class PowerViewModel:BaseViewModel() {
                 ToastUtils.showShort("${getResources().getString(R.string.sleep_machine)}${getResources().getString(R.string.success)}")
             },{
                 ToastUtils.showShort("${getResources().getString(R.string.sleep_machine)}${getResources().getString(R.string.failed)}")
-                logPrint2File(it)
+                logPrint2File(it,"PowerViewModel#sleepMachine")
             })
     }
 
@@ -58,7 +58,7 @@ class PowerViewModel:BaseViewModel() {
                 ToastUtils.showShort("${getResources().getString(R.string.turnoff_machine)}${getResources().getString(R.string.success)}")
             },{
                 ToastUtils.showShort("${getResources().getString(R.string.turnoff_machine)}${getResources().getString(R.string.failed)}")
-                logPrint2File(it)
+                logPrint2File(it,"PowerViewModel#turnoffMachine")
             })
     }
 }

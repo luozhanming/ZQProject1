@@ -9,14 +9,17 @@ import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.DateUtil
 import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.lubosdk.AVAHttpEngine
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.LocalVideoStream
 import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
+import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
+import cn.com.ava.lubosdk.zq.query.MeetingMemberQuery
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.ApplySpeakManager
 import cn.com.ava.zqproject.common.ComputerModeManager
@@ -26,7 +29,10 @@ import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ListenerViewModel : BaseViewModel() {
 
@@ -163,13 +169,15 @@ class ListenerViewModel : BaseViewModel() {
                 meetingInfoZQ.postValue(it)
             }, {
                 isShowLoading.postValue(OneTimeEvent(false))
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#startLoopMeetingInfoZQ")
             })
     }
 
     fun stopLoopMeetingInfoZQ() {
         mLoopMeetingInfoZQDisposable?.dispose()
     }
+
+
 
 
     fun loopCurVideoSceneSources() {
@@ -187,7 +195,7 @@ class ListenerViewModel : BaseViewModel() {
             }.subscribe({
                 curSceneSources.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#loopCurVideoSceneSources")
             })
     }
 
@@ -233,7 +241,7 @@ class ListenerViewModel : BaseViewModel() {
                         computerSourceList.postValue(sourceList)
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"ListenerViewModel#getComputerSourceInfo")
                 })
         )
     }
@@ -251,7 +259,7 @@ class ListenerViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"ListenerViewModel#toggleComputer")
                 })
         )
     }
@@ -264,7 +272,7 @@ class ListenerViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"ListenerViewModel#exitMeeting")
                 })
         )
     }
@@ -286,7 +294,7 @@ class ListenerViewModel : BaseViewModel() {
             .subscribe({
                 meetingMembers.postValue(it.datas)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#loadMeetingMember")
             })
         )
     }
@@ -303,13 +311,13 @@ class ListenerViewModel : BaseViewModel() {
                     if (!TextUtils.isEmpty(confStartTime)) {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
-                        val diff = now - begin - 30360*1000
+                        val diff = now - begin - 30458 * 1000
                         val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
                         meetingTime.postValue(toDateString)
                     }
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#startTimeCount")
             })
     }
 
@@ -336,7 +344,7 @@ class ListenerViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"ListenerViewModel#toggleLocalVolumeAudio")
                 })
             )
         }
@@ -352,7 +360,7 @@ class ListenerViewModel : BaseViewModel() {
                     ToastUtils.showShort(getResources().getString(R.string.request_speak_failed))
                 }
             },{
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#applySpeak")
             }))
     }
 
@@ -369,7 +377,7 @@ class ListenerViewModel : BaseViewModel() {
                 meetingState.postValue(it)
                 //处理申请发言的列表数据源
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ListenerViewModel#startLoopMeetingState")
             })
     }
 

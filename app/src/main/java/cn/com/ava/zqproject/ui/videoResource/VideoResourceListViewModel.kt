@@ -36,7 +36,7 @@ class VideoResourceListViewModel : BaseViewModel(), CanRefresh {
                     logd("downloadURL:" + info.downloadUrl + ", rtspUrl: " + info.rtspUrl)
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"VideoResourceListViewModel#getVideoResourceList")
                 logd("视频资源请求失败")
                 refreshState.postValue(RefreshState(true, true))
             })

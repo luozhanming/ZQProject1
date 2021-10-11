@@ -10,7 +10,7 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.DialogAuthCodeBinding
 import com.blankj.utilcode.util.ToastUtils
 
-class AuthCodeDialog:BaseDialogV2<DialogAuthCodeBinding>() {
+class AuthCodeDialog(val success:()->Unit):BaseDialogV2<DialogAuthCodeBinding>() {
 
 
     private val mAuthCodeViewModel by viewModels<AuthCodeViewModel>()
@@ -42,6 +42,7 @@ class AuthCodeDialog:BaseDialogV2<DialogAuthCodeBinding>() {
         mAuthCodeViewModel.validateResult.observeOne(this){
             if(it){
                 ToastUtils.showShort(getString(R.string.validate_success))
+                success.invoke()
                 dismiss()
             }else{
                 ToastUtils.showShort(getString(R.string.validate_failed))

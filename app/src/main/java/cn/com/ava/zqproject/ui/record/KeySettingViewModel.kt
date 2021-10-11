@@ -63,7 +63,7 @@ class KeySettingViewModel : BaseViewModel() {
                         getPresetList()
                         videoWindowList.postValue(it)
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"KeySettingViewModel#getVideoWindowList1")
                     })
             )
         } else {
@@ -83,7 +83,7 @@ class KeySettingViewModel : BaseViewModel() {
                 getPresetList()
                 videoWindowList.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"KeySettingViewModel#getVideoWindowList2")
             }))
         }
     }
@@ -113,7 +113,7 @@ class KeySettingViewModel : BaseViewModel() {
                     .subscribe({
                         videoLayoutList.postValue(it)
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"KeySettingViewModel#getVideoLayoutList1")
                     })
             )
         }else{
@@ -139,7 +139,7 @@ class KeySettingViewModel : BaseViewModel() {
                     .subscribe({
                         videoLayoutList.postValue(it)
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"KeySettingViewModel#getVideoLayoutList2")
                     })
             )
         }

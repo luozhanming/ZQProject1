@@ -314,7 +314,7 @@ class MasterViewModel : BaseViewModel() {
 
             }, {
                 isShowLoading.postValue(OneTimeEvent(false))
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startLoadMeetingInfo")
             })
     }
 
@@ -356,7 +356,7 @@ class MasterViewModel : BaseViewModel() {
             .subscribe({
                 interacInfo.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startLoopInteracInfo")
             })
     }
 
@@ -374,7 +374,7 @@ class MasterViewModel : BaseViewModel() {
                     modifyTheme()
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startLoopMeetingInfoZQ")
             })
     }
 
@@ -386,7 +386,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribe({
 
                     },{
-                        logPrint2File(it)
+                        logPrint2File(it,"MasterViewModel#modifyTheme")
                     })
             )
 
@@ -404,7 +404,7 @@ class MasterViewModel : BaseViewModel() {
             .subscribe({
                 linkUsers.postValue(it.datas)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startLoopLinkUsers")
             })
     }
 
@@ -447,7 +447,7 @@ class MasterViewModel : BaseViewModel() {
                 }
                 applySpeakUsers.postValue(applySpeakUser)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startLoopMeetingState")
             })
     }
 
@@ -465,7 +465,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#toggleComputer")
                 })
         )
     }
@@ -476,7 +476,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#overMeeting")
                 })
         )
     }
@@ -552,7 +552,7 @@ class MasterViewModel : BaseViewModel() {
                         computerSourceList.postValue(sourceList)
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#getComputerSourceInfo")
                 })
         )
     }
@@ -570,7 +570,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#toggleRecord")
                 })
         )
     }
@@ -582,7 +582,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#toggleLive")
                 })
         )
     }
@@ -604,7 +604,7 @@ class MasterViewModel : BaseViewModel() {
             .subscribe({
                 curSceneSources.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#loopCurVideoSceneSources")
             })
     }
 
@@ -615,6 +615,7 @@ class MasterViewModel : BaseViewModel() {
         isRecording.removeSource(meetingInfo)
         onVideoWindow.removeSource(interacInfo)
         videoLayoutCount.removeSource(interacInfo)
+        requestSpeakRet.removeSource(meetingState)
         mLoopMeetingInfoDisposable?.dispose()
         mLoopCurSceneSourcesDisposable?.dispose()
         mLoopInteracInfoDisposable?.dispose()
@@ -634,7 +635,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#setVideoLayout")
                 })
         )
     }
@@ -650,13 +651,13 @@ class MasterViewModel : BaseViewModel() {
                     if (!TextUtils.isEmpty(confStartTime)) {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
-                        val diff = now - begin - 30360 * 1000
+                        val diff = now - begin - 30458 * 1000
                         val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
                         meetingTime.postValue(toDateString)
                     }
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"MasterViewModel#startTimeCount")
             })
     }
 
@@ -682,7 +683,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"MasterViewModel#toggleLocalVolumeAudio")
                     })
             )
         }
@@ -698,7 +699,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#setRequestSpeakMode")
                 })
         )
     }
@@ -734,7 +735,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#agreeRequestSpeak")
                 })
         )
     }
@@ -750,7 +751,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"MasterViewModel#toggleLockMeeting")
                     })
             )
         }
@@ -813,7 +814,7 @@ class MasterViewModel : BaseViewModel() {
                     callback?.onChanged(patrolUsers[curPos])
                     curPos++
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"MasterViewModel#begin")
                 })
         }
 

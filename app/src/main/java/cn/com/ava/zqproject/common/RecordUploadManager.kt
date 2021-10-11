@@ -57,6 +57,8 @@ object RecordUploadManager {
                 }
             }, {
                 logPrint2File(it)
+            },{
+
             })
         disposables.add(disposable)
     }
@@ -71,17 +73,19 @@ object RecordUploadManager {
         uploadDisposable = null
     }
 
-
+    /**
+     * 开始上传 阻塞
+     * */
     fun startUpload(callback: (List<RecordFilesInfo.RecordFile>) -> Unit) {
         if(disposables.isEmpty())return
         uploadDisposable =
             Observable.create<Boolean> {
-                while (disposables.isNotEmpty() && disposables.all { it.isDisposed }) {
+                while (disposables.isNotEmpty() && disposables.all { !it.isDisposed }) {
                     Thread.sleep(100)
                 }
                 it.onNext(true)
                 it.onComplete()
-            }.timeout(20, TimeUnit.SECONDS)
+            }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

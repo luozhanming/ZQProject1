@@ -92,7 +92,7 @@ class RecordViewModel : BaseViewModel() {
                 isShowLoading.postValue(OneTimeEvent(false))
                 recordInfo.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"RecordViewModel#startLoadRecordInfo")
                 isShowLoading.postValue(OneTimeEvent(false))
             })
 
@@ -120,7 +120,7 @@ class RecordViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordViewModel#toggleRecord")
                 })
         )
     }
@@ -132,7 +132,7 @@ class RecordViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordViewModel#toggleLive")
                 })
         )
     }
@@ -149,7 +149,7 @@ class RecordViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordViewModel#togglePause")
                 })
         )
     }
@@ -161,7 +161,7 @@ class RecordViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"RecordViewModel#setTrackMode")
                 })
         )
     }
@@ -177,7 +177,7 @@ class RecordViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"RecordViewModel#toggleComputer1")
                     })
             )
         } else {
@@ -187,7 +187,7 @@ class RecordViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"RecordViewModel#toggleComputer2")
                     })
             )
         }
@@ -202,7 +202,7 @@ class RecordViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it)
+                        logPrint2File(it,"RecordViewModel#changeComputer")
                     })
             )
         }
@@ -215,7 +215,7 @@ class RecordViewModel : BaseViewModel() {
             .subscribe({
 
             },{
-                logPrint2File(it)
+                logPrint2File(it,"RecordViewModel#changeVolume")
             }))
     }
 
@@ -232,7 +232,7 @@ class RecordViewModel : BaseViewModel() {
                     masterVolume.postValue(it)
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"RecordViewModel#getVolumeInfo")
             })
         )
     }

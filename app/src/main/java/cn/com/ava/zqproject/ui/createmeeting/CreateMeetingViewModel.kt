@@ -144,7 +144,7 @@ class CreateMeetingViewModel : BaseViewModel() {
             }, {
                 isLoading.postValue(OneTimeEvent(false))
                 ToastUtils.showShort(getResources().getString(R.string.create_meeting_failed))
-                logPrint2File(it)
+                logPrint2File(it,"CreateMeetingViewModel#createMeeting")
             })
         )
 

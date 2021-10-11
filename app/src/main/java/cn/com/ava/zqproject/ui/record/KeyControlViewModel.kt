@@ -34,7 +34,7 @@ class KeyControlViewModel : BaseViewModel() {
             .subscribe({
                 commandButtons.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"KeyControlViewModel#getCommandButtons")
             })
     }
 
@@ -55,7 +55,7 @@ class KeyControlViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"KeyControlViewModel#sendKeyCommand")
                 })
         }
     }

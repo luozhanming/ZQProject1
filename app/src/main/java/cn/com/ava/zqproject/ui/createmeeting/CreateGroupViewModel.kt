@@ -82,7 +82,7 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
                 refreshState.postValue(RefreshState(true, false))
                 filterUser.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"CreateGroupViewModel#searchKeyUser")
                 refreshState.postValue(RefreshState(true, true))
             })
         )
@@ -108,7 +108,7 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
             .subscribe({
                 contractUsers.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"CreateGroupViewModel#getContractUser")
             })
         )
     }
@@ -146,7 +146,7 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
                     contractUsers.postValue(list)
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"CreateGroupViewModel#getContractUserList")
                 if(isLoadMore){
                     loadMoreState.postValue(LoadMoreState(true, true))
                 }else{
@@ -218,7 +218,7 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
                     createdGroup.postValue(it.data)
                 }, {
                     ToastUtils.showShort(Utils.getApp().getString(R.string.create_failed))
-                    logPrint2File(it)
+                    logPrint2File(it,"CreateGroupViewModel#createMeeting")
                 })
         )
     }

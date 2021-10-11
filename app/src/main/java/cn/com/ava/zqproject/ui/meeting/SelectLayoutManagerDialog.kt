@@ -42,7 +42,6 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
     }
 
     override fun initView(root: View) {
-
         mBinding.ivClose.setOnClickListener {
             dismiss()
         }
@@ -76,6 +75,10 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
         mBinding.btnNextStep.setOnClickListener {
             val selectLayout = mSelectLayoutViewModel.layoutSelect.value!!
             if (selectLayout == SelectLayoutManagerViewModel.LAYOUT_AUTO) {
+                if(mSelectLayoutViewModel.linkUsers.value?.size?:0<=1){  //不足一个无法是使用轮播
+                    ToastUtils.showShort(getString(R.string.toast_no_need_patrol))
+                    return@setOnClickListener
+                }
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_2
             } else {
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_1

@@ -89,7 +89,7 @@ class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoad
                     contractUsers.postValue(list)
                 }
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ContractBookViewModel#getContractUserList")
                 if(isLoadMore){
                     loadMoreState.postValue(LoadMoreState(true, true))
                 }else{
@@ -119,7 +119,7 @@ class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoad
                 refreshState.postValue(RefreshState(true, false))
                 filterUser.postValue(it)
             }, {
-                logPrint2File(it)
+                logPrint2File(it,"ContractBookViewModel#searchKey")
                 refreshState.postValue(RefreshState(true, true))
             })
         )
@@ -152,7 +152,7 @@ class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoad
 
 
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"ContractBookViewModel#setSelectedUsers")
                 })
         )
     }

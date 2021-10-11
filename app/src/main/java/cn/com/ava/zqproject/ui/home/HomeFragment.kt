@@ -79,7 +79,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                                 popUpTo( R.id.homeFragment){
                                     inclusive = true
                                 }
-
                             })
                         })
                         dialog.show(childFragmentManager,"confirm")
@@ -88,7 +87,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
             popupMenu.showAtLocation(mBinding.ivSetting,Gravity.RIGHT or Gravity.TOP,-SizeUtils.dp2px(32),SizeUtils.dp2px(60))
         }
-
         //预加载相关
         mHomeViewModel.preloadWindowAndLayout()
         //不停刷新token

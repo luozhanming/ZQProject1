@@ -40,7 +40,7 @@ class InfoUpgradeViewModel : BaseViewModel() {
                 .subscribe({
                     luboInfo.postValue(it)
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"InfoUpgradeViewModel#loadMachineInfo")
                 })
         )
     }
@@ -63,7 +63,7 @@ class InfoUpgradeViewModel : BaseViewModel() {
 
                     }
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"InfoUpgradeViewModel#requestNewVersion")
                 })
         )
     }

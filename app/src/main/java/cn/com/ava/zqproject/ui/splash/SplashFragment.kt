@@ -61,14 +61,16 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         super.onCreate(savedInstanceState)
         if (checkPermissions()) {  //检测必要权限
             //步骤1
-            if (!BuildConfig.DEBUG&&!hasAutoCode) {
-                AuthKeyUtil.generateDeviceFile()
-                //弹出对话框
-                mAuthCodeDialog = mAuthCodeDialog?: AuthCodeDialog()
-                mAuthCodeDialog?.show(childFragmentManager,"auth")
-            }else{
+//            if (!BuildConfig.DEBUG&&!hasAutoCode) {
+//                AuthKeyUtil.generateDeviceFile()
+//                //弹出对话框
+//                mAuthCodeDialog = mAuthCodeDialog?: AuthCodeDialog(){
+//                    mSplashViewModel.login()
+//                }
+//                mAuthCodeDialog?.show(childFragmentManager,"auth")
+//            }else{
                 mSplashViewModel.login()
-            }
+       //     }
         }
     }
 
@@ -84,7 +86,16 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         ) {
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 isPermissionsGrant = it.all { it.value }
-                mSplashViewModel.login()
+//                if (!BuildConfig.DEBUG&&!hasAutoCode) {
+//                    AuthKeyUtil.generateDeviceFile()
+//                    //弹出对话框
+//                    mAuthCodeDialog = mAuthCodeDialog?: AuthCodeDialog(){
+//                        mSplashViewModel.login()
+//                    }
+//                    mAuthCodeDialog?.show(childFragmentManager,"auth")
+//                }else{
+                    mSplashViewModel.login()
+              //  }
             }.launch(
                 arrayOf(
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -102,7 +113,10 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             val go: () -> Unit = {
                 when (it) {
                     SplashViewModel.WHERE_LUBO_SETTING -> {
-                        findNavController().navigate(R.id.action_splashFragment_to_luBoSettingFragment)
+                        findNavController().navigate(R.id.action_splashFragment_to_luBoSettingFragment,    Bundle().apply {
+                            putInt(LuBoSettingFragment.EXTRA_KEY_TAB_INDEX, 0)
+                        })
+
                     }
                     SplashViewModel.WHERE_PLATFORM_SETTING -> {
                         findNavController().navigate(
