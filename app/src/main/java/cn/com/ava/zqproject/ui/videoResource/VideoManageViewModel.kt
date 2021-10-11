@@ -44,6 +44,10 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
     override val refreshState: MutableLiveData<RefreshState> by lazy {
         MutableLiveData()
     }
+
+    // 标记是否需要刷新界面
+    var isNeedRefresh = true
+
     // 列表资源
     val videoResources: MutableLiveData<MutableList<StatefulView<RecordFilesInfo.RecordFile>>> by lazy {
         val data = arrayListOf<StatefulView<cn.com.ava.lubosdk.entity.RecordFilesInfo.RecordFile>>()

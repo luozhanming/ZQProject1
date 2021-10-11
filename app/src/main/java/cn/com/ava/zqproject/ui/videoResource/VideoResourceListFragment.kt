@@ -83,9 +83,12 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
             mVideoManageViewModel.getVideoResourceList()
         }
         mBinding.refreshLayout.autoRefresh()
-        if ((mVideoManageViewModel.videoResources.value?.size ?: 0) > 0) {
-            mVideoManageViewModel.getVideoResourceList()
-        }
+//        if ((mVideoManageViewModel.videoResources.value?.size ?: 0) > 0) {
+//            mVideoManageViewModel.getVideoResourceList()
+//        }
+
+        mVideoManageViewModel.getVideoResourceList()
+
         if (mVideoResourceListItemAdapter == null) {
             mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
                 override fun onDidClickedItem(data: StatefulView<RecordFilesInfo.RecordFile>?) {
@@ -299,11 +302,13 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
     }
 
     override fun onDestroyView() {
+        logd("videoresourceList onDestroyView")
         mBinding.rvResourceList.adapter = null
         super.onDestroyView()
     }
 
     override fun onDestroy() {
+        logd("videoresourceList onDestroy")
         unbindService()
         super.onDestroy()
     }

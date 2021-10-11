@@ -74,7 +74,7 @@
             <View
                 android:id="@+id/view1"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
+                android:layout_height="1px"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -99,6 +99,8 @@
                 android:layout_marginStart="26dp"
                 app:tabGravity="start"
                 app:tabIndicatorFullWidth="false"
+                app:tabIndicatorHeight="3dp"
+                app:tabIndicatorColor="@color/color_318EF8"
                 app:tabSelectedTextColor="@color/color_318EF8"
                 app:tabTextColor="@color/color_222222"/>
 
@@ -119,9 +121,9 @@
             <View
                 android:id="@+id/view2"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
+                android:layout_height="1px"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="@+id/tabLayout"
+                app:layout_constraintTop_toBottomOf="@+id/tabLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:background="@color/color_E2E2E2" />
 
