@@ -181,14 +181,16 @@ class VideoManageFragment : BaseFragment<FragmentVideoManageBinding>() {
     }
 
     override fun onDestroyView() {
-        logd("videoManagerFragment onDestroyView")
         VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
         super.onDestroyView()
     }
 
     override fun onPause() {
-        logd("videoManagerFragment onPause")
         VideoPreference.putElement(VideoPreference.KEY_VIDEO_TRANSMISSION_LIST, GsonUtil.toJson(VideoSingleton.cacheVideos))
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
