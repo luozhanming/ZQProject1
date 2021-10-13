@@ -53,20 +53,14 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
 
     private var mDownloadServiceConnection :ServiceConnection? =null
 
-
-
     override fun getLayoutId(): Int {
         return R.layout.fragment_video_resource_list
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }
-
-
-
 
     override fun onResume() {
         super.onResume()
@@ -79,15 +73,12 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
         bindService()
         logd("listfragment initView")
 
+        mVideoManageViewModel.getVideoResourceList()
+
         mBinding.refreshLayout.setOnRefreshListener {
             mVideoManageViewModel.getVideoResourceList()
         }
-        mBinding.refreshLayout.autoRefresh()
-//        if ((mVideoManageViewModel.videoResources.value?.size ?: 0) > 0) {
-//            mVideoManageViewModel.getVideoResourceList()
-//        }
-
-        mVideoManageViewModel.getVideoResourceList()
+//        mBinding.refreshLayout.autoRefresh()
 
         if (mVideoResourceListItemAdapter == null) {
             mVideoResourceListItemAdapter = VideoResourceListItemAdapter(object : VideoResourceListItemAdapter.VideoResourceListCallback {
@@ -105,27 +96,6 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
 
                 @RequiresApi(Build.VERSION_CODES.N)
                 override fun onDownload(data: StatefulView<RecordFilesInfo.RecordFile>?) {
-//                    var permission = PermissionUtils.permission(android.Manifest.permission.READ_EXTERNAL_STORAGE,
-//                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    permission.callback(object : PermissionUtils.SingleCallback {
-//                        @RequiresApi(Build.VERSION_CODES.N)
-//                        override fun callback(
-//                            isAllGranted: Boolean,
-//                            granted: MutableList<String>,
-//                            deniedForever: MutableList<String>,
-//                            denied: MutableList<String>
-//                        ) {
-//                            if (isAllGranted == true) {
-//                                logd("已同意用户申请权限, ${granted.toString()}")
-//                                showSelectDiskDialog(data)
-//                            } else {
-//                                logd("用户拒绝申请权限, deniedForever: ${deniedForever.toString()}, denied: ${denied.toString()}")
-//                            }
-//                        }
-//                    })
-//                    // 申请权限
-//                    permission.request()
-
                     val video = RecordFilesInfo.RecordFile(data?.obj!!)
                     video.transmissionType = 1
                     // 检测是否有下载缓存
@@ -217,9 +187,6 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                 mBinding.refreshLayout.finishRefresh(!it.hasError)
             }
         }
-//        mVideoManageViewModel.uploadFileNames.observe(viewLifecycleOwner) {
-//            mDownloadService?.uploadFileNames = it
-//        }
     }
 
     // 开启下载服务

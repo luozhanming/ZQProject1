@@ -14,7 +14,8 @@ class VolumePopupWindow(context: Context, val onVolumeChanged: ((Int) -> Unit)? 
     BasePopupWindow(context) {
 
     private var sbVolume: SeekBar? = null
-
+    // 默认最大音量为 5
+    public var mMaxVolume = 5
 
     override fun getWindowOptions(): WindowOptions {
         return WindowOptions(SizeUtils.dp2px(20), SizeUtils.dp2px(160), true)
@@ -43,10 +44,15 @@ class VolumePopupWindow(context: Context, val onVolumeChanged: ((Int) -> Unit)? 
     }
 
     fun setVolume(value: Int) {
-        if (value > 5) {
+        if (value > mMaxVolume) {
             sbVolume?.progress = 0
         }else{
             sbVolume?.progress = value
         }
+    }
+
+    fun setMaxVolume(value: Int) {
+        mMaxVolume = value
+        sbVolume?.max = mMaxVolume
     }
 }

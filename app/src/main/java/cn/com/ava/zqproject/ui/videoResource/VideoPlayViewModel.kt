@@ -27,37 +27,8 @@ class VideoPlayViewModel : BaseViewModel() {
         }
     }
 
-    val masterVolume: MutableLiveData<VolumeChannel> by lazy {
+    val masterVolume: MutableLiveData<Int> by lazy {
         MutableLiveData()
-    }
-
-    fun changeVolume(volume: Int) {
-        mDisposables.add(GeneralManager.setMasterChannelVolume(volume)
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-
-            }, {
-                logPrint2File(it,"VideoPlayViewModel#changeVolume")
-            })
-        )
-    }
-
-    fun getVolumeInfo() {
-        mDisposables.add(GeneralManager.getVolumeChannelInfoV2()
-            .map {
-                it.firstOrNull {
-                    it.channelName == "MASTER"
-                }
-            }
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                if (it !=  null) {
-                    masterVolume.postValue(it)
-                }
-            }, {
-                logPrint2File(it,"VideoPlayViewModel#getVolumeInfo")
-            })
-        )
     }
 
     fun getCurrentTime(time: Int): String {

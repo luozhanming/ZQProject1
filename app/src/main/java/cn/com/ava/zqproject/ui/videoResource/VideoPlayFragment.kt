@@ -1,5 +1,10 @@
 package cn.com.ava.zqproject.ui.videoResource
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioManager
 import android.view.Gravity
 import android.view.Surface
 import android.view.SurfaceHolder
@@ -61,10 +66,45 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
     private var bottomVisibleAnim by autoCleared<Animation>()
 
     private var bottomGoneAnim by autoCleared<Animation>()
+    // 系统音量广播
+    private var mVolumeReceiver: MyVolumeReceiver? = null
+    // 音量控制器
+    private var mAudioManager: AudioManager? = null
+    // 系统最大音量值
+    private var mMaxVolume = 15
+    private var mCurrentVolume = 0
+
+    private var isShowVolume = false
 
     override fun getLayoutId(): Int {
         return R.layout.fragment_video_play
     }
+
+    override fun onResume() {
+        super.onResume()
+        myRegisterReceiver()
+    }
+
+    fun myRegisterReceiver() {
+        logd("注册音量广播")
+        mVolumeReceiver = MyVolumeReceiver(object : MyVolumeReceiver.MyVolumeReceiverCallback {
+            override fun onVolumeChanged(volume: Int) {
+                mCurrentVolume = volume
+                mVolumeWindow?.setMaxVolume(mMaxVolume)
+                mVolumeWindow?.setVolume(mCurrentVolume)
+            }
+        })
+        var filter = IntentFilter()
+        filter.addAction("android.media.VOLUME_CHANGED_ACTION")
+        requireActivity().registerReceiver(mVolumeReceiver, filter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logd("解除注册音量广播")
+        requireActivity().unregisterReceiver(mVolumeReceiver)
+    }
+
     // rtsp://192.168.21.204:554/playback/63613135613863302d73747265616d302dbeabc6b7bfceb3ccc2bcd6c65fc1d6c0cfcaa62d3139323078313038305f33306670735f313230676f705f343039366b6270735f7662725f6176632d3332306b5f3136626974735f73746572656f5f34386b687a5f6161632d32303230313231313134323530345f32303230313231313134323530385f332e6d7034
     override fun initView() {
         super.initView()
@@ -75,15 +115,22 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
         video = Gson().fromJson(arguments?.get("video").toString(), object : TypeToken<RecordFilesInfo.RecordFile>(){}.type)
         logd("视频信息: ${video.toString()}")
 
+        mAudioManager = requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        mMaxVolume = mAudioManager?.getStreamMaxVolume(AudioManager.STREAM_MUSIC)!!
+        mCurrentVolume = mAudioManager?.getStreamVolume(AudioManager.STREAM_MUSIC)!!
+        logd("当前系统音量: $mCurrentVolume")
+
         mBinding.tvFileName.setText(video?.downloadFileName)
         mBinding.tvDuration.setText(video?.duration)
         mBinding.sbProgress.max = video?.rawDuration!!.toInt()
 
         mBinding.ivBack.setOnClickListener {
+            isShowVolume = false
             findNavController().navigateUp()
         }
         // 播放/暂停
         mBinding.btnPlayStop.setOnClickListener {
+            isShowVolume = false
             if (mBinding.sbProgress.progress >= video?.rawDuration!!.toInt()) {
                 mBinding.sbProgress.progress = 0
                 isFinishPlay = false
@@ -97,7 +144,8 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
             }
         }
         mBinding.root.setOnClickListener {
-            if (mVolumeWindow?.isShowing == true) {
+            if (isShowVolume) {
+                isShowVolume = false
                 mVolumeWindow?.dismiss()
                 return@setOnClickListener
             }
@@ -105,11 +153,13 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
         }
         // 音量
         mBinding.btnVolume.setOnClickListener {
-            if (mVolumeWindow?.isShowing == true) {
+            if (isShowVolume) {
+                isShowVolume = false
                 mVolumeWindow?.dismiss()
                 return@setOnClickListener
             }
-            mVideoPlayViewModel.getVolumeInfo()
+            isShowVolume = true
+            mVideoPlayViewModel.masterVolume.value = mCurrentVolume
         }
         // 播放进度
         mBinding.sbProgress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -122,6 +172,7 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
+                isShowVolume = false
                 logd("进度：" + p0?.progress)
                 val duration = p0?.progress!!.toLong() * 1000
                 logd("跳转到：$duration")
@@ -298,10 +349,14 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
 
         mVideoPlayViewModel.masterVolume.observe(viewLifecycleOwner) { volume ->
             mVolumeWindow = mVolumeWindow?: VolumePopupWindow(requireContext()){
-                mVideoPlayViewModel.changeVolume(it)
+//                mVideoPlayViewModel.changeVolume(it)
+                logd("设置的音量: $it")
+                mCurrentVolume = it
+                mAudioManager?.setStreamVolume(AudioManager.STREAM_MUSIC, it, AudioManager.FLAG_SHOW_UI)
             }
-            mVolumeWindow?.setVolume(volume.volumnLevel)
-            val xoff = (mVolumeWindow!!.width - mBinding.btnVolume.width) / 2
+            mVolumeWindow?.setMaxVolume(mMaxVolume)
+            mVolumeWindow?.setVolume(volume)
+            val xoff = (mVolumeWindow!!.width - mBinding.btnVolume.width) / 2 + 5
             mVolumeWindow?.showAsDropDown(
                 mBinding.btnVolume,
                 -xoff,
@@ -324,5 +379,24 @@ class VideoPlayFragment : BaseFragment<FragmentVideoPlayBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    private class MyVolumeReceiver(private val mCallback: MyVolumeReceiverCallback? = null) : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action.equals("android.media.VOLUME_CHANGED_ACTION")) {
+                val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+                val currVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+                mCallback.let {
+                    it?.onVolumeChanged(currVolume)
+                }
+//                ToastUtils.showLong("当前音量: $currVolume")
+//                logd("当前音量: $currVolume")
+            }
+        }
+
+        interface MyVolumeReceiverCallback {
+            fun onVolumeChanged(volume: Int)
+        }
     }
 }
