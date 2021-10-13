@@ -158,6 +158,24 @@ object ZQManager {
     }
 
     /**
+     * 移除角色
+     * */
+    fun deleteMeetingMember(username:String):Observable<Boolean>{
+        return Observable.create<Boolean> { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        DeleteUserMemberControl(username,
+                            onResult = { result -> it.resumeWith(Result.success(result)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(result)
+            }
+        }
+    }
+
+    /**
      * 加载会议信息
      * */
     fun loadMeetingInfo():Observable<MeetingInfoZQ>{

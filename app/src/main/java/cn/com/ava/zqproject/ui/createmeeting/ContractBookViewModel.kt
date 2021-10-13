@@ -69,9 +69,11 @@ class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoad
                 curPage = it.query.pageIndex
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
                 it.data.forEach {
-                    val stateful = StatefulView(it)
-                    stateful.isSelected = mSelectedUsers.contains(it)
-                    statefuls.add(stateful)
+                    if(it.userName!=PlatformApi.getPlatformLogin()?.name){
+                        val stateful = StatefulView(it)
+                        stateful.isSelected = mSelectedUsers.contains(it)
+                        statefuls.add(stateful)
+                    }
                 }
                 statefuls
             }
@@ -108,9 +110,11 @@ class ContractBookViewModel : BaseViewModel(), CanRefresh, SelectedUser ,CanLoad
             .map {
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
                 it.data.forEach {
-                    val stateful = StatefulView(it)
-                    stateful.isSelected = mSelectedUsers.contains(it)
-                    statefuls.add(stateful)
+                    if(it.userName!=PlatformApi.getPlatformLogin()?.name) {
+                        val stateful = StatefulView(it)
+                        stateful.isSelected = mSelectedUsers.contains(it)
+                        statefuls.add(stateful)
+                    }
                 }
                 statefuls
             }

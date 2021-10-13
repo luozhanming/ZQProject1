@@ -8,9 +8,7 @@ import cn.com.ava.lubosdk.Cache
 import cn.com.ava.lubosdk.entity.VolumeChannel
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.zqproject.vo.CamPreviewInfo
-import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class VolumeSceneViewModel : BaseViewModel() {
 
@@ -18,25 +16,25 @@ class VolumeSceneViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
-    val volumeChannels:MutableLiveData<List<VolumeChannel>> by lazy {
+    val volumeChannels: MutableLiveData<List<VolumeChannel>> by lazy {
         MutableLiveData()
     }
 
-    val tabIndex:MutableLiveData<Int> by lazy {
+    val tabIndex: MutableLiveData<Int> by lazy {
         MutableLiveData()
     }
 
     /**
      * 是否有Mic3
      * */
-    val isVolumein5Visible:MediatorLiveData<Boolean> by lazy {
+    val isVolumein5Visible: MediatorLiveData<Boolean> by lazy {
         MediatorLiveData<Boolean>().apply {
-            addSource(volumeChannels){
-                if(it.size<6){
+            addSource(volumeChannels) {
+                if (it.size < 6) {
                     postValue(false)
-                }else{
-                    val hasMic3 = it[5].channelName.isNotEmpty()
-                    postValue(hasMic3&&tabIndex.value==1)
+                } else {
+                    val hasMic3 = !it[5].channelName.isNullOrEmpty()
+                    postValue(hasMic3 && tabIndex.value == 1)
                 }
             }
 
@@ -44,50 +42,53 @@ class VolumeSceneViewModel : BaseViewModel() {
     }
 
 
-
     fun loadCamPreviewInfo() {
         mDisposables.add(
-                    InteracManager.getSceneStream(true).map {
-                        val windows = Cache.getCache().windowsCache
-                        val cams = windows.filter {
-                            it.isPtz
-                        }
-                        val curOutput = it.firstOrNull { it.isMainOutput }
-                        cams.forEach {
-                            it.isCurrentOutput = it.index==curOutput?.windowIndex?:-1
-                        }
-                        val info = CamPreviewInfo(
-                            if (windows.size <= 6) 1 else 2,
-                            if (windows.size <= 6) windows.size else 5,
-                            cams.size,
-                            cams,
-                            curOutput?.windowIndex ?: -1
-                        )
-                        info
-                    }.subscribeOn(Schedulers.io())
+            InteracManager.getSceneStream(true).map {
+                val windows = Cache.getCache().windowsCache
+                val cams = windows.filter {
+                    it.isPtz
+                }
+                val curOutput = it.firstOrNull { it.isMainOutput }
+                cams.forEach {
+                    it.isCurrentOutput = it.index == curOutput?.windowIndex ?: -1
+                }
+                val info = CamPreviewInfo(
+                    if (windows.size <= 6) 1 else 2,
+                    if (windows.size <= 6) windows.size else 5,
+                    cams.size,
+                    cams,
+                    curOutput?.windowIndex ?: -1
+                )
+                info
+            }.subscribeOn(Schedulers.io())
 
-           .subscribe({
-            camPreviewInfo.postValue(it)
-        }, {
-            logPrint2File(it)
-        }))
+                .subscribe({
+                    if (it.curOutputIndex < 0 || it.curOutputIndex > it.camCount)
+                        it.curOutputIndex = 0
+                    camPreviewInfo.postValue(it)
+                }, {
+                    logPrint2File(it)
+                })
+        )
     }
 
-    fun loadVolumeChannels(){
+    fun loadVolumeChannels() {
         mDisposables.add(
             InteracManager.getInteracVolumeChannels()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     val filter = mutableListOf<VolumeChannel>()
-                    val array = arrayOf("MASTER","LINEIN1","LINEIN2","MICIN1","MICIN2","MICIN3")
-                    filter.addAll( it.filter {
+                    val array =
+                        arrayOf("MASTER", "LINEIN1", "LINEIN2", "MICIN1", "MICIN2", "MICIN3")
+                    filter.addAll(it.filter {
                         it.channelName in array
                     })
-                    if(filter.size<6){   //没有MICIN3
+                    if (filter.size < 6) {   //没有MICIN3
                         filter.add(VolumeChannel())
                     }
                     volumeChannels.postValue(filter)
-                },{
+                }, {
                     logPrint2File(it)
                 })
         )
@@ -95,11 +96,11 @@ class VolumeSceneViewModel : BaseViewModel() {
 
     fun setAudioLevel(channelName: String, level: Int) {
         mDisposables.add(
-            InteracManager.setInteracVolumeChannels(channelName,level)
+            InteracManager.setInteracVolumeChannels(channelName, level)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     loadVolumeChannels()
-                },{
+                }, {
                     logPrint2File(it)
                 })
         )
@@ -111,7 +112,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     loadCamPreviewInfo()
-                },{
+                }, {
                     logPrint2File(it)
                 })
         )

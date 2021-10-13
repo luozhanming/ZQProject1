@@ -54,6 +54,9 @@ class LoginViewModel : ViewModel() {
     fun onLoginResult(result: String) {
         //登录结果，登录后刷新一下token
         logd("${result}")
+        if(result=="false"){
+            return
+        }
         val type = object : TypeToken<PlatformResponse<PlatformLogin>>() {}.type
         val response = GsonUtil.fromJson<PlatformResponse<PlatformLogin>>(result, type)
         logd(response.toString())

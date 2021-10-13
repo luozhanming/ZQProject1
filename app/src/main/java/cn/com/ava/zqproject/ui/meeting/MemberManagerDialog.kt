@@ -100,7 +100,12 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
             mMemberManagerViewModel.removeAllMemberToWaiting()
         }
         mBinding.btnAllSilent.setOnClickListener {
-            mMemberManagerViewModel.silentAllMembers()
+            if(mMemberManagerViewModel.isAllSilent.value==false){
+                mMemberManagerViewModel.silentAllMembers()
+            }else{
+                mMemberManagerViewModel.cancelAllSilent()
+            }
+
         }
         mBinding.ivClose.setOnClickListener {
             dismiss()

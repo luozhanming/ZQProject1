@@ -143,6 +143,11 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 }
             }
         }
+        mMasterViewModel.meetingInfoZq.observe(viewLifecycleOwner){
+            mMemberManagerViewModel.setWaitingEnable(it.waitingRoomEnable)
+        }
+
+
         mMasterViewModel.computerSourceList.observe(viewLifecycleOwner) {
             mComputerSourceWindow =
                 mComputerSourceWindow ?: ComputerSourcePopupWindow(requireContext())
@@ -240,7 +245,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             mExitMeetingDialog = ConfirmDialog(getString(R.string.tip_confirm_exit_meeting), true, {
                 mMasterViewModel.overMeeting()
                 it?.dismiss()
-            })
+            },isDangerous = true)
             if (mExitMeetingDialog?.isAdded == false) {
                 mExitMeetingDialog?.show(childFragmentManager, "exit_meeting")
             }

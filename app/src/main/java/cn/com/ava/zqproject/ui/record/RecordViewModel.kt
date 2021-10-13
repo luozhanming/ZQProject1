@@ -108,13 +108,15 @@ class RecordViewModel : BaseViewModel() {
         isRecording.removeSource(recordInfo)
     }
 
+
+
     fun toggleRecord() {
         val curState = recordInfo.value?.recordState ?: Constant.RECORD_STOP
         var nextState = when (curState) {
             Constant.RECORD_STOP -> Constant.RECORD_RECORDING
             else -> Constant.RECORD_STOP
         }
-        mDisposables.add(
+
             RecordManager.controlRecord(nextState)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -122,11 +124,13 @@ class RecordViewModel : BaseViewModel() {
                 }, {
                     logPrint2File(it,"RecordViewModel#toggleRecord")
                 })
-        )
+
     }
 
+
+
     fun toggleLive() {
-        mDisposables.add(
+
             RecordManager.controlLiving(recordInfo.value?.isLiving?.not() ?: false)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
@@ -134,7 +138,7 @@ class RecordViewModel : BaseViewModel() {
                 }, {
                     logPrint2File(it,"RecordViewModel#toggleLive")
                 })
-        )
+
     }
 
     fun togglePause() {
@@ -213,7 +217,7 @@ class RecordViewModel : BaseViewModel() {
         mDisposables.add(InteracManager.setRecordVolumeChannels("MASTER",volume)
             .subscribeOn(Schedulers.io())
             .subscribe({
-
+                getVolumeInfo()
             },{
                 logPrint2File(it,"RecordViewModel#changeVolume")
             }))

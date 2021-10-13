@@ -250,7 +250,7 @@ class MasterViewModel : BaseViewModel() {
 
     /**
      * 会议时间
-     * */
+     **/
     val meetingTime: MutableLiveData<String> by lazy {
         MutableLiveData()
     }
@@ -522,8 +522,8 @@ class MasterViewModel : BaseViewModel() {
                             computerIndex,
                             computerWindow.isHasMultiSource,
                             computerWindow.curSourceIndex,
-                            computerWindow.sources,
-                            computerWindow.sourcesCmd
+                            computerWindow.sources?: emptyList(),
+                            computerWindow.sourcesCmd?: emptyList()
                         )
                         return@map computerSource
                     } else {
@@ -651,8 +651,9 @@ class MasterViewModel : BaseViewModel() {
                     if (!TextUtils.isEmpty(confStartTime)) {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
-                        val diff = now - begin - 30458 * 1000
-                        val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
+                        val diff = now - begin
+
+                        val toDateString = DateUtil.toHourString(diff)
                         meetingTime.postValue(toDateString)
                     }
                 }
@@ -729,7 +730,6 @@ class MasterViewModel : BaseViewModel() {
 //                                return@flatMap Observable.just(it1)
 //                            }
 //                        }
-//
 //                }
                 .subscribeOn(Schedulers.io())
                 .subscribe({

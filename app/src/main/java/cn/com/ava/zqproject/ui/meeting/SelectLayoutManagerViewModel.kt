@@ -153,10 +153,13 @@ class SelectLayoutManagerViewModel : BaseViewModel() {
     fun getInteracMemberInfo() {
         layoutSignals
         unSelectSignals
-        mDisposables.add(InteracManager.getInteracInfo()
+        mDisposables.add(ZQManager.loadMeetingMember()
             .map {
-                it.onlineList.filter {
-                    it.onlineState == 1
+                it.datas
+            }
+            .map {
+                it.filter {
+                    it.onlineState == 1&&it.role!="3"
                 }
             }
             .subscribeOn(Schedulers.io())

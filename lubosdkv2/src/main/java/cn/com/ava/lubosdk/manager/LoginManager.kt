@@ -105,17 +105,19 @@ object LoginManager {
                     )
                 }
                 Log.d(TAG, "loginEx: getLogin ${login.toString()}")
-                val luboInfo = suspendCoroutine<LuBoInfo> {
-                    AVAHttpEngine.addQueryCommand(LuboInfoQuery(
-                        onResult = {queryResult ->
-                            it.resumeWith(Result.success(queryResult as LuBoInfo))
-                        }, onError = {throwable ->
-                            it.resumeWithException(throwable)
-                        }
-                    ))
+                if(login.isLoginSuccess&&!login.isSleep){
+                    val luboInfo = suspendCoroutine<LuBoInfo> {
+                        AVAHttpEngine.addQueryCommand(LuboInfoQuery(
+                            onResult = {queryResult ->
+                                it.resumeWith(Result.success(queryResult as LuBoInfo))
+                            }, onError = {throwable ->
+                                it.resumeWithException(throwable)
+                            }
+                        ))
+                    }
+                    mLogin = login
+                    mLogin?.rserverInfo = luboInfo.stun
                 }
-                mLogin = login
-                mLogin?.rserverInfo = luboInfo.stun
                 emitter.onNext(mLogin?:login)
 
             }

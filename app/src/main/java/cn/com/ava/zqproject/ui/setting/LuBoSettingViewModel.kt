@@ -121,6 +121,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                     Utils.getApp().getString(R.string.toast_input_correct_lubo_info)
                 )
             )
+            return
         }
         val platformAddr: String =
             CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")

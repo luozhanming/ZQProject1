@@ -6,6 +6,7 @@ import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentJoinMeetingBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
+import com.blankj.utilcode.util.ToastUtils
 
 class JoinMeetingFragment:BaseLoadingFragment<FragmentJoinMeetingBinding>() {
 
@@ -33,7 +34,12 @@ class JoinMeetingFragment:BaseLoadingFragment<FragmentJoinMeetingBinding>() {
 
     override fun observeVM() {
         mJoinMeetingViewModel.goListener.observeOne(viewLifecycleOwner){
-            findNavController().navigate(R.id.action_joinMeetingFragment_to_listenerFragment)
+            if(it){
+                findNavController().navigate(R.id.action_joinMeetingFragment_to_listenerFragment)
+            }else{
+                ToastUtils.showShort(getString(R.string.join_failed))
+            }
+
         }
         mJoinMeetingViewModel.isLoading.observeOne(viewLifecycleOwner){
             if(it)showLoading()

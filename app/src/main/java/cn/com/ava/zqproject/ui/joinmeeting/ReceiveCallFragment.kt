@@ -30,6 +30,7 @@ class ReceiveCallFragment : BaseLoadingFragment<FragmentReceiveCallingBinding>()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mReceiveCallViewModel.invitationInfo.value = mInvitationInfo
+        mReceiveCallViewModel.startFinishCountDown()
     }
 
     override fun bindListener() {
@@ -52,6 +53,9 @@ class ReceiveCallFragment : BaseLoadingFragment<FragmentReceiveCallingBinding>()
             if(it)showLoading() else hideLoading()
         }
         mReceiveCallViewModel.joinSuccess.observeOne(viewLifecycleOwner){
+            findNavController().popBackStack()
+        }
+        mReceiveCallViewModel.finishCall.observeOne(viewLifecycleOwner){
             findNavController().popBackStack()
         }
     }

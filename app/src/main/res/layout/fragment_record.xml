@@ -342,8 +342,9 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
-                    android:src="@mipmap/ic_volume"
-                    app:tint="@drawable/selector_color_1" />
+                    android:selected="@{recordViewModel.masterVolume.silent||recordViewModel.masterVolume.volumnLevel==0}"
+                    android:src="@drawable/ic_volume"
+                     />
 
                 <TextView
                     android:layout_width="wrap_content"

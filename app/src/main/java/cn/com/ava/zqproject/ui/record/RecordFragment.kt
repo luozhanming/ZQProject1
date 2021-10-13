@@ -14,6 +14,7 @@ import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.listener.SimpleAnimationListener
 import cn.com.ava.common.util.SizeUtils
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.Constant
 import cn.com.ava.player.IjkVideoPlayer
 import cn.com.ava.player.PlayerCallback
 import cn.com.ava.zqproject.R
@@ -22,6 +23,7 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.databinding.FragmentRecordBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.MainViewModel
+import cn.com.ava.zqproject.ui.common.ConfirmDialog
 
 /**
  * 录课界面
@@ -106,6 +108,18 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
 
         }
         mBinding.llVolume.setOnClickListener {
+
+            mVolumeWindow = mVolumeWindow?: VolumePopupWindow(requireContext()){
+                mRecordViewModel.changeVolume(it)
+            }
+
+            val xoff = (mVolumeWindow!!.width - mBinding.llVolume.width) / 2
+            mVolumeWindow?.showAsDropDown(
+                mBinding.llVolume,
+                -xoff,
+                -SizeUtils.dp2px(26),
+                Gravity.TOP
+            )
             mRecordViewModel.getVolumeInfo()
         }
         mBinding.ivRecordInfo.setOnClickListener {
@@ -115,7 +129,22 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
             }
         }
         mBinding.ivBack.setOnClickListener {
-            findNavController().popBackStack()
+            val recordInfo = mRecordViewModel.recordInfo.value
+            if(recordInfo?.isLiving==true||recordInfo?.recordState!=Constant.RECORD_STOP){
+                val dialog = ConfirmDialog(getString(R.string.tip_cancel_record_or_live),true,{
+                    if(recordInfo?.recordState!=Constant.RECORD_STOP){
+                        mRecordViewModel.toggleRecord()
+                    }
+                    if(recordInfo?.isLiving==true){
+                        mRecordViewModel.toggleLive()
+                    }
+                    findNavController().popBackStack()
+                },isDangerous = true)
+                dialog.show(childFragmentManager,"dialog_exit")
+            }else{
+                findNavController().popBackStack()
+            }
+
         }
         mBinding.rootView.setOnClickListener {
             //如果有弹出菜单，不隐藏
@@ -133,6 +162,7 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
 
 
         mRecordViewModel.startLoadRecordInfo()
+        mRecordViewModel.getVolumeInfo()
 
     }
 
@@ -234,17 +264,7 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
             }
         }
         mRecordViewModel.masterVolume.observe(viewLifecycleOwner){volume->
-            mVolumeWindow = mVolumeWindow?: VolumePopupWindow(requireContext()){
-                mRecordViewModel.changeVolume(it)
-            }
             mVolumeWindow?.setVolume(volume.volumnLevel)
-            val xoff = (mVolumeWindow!!.width - mBinding.llVolume.width) / 2
-            mVolumeWindow?.showAsDropDown(
-                mBinding.llVolume,
-                -xoff,
-                -SizeUtils.dp2px(26),
-                Gravity.TOP
-            )
         }
 
     }

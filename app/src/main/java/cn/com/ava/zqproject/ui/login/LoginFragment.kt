@@ -15,6 +15,7 @@ import cn.com.ava.zqproject.databinding.FragmentLoginBinding
 import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
+import com.blankj.utilcode.util.AppUtils
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
@@ -61,6 +62,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
             val power = PowerDialog()
             power.show(childFragmentManager,"power")
         }
+        mBinding.tvAppVersion.text = "版本号：${AppUtils.getAppVersionName()}"
 
     }
 

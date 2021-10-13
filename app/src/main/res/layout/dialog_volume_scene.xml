@@ -444,15 +444,15 @@
             android:id="@+id/tabLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="140dp"
+            android:layout_marginLeft="135dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="140dp"
+            android:layout_marginRight="135dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tabIndicatorColor="@color/color_318EF8"
             app:tabIndicatorFullWidth="false"
-            app:tabMode="fixed" />
+             />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

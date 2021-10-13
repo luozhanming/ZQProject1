@@ -71,9 +71,11 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
             .map {
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
                 it.data.forEach {
-                    val stateful = StatefulView(it)
-                    stateful.isSelected = selectedUser.value?.contains(it)?:false
-                    statefuls.add(stateful)
+                    if(it.userName!=PlatformApi.getPlatformLogin()?.name){
+                        val stateful = StatefulView(it)
+                        stateful.isSelected = selectedUser.value?.contains(it)?:false
+                        statefuls.add(stateful)
+                    }
                 }
                 statefuls
             }
@@ -126,9 +128,11 @@ class CreateGroupViewModel : BaseViewModel() , CanRefresh, CanLoadMore {
                 curPage = it.query.pageIndex
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()
                 it.data.forEach {
-                    val stateful = StatefulView(it)
-                    stateful.isSelected = selectedUser.value?.contains(it)?:false
-                    statefuls.add(stateful)
+                    if(it.userName!=PlatformApi.getPlatformLogin()?.name) {
+                        val stateful = StatefulView(it)
+                        stateful.isSelected = selectedUser.value?.contains(it) ?: false
+                        statefuls.add(stateful)
+                    }
                 }
                 statefuls
             }

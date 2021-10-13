@@ -10,5 +10,5 @@ data class CamPreviewInfo(
     val column: Int,/*预览列数*/
     val camCount: Int,/*摄像头个数*/
     val previewWindow: List<PreviewVideoWindow>,/*摄像头实体*/
-    val curOutputIndex:Int/*当前输出*/
+    var curOutputIndex:Int/*当前输出*/
 )

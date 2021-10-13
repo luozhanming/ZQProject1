@@ -52,6 +52,8 @@ class ListenerViewModel : BaseViewModel() {
 
     private var mLoopMeetingInfoZQDisposable: Disposable? = null
 
+    private var mLoopMeetingMemberInfoDisposable:Disposable?=null
+
     private var mTimeCountDisposable: Disposable? = null
 
     private var mLoopMeetingStateZQDisposable:Disposable? = null
@@ -146,6 +148,11 @@ class ListenerViewModel : BaseViewModel() {
      * 会议时间
      * */
     val meetingTime: MutableLiveData<String> by lazy {
+        MutableLiveData()
+    }
+
+
+    val isInWaittingRoom:MutableLiveData<Boolean> by lazy {
         MutableLiveData()
     }
 
@@ -286,17 +293,21 @@ class ListenerViewModel : BaseViewModel() {
         mLoopCurSceneSources = null
         mLoopMeetingInfoZQDisposable?.dispose()
         mLoopMeetingInfoZQDisposable = null
+        mLoopMeetingMemberInfoDisposable?.dispose()
+        mLoopMeetingMemberInfoDisposable = null
     }
 
     fun loadMeetingMember() {
-        mDisposables.add(ZQManager.loadMeetingMember()
-            .subscribeOn(Schedulers.io())
+        mLoopMeetingMemberInfoDisposable = Observable.interval(0,1500,TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingMember()
+            }.subscribeOn(Schedulers.io())
             .subscribe({
                 meetingMembers.postValue(it.datas)
+                isInWaittingRoom.postValue(it.localRole==3)
             }, {
                 logPrint2File(it,"ListenerViewModel#loadMeetingMember")
             })
-        )
     }
 
 
@@ -311,8 +322,8 @@ class ListenerViewModel : BaseViewModel() {
                     if (!TextUtils.isEmpty(confStartTime)) {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
-                        val diff = now - begin - 30458 * 1000
-                        val toDateString = DateUtil.toDateString(diff, "HH:mm:ss")
+                        val diff = now - begin
+                        val toDateString = DateUtil.toHourString(diff)
                         meetingTime.postValue(toDateString)
                     }
                 }

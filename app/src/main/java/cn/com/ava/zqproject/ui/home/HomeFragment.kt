@@ -7,9 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.Gravity
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import cn.com.ava.base.ui.BaseFragment
@@ -20,12 +18,9 @@ import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.RecordUploadManager
 import cn.com.ava.zqproject.databinding.FragmentHomeBinding
-import cn.com.ava.zqproject.ui.LuBoShareViewModel
-import cn.com.ava.zqproject.ui.MainViewModel
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
-import cn.com.ava.zqproject.ui.meeting.MemberManagerDialog
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 
@@ -46,7 +41,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun initView() {
         initData()
         mBinding.btnCreateMeeting.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_createMeetingFragment)
+            mHomeViewModel.requestCanCreateMeeting(0)
+            //     findNavController().navigate(R.id.action_homeFragment_to_createMeetingFragment)
         }
         mBinding.btnRecord.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_recordFragment)
@@ -56,8 +52,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 //            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
         mBinding.btnJoinMeeting.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
-
+            mHomeViewModel.requestCanCreateMeeting(1)
         }
 
         mBinding.ivSetting.setOnClickListener {
@@ -75,17 +70,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         val dialog = ConfirmDialog(getString(R.string.confirm_logout), true, {
                             it?.dismiss()
                             mHomeViewModel.logout()
-                            findNavController().navigate(R.id.action_back_to_login,null, navOptions {
-                                popUpTo( R.id.homeFragment){
-                                    inclusive = true
-                                }
-                            })
+                            findNavController().navigate(
+                                R.id.action_back_to_login,
+                                null,
+                                navOptions {
+                                    popUpTo(R.id.homeFragment) {
+                                        inclusive = true
+                                    }
+                                })
                         })
-                        dialog.show(childFragmentManager,"confirm")
+                        dialog.show(childFragmentManager, "confirm")
                     }
                 }
             }
-            popupMenu.showAtLocation(mBinding.ivSetting,Gravity.RIGHT or Gravity.TOP,-SizeUtils.dp2px(32),SizeUtils.dp2px(60))
+            popupMenu.showAtLocation(
+                mBinding.ivSetting,
+                Gravity.RIGHT or Gravity.TOP,
+                -SizeUtils.dp2px(32),
+                SizeUtils.dp2px(60)
+            )
         }
         //预加载相关
         mHomeViewModel.preloadWindowAndLayout()
@@ -106,7 +109,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mHomeViewModel.startLoopMeetingInvitation()
         RecordUploadManager.startUpload {
             it.forEach {
-                mDownloadBinder?.service?.uploadVideo(it,"")
+                mDownloadBinder?.service?.uploadVideo(it, "")
             }
         }
     }
@@ -122,7 +125,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mHomeViewModel.startHeartBeat()
-        mServiceConnection = mServiceConnection?:object :ServiceConnection{
+        mServiceConnection = mServiceConnection ?: object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 mDownloadBinder = service as? DownloadService.DownloadBinder
             }
@@ -133,8 +136,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         }
         requireContext().bindService(
-            Intent(requireContext(),DownloadService::class.java),mServiceConnection,
-            Service.BIND_AUTO_CREATE)
+            Intent(requireContext(), DownloadService::class.java), mServiceConnection,
+            Service.BIND_AUTO_CREATE
+        )
     }
 
 
@@ -155,8 +159,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         val goSetting = { it: Boolean ->
             //退出登录
             LoginManager.logout()
-            findNavController().navigate(R.id.action_back_to_lubo_setting,null, navOptions {
-                popUpTo(R.id.homeFragment){
+            findNavController().navigate(R.id.action_back_to_lubo_setting, null, navOptions {
+                popUpTo(R.id.homeFragment) {
                     inclusive = true
                 }
             })
@@ -165,22 +169,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mPowerViewModel.sleepMachine.observe(viewLifecycleOwner, goSetting)
         mPowerViewModel.turnoffMachine.observe(viewLifecycleOwner, goSetting)
 
-        mHomeViewModel.meetingInfoZq.observeOne(viewLifecycleOwner){
-            if("created"==it.confStatus){
-                if("cloudCtrlMode"==it.confMode){
+        mHomeViewModel.meetingInfoZq.observeOne(viewLifecycleOwner) {
+            if ("created" == it.confStatus) {
+                if ("cloudCtrlMode" == it.confMode) {
                     findNavController().navigate(R.id.action_homeFragment_to_masterFragment)
-                }else if("classMode"==it.confMode){
+                } else if ("classMode" == it.confMode) {
                     findNavController().navigate(R.id.action_homeFragment_to_listenerFragment)
                 }
             }
         }
-        mHomeViewModel.invitationInfo.observeOne(viewLifecycleOwner){
+        mHomeViewModel.invitationInfo.observeOne(viewLifecycleOwner) {
             val args = Bundle()
-            args.putSerializable("invitationInfo",it)
-            findNavController().navigate(R.id.action_homeFragment_to_receiveCallFragment,args)
+            args.putSerializable("invitationInfo", it)
+            findNavController().navigate(R.id.action_homeFragment_to_receiveCallFragment, args)
         }
-        mHomeViewModel.backToLogin.observeOne(viewLifecycleOwner){
+        mHomeViewModel.backToLogin.observeOne(viewLifecycleOwner) {
             findNavController().navigate(R.id.action_back_to_login)
+        }
+        mHomeViewModel.goCreateMeeting.observeOne(viewLifecycleOwner) {
+            findNavController().navigate(R.id.action_homeFragment_to_createMeetingFragment)
+        }
+        mHomeViewModel.goJoinMeeting.observeOne(viewLifecycleOwner){
+            findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
     }
 

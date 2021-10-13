@@ -8,7 +8,9 @@ import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.InvitationInfo
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class ReceiveCallViewModel:BaseViewModel() {
 
@@ -49,6 +51,10 @@ class ReceiveCallViewModel:BaseViewModel() {
         OneTimeLiveData()
     }
 
+    val finishCall:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
 
     /**
      * 我的入会昵称
@@ -82,5 +88,15 @@ class ReceiveCallViewModel:BaseViewModel() {
                 }))
         }
 
+    }
+
+    fun startFinishCountDown() {
+        mDisposables.add(Observable.timer(3,TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                finishCall.postValue(OneTimeEvent(true))
+            },{
+                logPrint2File(it,"ReceiveCallViewModel#startFinishCountDown")
+            }))
     }
 }

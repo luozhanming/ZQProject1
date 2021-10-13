@@ -9,8 +9,10 @@ import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.manager.GeneralManager
+import cn.com.ava.lubosdk.manager.RecordManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
@@ -68,6 +70,15 @@ class HomeViewModel : BaseViewModel() {
         OneTimeLiveData()
     }
 
+
+    val goCreateMeeting:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
+    val goJoinMeeting:OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
+
     private var mLoadLuboInfoDisposable: Disposable? = null
     private var mSendHeartBeatDisposable: Disposable? = null
     private var mLoopMeetingInfoZQDisposable: Disposable? = null
@@ -76,11 +87,12 @@ class HomeViewModel : BaseViewModel() {
 
     fun startloadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
-        mLoadLuboInfoDisposable = Observable.interval(5, TimeUnit.SECONDS)
+        mLoadLuboInfoDisposable = Observable.interval(0,5, TimeUnit.SECONDS)
             .flatMap {
                 GeneralManager.getLuboInfo()
-                    .retryWhen(RetryFunction(Int.MAX_VALUE))
-            }.subscribe({
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
                 luboInfo.postValue(it)
             }, {
                 logPrint2File(it,"HomeViewModel#startloadLuboInfo")
@@ -98,9 +110,9 @@ class HomeViewModel : BaseViewModel() {
         mLoopMeetingInvitationDisposable = Observable.interval(5000, TimeUnit.MILLISECONDS)
             .flatMap {
                 PlatformApi.getService().queryCalledMeeting()
-            }.subscribeOn(Schedulers.io())
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
             .subscribe({
-                //TODO 没响应
                 if (it.success) {
                     //振铃了，立刻到振铃界面
                     if (it.data.isNotEmpty()) {
@@ -123,11 +135,11 @@ class HomeViewModel : BaseViewModel() {
      * */
     fun startHeartBeat() {
         mSendHeartBeatDisposable?.dispose()
-        mSendHeartBeatDisposable = Observable.interval(0, 20, TimeUnit.SECONDS)
+        mSendHeartBeatDisposable = Observable.interval(3, 20, TimeUnit.SECONDS)
             .flatMap {
                 PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr ?: "")
                     .compose(PlatformApi.applySchedulers())
-            }
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
                 it.toString()
             }, {
@@ -192,11 +204,11 @@ class HomeViewModel : BaseViewModel() {
      * */
     fun loopRefreshToken() {
         mDisposables.add(
-            Observable.interval(0, 2, TimeUnit.MINUTES)
+            Observable.interval(0, 1, TimeUnit.MINUTES)
                 .flatMap {
                     PlatformApi.getService().refreshToken()
                         .compose(PlatformApi.applySchedulers())
-                }
+                }.retryWhen(RetryFunction(Int.MAX_VALUE))
                 .subscribe({
                     PlatformApi.refreshLoginToken(it.data)
                     logd(it.toString())
@@ -237,6 +249,27 @@ class HomeViewModel : BaseViewModel() {
     fun stopLoopMeetingInfoZQ() {
         mLoopMeetingInfoZQDisposable?.dispose()
 
+    }
+
+    /**
+     * 请求是否能去互动   0创建会议  1加入会议
+     * */
+    fun requestCanCreateMeeting(createOrJoin:Int) {
+        mDisposables.add(RecordManager.getRecordInfo()
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if(it.isLiving||it.recordState!=Constant.RECORD_STOP){
+                    ToastUtils.showShort(getResources().getString(R.string.toast_cannot_go_create_meeting))
+                }else{
+                    if(createOrJoin==0){
+                        goCreateMeeting.postValue(OneTimeEvent(true))
+                    }else{
+                        goJoinMeeting.postValue(OneTimeEvent(true))
+                    }
+                }
+            },{
+                logPrint2File(it,"HomeViewModel#requestCanCreateMeeting")
+            }))
     }
 
 

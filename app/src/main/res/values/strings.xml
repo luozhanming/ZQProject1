@@ -116,7 +116,7 @@
     <string name="custom_layout_format">自定义布局%d</string>
     <string name="preset_position_format">预置位%d</string>
     <string name="toast_max_button_add">当前最大添加按钮为9个</string>
-    <string name="preset_video_format">摄像头%d预置位%d</string>
+    <string name="preset_video_format">%s预置位%d</string>
     <string name="reset">重置</string>
 
     <string name="computer_scene">电脑画面</string>
@@ -129,6 +129,9 @@
     <string name="reload_machine">重启</string>
     <string name="success">成功</string>
     <string name="failed">失败</string>
+    <string name="listener_in_waiting">等候室等候中......</string>
+    <string name="toast_cannot_go_create_meeting">正在录制或直播，无法进行会议</string>
+    <string name="tip_cancel_record_or_live">确认停止当前录制或直播？</string>
 
 
     <string name="machine_info">设备信息</string>
@@ -178,12 +181,14 @@
     <string name="lock_meeting">锁定会议</string>
     <string name="unlock_meeting">解除锁定</string>
     <string name="all_silent">全体静音</string>
+    <string name="cancel_all_silent">解除静音</string>
     <string name="all_accept">全部准入</string>
     <string name="has_enter">已入会</string>
     <string name="waitingroom">等候室</string>
     <string name="accept_enter">准入</string>
     <string name="no_signal">无信号</string>
     <string name="exit_speak_mode">退出发言模式</string>
+    <string name="join_failed">加入失败</string>
 
     <string name="set_meeting_layout_failed">切换布局失败</string>
 

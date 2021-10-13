@@ -39,6 +39,7 @@ class RecordInfoViewModel : BaseViewModel() {
                 value =
                     "${info.recordParams.width}*${info.recordParams.height}@${info.recordParams.gop},${info.recordParams.bps}Kbps"
             }
+            value = ""
         }
     }
 
@@ -50,8 +51,9 @@ class RecordInfoViewModel : BaseViewModel() {
         MediatorLiveData<String>().apply {
             addSource(machineInfo) { info ->
                 value = String.format(Utils.getApp().getString(R.string.file_space),
-                "${info.remainSpace.nowSize}/${info.remainSpace.totalSize}")
+                "${info.remainSpace.freeSize}/${info.remainSpace.totalSize}")
             }
+            value = ""
         }
     }
 

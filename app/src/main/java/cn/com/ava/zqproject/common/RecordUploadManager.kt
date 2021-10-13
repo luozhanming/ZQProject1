@@ -27,6 +27,8 @@ object RecordUploadManager {
     }
 
     private var uploadDisposable: Disposable? = null
+    //完成添加的录制文件个数
+    private var completeDisposableCount = 0
 
 
     /**
@@ -34,6 +36,7 @@ object RecordUploadManager {
      * */
     fun addLatestUpload() {
         val disposable = Observable.timer(20, TimeUnit.SECONDS)
+
             .flatMap {
                 VideoResourceManager.getRecordFileList()
                     .map {
@@ -52,13 +55,12 @@ object RecordUploadManager {
                     }
                     .subscribeOn(Schedulers.io())
             }.subscribe({
+                completeDisposableCount++
                 it?.apply {
                     prepareUploadRecordFile.add(this)
                 }
             }, {
                 logPrint2File(it)
-            },{
-
             })
         disposables.add(disposable)
     }
@@ -70,6 +72,7 @@ object RecordUploadManager {
         }
         prepareUploadRecordFile.clear()
         disposables.clear()
+        completeDisposableCount = 0
         uploadDisposable = null
     }
 
@@ -80,7 +83,7 @@ object RecordUploadManager {
         if(disposables.isEmpty())return
         uploadDisposable =
             Observable.create<Boolean> {
-                while (disposables.isNotEmpty() && disposables.all { !it.isDisposed }) {
+                while (disposables.isNotEmpty() && completeDisposableCount< disposables.size) {
                     Thread.sleep(100)
                 }
                 it.onNext(true)

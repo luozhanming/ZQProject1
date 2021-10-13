@@ -119,6 +119,7 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
         mBinding.rvSelectWhatPatrol.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         mAutoPatrolMemberAdapter = AutoPatrolMemberAdapter()
         mBinding.rvSelectWhatPatrol.adapter = mAutoPatrolMemberAdapter
+        mSelectLayoutViewModel.getInteracMemberInfo()
     }
 
     override fun getLayoutId(): Int {

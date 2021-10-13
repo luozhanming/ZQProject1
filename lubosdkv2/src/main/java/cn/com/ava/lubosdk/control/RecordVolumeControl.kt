@@ -6,7 +6,7 @@ import cn.com.ava.lubosdk.util.URLHexEncodeDecodeUtil
 
 class RecordVolumeControl (
     val channelName:String,val channelLevel:Int,
-    val raw:String,
+    var raw:String,
     override var onResult: (Boolean) -> Unit,
     override var onError: ((Throwable) -> Unit)?=null
 ) : IControl {
@@ -19,6 +19,9 @@ class RecordVolumeControl (
             this["cmd"] = "40"
             this["key"] = LoginManager.getLogin()?.key ?: ""
             this["idx"] = "11"
+            if(raw.isEmpty()){
+                raw = "MASTER=0,LINEIN1=0,LINEIN2=0,MICIN1=0,MICIN2=0,MICIN3=0"
+            }
             val start =  raw.indexOf("${channelName}=")
             val end = raw.indexOf(",", start)
             var subString = ""

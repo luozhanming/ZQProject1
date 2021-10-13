@@ -71,7 +71,7 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
             mExitMeetingDialog = ConfirmDialog(getString(R.string.tip_confirm_exit_meeting), true, {
                 mListenerViewModel.exitMeeting()
                 it?.dismiss()
-            })
+            },isDangerous = true)
             if (mExitMeetingDialog?.isAdded == false) {
                 mExitMeetingDialog?.show(childFragmentManager, "exit_meeting")
             }

@@ -107,7 +107,7 @@ class CreateMeetingViewModel : BaseViewModel() {
         }
         isLoading.postValue(OneTimeEvent(true))
         mDisposables.add(ZQManager.createMeeting(theme, "", nickname, waiting, arrayOf())
-            .delay(4000,TimeUnit.MILLISECONDS)
+            .delay(5000,TimeUnit.MILLISECONDS)
             .flatMap {
                 if (it) {
                     ZQManager.loadMeetingInfo()   //加载会议信息
