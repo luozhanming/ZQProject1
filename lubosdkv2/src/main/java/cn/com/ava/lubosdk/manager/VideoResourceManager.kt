@@ -1,5 +1,6 @@
 package cn.com.ava.lubosdk.manager
 
+import android.text.TextUtils
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.AVAHttpEngine
 import cn.com.ava.lubosdk.LuBoSDK
@@ -292,7 +293,7 @@ object VideoResourceManager {
         params["command"] = "1"
         val username = ftpInfo["ftpAcct"]
         val password = ftpInfo["ftpPsw"]
-        val targetPath = ""
+        val targetPath = ftpInfo["uploadPath"] ?: ""
         val serverIp = ftpInfo["ftpUrl"]
         val serverPort = ftpInfo["ftpPort"]
         val filename = data.rawFileName
