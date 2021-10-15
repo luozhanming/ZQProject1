@@ -10,18 +10,14 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.storage.StorageVolume
 import android.text.TextUtils
-import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
-import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
@@ -35,9 +31,7 @@ import cn.com.ava.zqproject.usb.UsbHelper
 import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.util.*
-import java.util.concurrent.ConcurrentMap
 import kotlin.concurrent.schedule
 
 class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
@@ -165,7 +159,7 @@ class SearchVideoFragment : BaseFragment<FragmentSearchVideoBinding>() {
                     logd("删除")
                     val dialog = DeleteVideoDialog(getString(R.string.tip_delete_video), {
                         logd("删除")
-                        mVideoManageViewModel.deleteVideo(data?.obj!!)
+                        mVideoManageViewModel.deleteVideo(listOf(data?.obj!!))
                     })
                     dialog.show(childFragmentManager, "")
                 }

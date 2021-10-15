@@ -12,6 +12,7 @@ import java.util.*
 import kotlin.collections.LinkedHashMap
 import io.reactivex.Observable
 import java.lang.Exception
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 object VideoResourceManager {
@@ -246,6 +247,47 @@ object VideoResourceManager {
             logd("删除视频的body： $bodyStr")
             if (bodyStr != null) {
                 if (bodyStr.contains("record_deleteFile_ret=ok")) {
+                    e.onNext(true)
+                } else {
+                    e.onNext(false)
+                }
+            } else {
+                e.onNext(false)
+            }
+        }
+    }
+
+    /*
+    * 删除多个视频资源
+    * */
+    fun deleteMultiRecordFiles(datas: List<RecordFilesInfo.RecordFile>): Observable<Boolean> {
+        logd("待删除的视频 = ${datas.toString()}")
+        val params: MutableMap<String, String> = LinkedHashMap()
+        params["action"] = "9"
+        params["user"] = LoginManager.getLogin()?.username ?: ""
+        params["pswd"] = EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password ?: "").lowercase()
+        params["command"] = "1"
+        logd("pswd = ${LoginManager.getLogin()?.password}")
+
+        val fileList = arrayListOf<String>().apply {
+            datas?.forEach {
+                add(it.rawFileName)
+            }
+        }
+        val fileListName = fileList.joinToString(separator = ",")
+
+        val tempData = "record_deleteMultiFiles_${fileListName}"
+        logd("data = $tempData")
+        params["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(tempData, "GBK")
+        logd("删除视频的params: ${params.toString()}")
+        return Observable.create { e ->
+            val call = AVAHttpEngine.getHttpService().deleteMultiFiles(params)
+            val response = call.execute()
+            logd("删除视频的response：${response}")
+            val bodyStr = response.body()?.string()
+            logd("删除视频的body： $bodyStr")
+            if (bodyStr != null) {
+                if (bodyStr.contains("record_deleteMultiFiles_ret=ok")) {
                     e.onNext(true)
                 } else {
                     e.onNext(false)
