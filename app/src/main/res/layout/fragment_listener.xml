@@ -118,8 +118,9 @@
 
             <ImageView
                 android:id="@+id/iv_computer_menu"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="5dp"
                 android:layout_marginLeft="12dp"
                 android:background="@drawable/bg_text_button_2"
                 android:src="@drawable/btn_up_down"
@@ -133,10 +134,10 @@
 
             <ImageView
                 android:id="@+id/iv_volume_scene_menu"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="5dp"
                 android:layout_marginLeft="12dp"
-
                 android:background="@drawable/bg_text_button_2"
                 android:src="@drawable/btn_up_down"
                 app:layout_constraintBottom_toBottomOf="@+id/ll_volume_scene"

@@ -151,10 +151,12 @@
 
             <ImageView
                 android:id="@+id/iv_computer_menu"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="5dp"
+                android:layout_marginLeft="12dp"
                 android:background="@drawable/bg_text_button_2"
-                android:layout_marginLeft="6dp"
+
                 android:src="@drawable/btn_up_down"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/ll_volume_scene"
@@ -165,11 +167,13 @@
 
             <ImageView
                 android:id="@+id/iv_volume_scene_menu"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:padding="5dp"
+                android:layout_marginLeft="12dp"
                 android:background="@drawable/bg_text_button_2"
                 android:src="@drawable/btn_up_down"
-                android:layout_marginLeft="6dp"
+
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/ll_exit_meeting"
                 app:layout_constraintHorizontal_bias="0.5"

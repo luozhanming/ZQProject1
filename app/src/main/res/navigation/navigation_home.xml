@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_home"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        tools:layout="@layout/fragment_home"
+        android:name="cn.com.ava.zqproject.ui.home.HomeFragment"
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_recordFragment"
+            app:destination="@id/recordFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:launchSingleTop="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_createMeetingFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/createMeetingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_videoResourceFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoResourceFragment"
+            app:launchSingleTop="true" />
+
+
+        <action
+            android:id="@+id/action_homeFragment_to_listenerFragment"
+            app:destination="@id/listenerFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_masterFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/masterFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_joinMeetingFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/joinMeetingFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_receiveCallFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:launchSingleTop="true"
+            app:destination="@id/receiveCallFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordFragment"
+        tools:layout="@layout/fragment_record"
+        android:name="cn.com.ava.zqproject.ui.record.RecordFragment"
+        android:label="RecordFragment" />
+    <fragment
+        android:id="@+id/createMeetingFragment"
+        android:name="cn.com.ava.zqproject.ui.createmeeting.CreateMeetingFragment"
+        android:label="CreateMeetingFragment" >
+        <action
+            android:id="@+id/action_createMeetingFragment_to_createGroupFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/createGroupFragment" />
+        <action
+            android:id="@+id/action_createMeetingFragment_to_masterFragment"
+            app:popUpTo="@id/createMeetingFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/masterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createGroupFragment"
+        android:name="cn.com.ava.zqproject.ui.createmeeting.CreateGroupFragment"
+        android:label="CreateGroupFragment" />
+
+
+    <fragment android:id="@+id/videoResourceFragment"
+        tools:layout="@layout/fragment_video_manage"
+        android:name="cn.com.ava.zqproject.ui.videoResource.VideoManageFragment">
+
+        <action
+            android:id="@+id/action_videoFragment_to_manageFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/manageResourceFragment"
+            app:launchSingleTop="true"/>
+        <action
+            android:id="@+id/action_videoFragment_to_searchFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/searchVideoFragment"
+            app:launchSingleTop="true"/>
+        <action
+            android:id="@+id/action_videoResourceFragment_to_videoPlayFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoPlayFragment"
+            app:launchSingleTop="true" />
+    </fragment>
+
+    <fragment android:id="@+id/manageResourceFragment"
+        tools:layout="@layout/fragment_manage_resources"
+        android:name="cn.com.ava.zqproject.ui.videoResource.ManageResourcesFragment">
+        <argument
+            android:name="videos"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment android:id="@+id/searchVideoFragment"
+        tools:layout="@layout/fragment_search_video"
+        android:name="cn.com.ava.zqproject.ui.videoResource.SearchVideoFragment">
+        <argument
+            android:name="videos"
+            app:argType="string"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_searchVideoFragment_to_videoPlayFragment"
+            app:enterAnim="@anim/enter"
+            app:exitAnim="@anim/exit"
+            app:popEnterAnim="@anim/pop_enter"
+            app:popExitAnim="@anim/pop_exit"
+            app:destination="@id/videoPlayFragment"
+            app:launchSingleTop="true"/>
+    </fragment>
+    <fragment
+        android:id="@+id/listenerFragment"
+        tools:layout="@layout/fragment_listener"
+        android:name="cn.com.ava.zqproject.ui.meeting.ListenerFragment"
+        android:label="ListenerFragment" />
+    <fragment
+        android:id="@+id/masterFragment"
+        android:name="cn.com.ava.zqproject.ui.meeting.MasterFragment"
+        android:label="MasterFragment" />
+    <fragment
+        android:id="@+id/videoPlayFragment"
+        android:name="cn.com.ava.zqproject.ui.videoResource.VideoPlayFragment"
+        android:label="VideoPlayFragment" />
+    <fragment
+        android:id="@+id/joinMeetingFragment"
+        tools:layout="@layout/fragment_join_meeting"
+        android:name="cn.com.ava.zqproject.ui.joinmeeting.JoinMeetingFragment"
+        android:label="JoinMeetingFragment" >
+        <action
+            android:id="@+id/action_joinMeetingFragment_to_listenerFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/joinMeetingFragment"
+            app:destination="@id/listenerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/receiveCallFragment"
+        android:name="cn.com.ava.zqproject.ui.joinmeeting.ReceiveCallFragment"
+        android:label="ReceiveCallFragment" />
+</navigation>

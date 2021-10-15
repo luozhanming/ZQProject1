@@ -129,7 +129,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                         findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
                     }
                     SplashViewModel.WHERE_GO_HOME -> {
-                        findNavController().navigate(R.id.action_splashFragment_to_homeFragment)
+                        findNavController().navigate(R.id.action_splashFragment_to_navigation_home)
                     }
                 }
             }

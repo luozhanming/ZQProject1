@@ -15,6 +15,7 @@ import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.ComputerModeManager
+import cn.com.ava.zqproject.eventbus.GoLoginEvent
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.InvitationInfo
 import cn.com.ava.zqproject.vo.PlatformLogin
@@ -22,6 +23,7 @@ import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 
 
@@ -131,33 +133,23 @@ class HomeViewModel : BaseViewModel() {
      * 开始发送心跳
      * */
     fun startHeartBeat() {
-        mSendHeartBeatDisposable?.dispose()
-        mSendHeartBeatDisposable = Observable.interval(3, 20, TimeUnit.SECONDS)
+        mDisposables.add(Observable.interval(
+            0, 20, TimeUnit.SECONDS)
             .flatMap {
-                PlatformApi.getService().heartBeat(rsAcct = luboInfo.value?.stun?.usr ?: "")
-                    .compose(PlatformApi.applySchedulers())
+                PlatformApi.getService().heartBeat(rsAcct = LoginManager.getLogin()?.rserverInfo?.usr?:"")
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
-                it.toString()
-            }, {
-                if(it is ServerException){  //有人异地登录
-                    if(it.code==10004){
-                        ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
-                        backToLogin.postValue(OneTimeEvent(true))
-                    }
+                if(it.code==10004){
+                    ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
+                    EventBus.getDefault().post(GoLoginEvent())
+                //    backToLogin.postValue(OneTimeEvent(true))
                 }
+            }, {
                 logPrint2File(it,"HomeViewModel#startHeartBeat")
                 //发送心跳错误
-            })
+            }))
     }
 
-
-    /**
-     * 停止发送心跳
-     * */
-    fun stopHeartBeat() {
-        mSendHeartBeatDisposable?.dispose()
-    }
 
     fun preloadWindowAndLayout() {
         mDisposables.add(

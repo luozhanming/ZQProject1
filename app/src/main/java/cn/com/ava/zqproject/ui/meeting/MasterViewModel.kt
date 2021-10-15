@@ -472,14 +472,23 @@ class MasterViewModel : BaseViewModel() {
     }
 
     fun overMeeting() {
-        mDisposables.add(
+        val meetingNo = meetingInfoZq.value?.confId?:""
+        PlatformApi.getService().endMeeting(meetingNo)
+            .compose(PlatformApi.applySchedulers())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                it.toString()
+            },{
+                logPrint2File(it,"MasterViewModel#overMeeting1")
+            })
+
             ZQManager.exitMeeting()
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                 }, {
-                    logPrint2File(it,"MasterViewModel#overMeeting")
+                    logPrint2File(it,"MasterViewModel#overMeeting2")
                 })
-        )
+
     }
 
 

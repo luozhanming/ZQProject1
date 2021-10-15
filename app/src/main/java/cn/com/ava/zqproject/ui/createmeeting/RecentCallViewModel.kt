@@ -34,7 +34,7 @@ class RecentCallViewModel : BaseViewModel(),CanRefresh,SelectedUser {
 
 
     fun getRecentContracts() {
-        mDisposables.add(PlatformApi.getService().getRecentCall()
+        mDisposables.add(PlatformApi.getService().getRecentCall(pageSize = 30)
             .compose(PlatformApi.applySchedulers())
             .map {
                 val statefuls = arrayListOf<StatefulView<ContractUser>>()

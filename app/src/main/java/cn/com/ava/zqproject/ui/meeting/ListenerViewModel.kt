@@ -174,6 +174,9 @@ class ListenerViewModel : BaseViewModel() {
         mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 ZQManager.loadMeetingInfo()
+                    .doOnError {
+                        logPrint2File(it,"ListenerViewModel#startLoopMeetingInfoZQ")
+                    }
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({

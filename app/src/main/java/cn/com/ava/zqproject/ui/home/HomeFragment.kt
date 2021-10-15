@@ -18,11 +18,15 @@ import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.RecordUploadManager
 import cn.com.ava.zqproject.databinding.FragmentHomeBinding
+import cn.com.ava.zqproject.eventbus.GoLoginEvent
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
@@ -71,13 +75,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             it?.dismiss()
                             mHomeViewModel.logout()
                             findNavController().navigate(
-                                R.id.action_back_to_login,
-                                null,
-                                navOptions {
-                                    popUpTo(R.id.homeFragment) {
-                                        inclusive = true
-                                    }
-                                })
+                                R.id.action_back_to_login)
                         })
                         dialog.show(childFragmentManager, "confirm")
                     }
@@ -100,9 +98,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         VideoSingleton.getInstance()
     }
 
+
+
     override fun onStart() {
         super.onStart()
-        mHomeViewModel.startloadLuboInfo()
+      //  mHomeViewModel.startloadLuboInfo()
         mHomeViewModel.startLoopMeetingInfoZQ()
         mHomeViewModel.startLoopMeetingInvitation()
         RecordUploadManager.startUpload {
@@ -115,14 +115,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onStop() {
         super.onStop()
-        mHomeViewModel.stopLoadLuboInfo()
+       // mHomeViewModel.stopLoadLuboInfo()
         mHomeViewModel.stopLoopMeetingInfoZQ()
         mHomeViewModel.stopLoopMeetingInvitation()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mHomeViewModel.startHeartBeat()
+        EventBus.getDefault().register(this)
         mServiceConnection = mServiceConnection ?: object : ServiceConnection {
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 mDownloadBinder = service as? DownloadService.DownloadBinder
@@ -143,12 +143,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         //不停刷新token
         mHomeViewModel.loopRefreshToken()
         mHomeViewModel.autoLuboLogin()
+        mHomeViewModel.startHeartBeat()
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        mHomeViewModel.stopHeartBeat()
+        EventBus.getDefault().unregister(this)
         //解绑
         requireContext().unbindService(mServiceConnection)
         mServiceConnection = null
@@ -187,9 +188,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             args.putSerializable("invitationInfo", it)
             findNavController().navigate(R.id.action_homeFragment_to_receiveCallFragment, args)
         }
-        mHomeViewModel.backToLogin.observeOne(viewLifecycleOwner) {
-            findNavController().navigate(R.id.action_back_to_login)
-        }
+//        mHomeViewModel.backToLogin.observeOne(this) {
+//            findNavController().navigate(R.id.action_back_to_login)
+//        }
         mHomeViewModel.goCreateMeeting.observeOne(viewLifecycleOwner) {
             findNavController().navigate(R.id.action_homeFragment_to_createMeetingFragment)
         }
@@ -200,6 +201,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onBackPressed(): Boolean {
         return true
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun goLogin(event:GoLoginEvent){
+        findNavController().navigate(R.id.action_back_to_login)
     }
 
 }

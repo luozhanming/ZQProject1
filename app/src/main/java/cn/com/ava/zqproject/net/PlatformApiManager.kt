@@ -44,6 +44,10 @@ object PlatformApiManager {
 
     const val PATH_SAVE_FTP_VIDEO = "saveFTPVideoUrl"
 
+    const val PATH_END_MEETING = "endMeetingUrl"
+
+    const val PATH_USER_RSACCTLIST = "userRsAcctListUrl"
+
     @StringDef(PATH_GET_INTERFACE, PATH_WEBVIEW_LOGIN)
     annotation class PlatformPath
 

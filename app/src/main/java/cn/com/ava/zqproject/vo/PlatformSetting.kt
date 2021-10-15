@@ -20,7 +20,9 @@ data class PlatformSetting(
     val recentCallUrl: String,
     val refreshTokenUrl: String,
     val logoutUrl:String,
-    val saveFTPVideoUrl:String
+    val saveFTPVideoUrl:String,
+    val endMeetingUrl:String,
+    val userRsAcctListUrl:String
 )
 
 

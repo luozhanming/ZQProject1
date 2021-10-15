@@ -5,6 +5,8 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import cn.com.ava.common.util.Extra
+import cn.com.ava.common.widget.CharLengthInputFilter
+import cn.com.ava.common.widget.SpecialCharInputFilter
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentReceiveCallingBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
@@ -31,6 +33,11 @@ class ReceiveCallFragment : BaseLoadingFragment<FragmentReceiveCallingBinding>()
         super.onViewCreated(view, savedInstanceState)
         mReceiveCallViewModel.invitationInfo.value = mInvitationInfo
         mReceiveCallViewModel.startFinishCountDown()
+    }
+
+    override fun initView() {
+        super.initView()
+        mBinding.etNickname.filters = arrayOf(SpecialCharInputFilter(),CharLengthInputFilter(36))
     }
 
     override fun bindListener() {

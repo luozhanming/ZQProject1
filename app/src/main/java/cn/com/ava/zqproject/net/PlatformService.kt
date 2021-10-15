@@ -34,7 +34,6 @@ interface PlatformService {
     /**
      * 最近呼叫
      * */
-
     @GET("/{path}")
     fun getRecentCall(
         @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
@@ -156,5 +155,14 @@ interface PlatformService {
             PlatformApiManager.PATH_CALL_MEETING
         )
     ):Observable<PlatformResponse<List<InvitationInfo>>>
+
+    @FormUrlEncoded
+    @POST("/{path}")
+    fun endMeeting(
+        @Path("path", encoded = true) path: String? = PlatformApiManager.getApiPath(
+            PlatformApiManager.PATH_END_MEETING
+        ),
+        @Field("meetingNo") meetingNo: String = ""
+    ): Observable<PlatformResponse<Any>>
 
 }

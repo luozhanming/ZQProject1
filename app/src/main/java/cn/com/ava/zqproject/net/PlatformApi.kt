@@ -3,6 +3,8 @@ package cn.com.ava.zqproject.net
 import cn.com.ava.common.http.BaseHttpApi
 import cn.com.ava.common.http.ServerException
 import cn.com.ava.common.util.GsonUtil
+import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.common.util.logd
 import cn.com.ava.common.util.logi
 import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.vo.PlatformLogin
@@ -10,6 +12,7 @@ import cn.com.ava.zqproject.vo.PlatformResponse
 import io.reactivex.functions.Function
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import kotlin.math.log
 
 object PlatformApi : BaseHttpApi() {
 
@@ -55,10 +58,12 @@ object PlatformApi : BaseHttpApi() {
         return PlatformApiManager.getApiPath(PlatformApiManager.PATH_WEBVIEW_LOGIN) != null
     }
 
-    fun refreshLoginToken(token:String){
+    fun refreshLoginToken(newToken:String){
+        logd("newToken${newToken}")
         platformLogin?.apply {
-            this.token = token
-            this@PlatformApi.token = token
+            this.token = newToken
+            this@PlatformApi.token = newToken
+            this@PlatformApi.logd("thisToken${this.token}")
             val toJson = GsonUtil.toJson(this)
             CommonPreference.putElement(CommonPreference.KEY_PLATFORM_LATEST_LOGIN,toJson)
         }

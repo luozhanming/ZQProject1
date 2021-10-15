@@ -79,7 +79,7 @@ class CreateMeetingViewModel : BaseViewModel() {
                 }
             }
             val preCount = (selectedUsers?.size ?: 0) + unAddedUsers.size
-            if (preCount < MAX_SELECTED_USER) {
+            if (preCount <= MAX_SELECTED_USER) {
                 selectedUsers?.addAll(unAddedUsers)
                 selectedUser.value = selectedUsers
                 return true

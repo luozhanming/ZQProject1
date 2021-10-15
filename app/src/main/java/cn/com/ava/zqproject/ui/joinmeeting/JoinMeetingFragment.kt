@@ -3,6 +3,7 @@ package cn.com.ava.zqproject.ui.joinmeeting
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import cn.com.ava.base.ui.BaseFragment
+import cn.com.ava.common.widget.CharLengthInputFilter
 import cn.com.ava.common.widget.SpecialCharInputFilter
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentJoinMeetingBinding
@@ -26,7 +27,7 @@ class JoinMeetingFragment:BaseLoadingFragment<FragmentJoinMeetingBinding>() {
         mBinding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
-        mBinding.editText8.filters = arrayOf(SpecialCharInputFilter())
+        mBinding.editText8.filters = arrayOf(SpecialCharInputFilter(),CharLengthInputFilter(36))
     }
 
 
