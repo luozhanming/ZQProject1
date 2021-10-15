@@ -4,6 +4,8 @@ import android.text.TextUtils
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.mvvm.OneTimeEvent
+import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
@@ -17,8 +19,6 @@ import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
 import cn.com.ava.zqproject.vo.RefreshState
 import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.*
@@ -45,8 +45,9 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
         MutableLiveData()
     }
 
-    // 标记是否需要刷新界面
-    var isNeedRefresh = true
+    val isLoading: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
+    }
 
     // 列表资源
     val videoResources: MutableLiveData<MutableList<StatefulView<RecordFilesInfo.RecordFile>>> by lazy {
@@ -185,39 +186,91 @@ class VideoManageViewModel : BaseViewModel, CanRefresh {
 //        )
     }
 
+//    // 删除视频
+//    fun deleteVideo(video: RecordFilesInfo.RecordFile) {
+//        isLoading.postValue(OneTimeEvent(true))
+//        mDisposables.add(
+//            VideoResourceManager.deleteRecordFile2(video)
+//                .compose(PlatformApi.applySchedulers())
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({ result ->
+//                    if (result == true) {
+//                        logd("删除视频资源成功")
+//                        if (mSelectedVideos?.contains(video) == true) {
+//                            mSelectedVideos.remove(video)
+//                        }
+//                        if (mSelectedVideos.size == 0) {
+//                            isLoading.postValue(OneTimeEvent(false))
+//                            ToastUtils.showShort("删除成功")
+//                        }
+//                        val videos = videoResources.value
+//                        val stateful = StatefulView(video)
+//                        videos?.remove(stateful)
+//                        videoResources.value = videos
+//
+//                        if (!TextUtils.isEmpty(searchKey.value)) { // 更新搜索视频列表
+//                            val list = videoResources.value
+//                            val filter = list?.filter {
+//                                return@filter it.obj.downloadFileName.contains(searchKey.value ?: "")
+//                            }
+//                            filterVideos.value = filter
+//                        }
+//                    } else {
+//                        isLoading.postValue(OneTimeEvent(false))
+//                        ToastUtils.showShort("删除失败")
+//                        logd("删除视频资源失败")
+//                    }
+//                }, {
+//                    isLoading.postValue(OneTimeEvent(false))
+//                    logPrint2File(it,"VideoManageViewModel#deleteVideo")
+//                    logd("删除视频资源接口出错")
+//                })
+//        )
+//    }
+
     // 删除视频
-    fun deleteVideo(video: RecordFilesInfo.RecordFile) {
+    fun deleteVideo(videos: List<RecordFilesInfo.RecordFile>) {
+        isLoading.postValue(OneTimeEvent(true))
         mDisposables.add(
-            VideoResourceManager.deleteRecordFile2(video)
+            VideoResourceManager.deleteMultiRecordFiles(videos)
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
                     if (result == true) {
                         logd("删除视频资源成功")
-                        if (mSelectedVideos?.contains(video) == true) {
-                            mSelectedVideos.remove(video)
+
+                        val list = videoResources.value
+
+                        videos.forEach {
+                            val stateful = StatefulView(it)
+                            list?.remove(stateful)
+                            if (mSelectedVideos?.contains(it) == true) {
+                                mSelectedVideos.remove(it)
+                            }
                         }
+
                         if (mSelectedVideos.size == 0) {
+                            isLoading.postValue(OneTimeEvent(false))
                             ToastUtils.showShort("删除成功")
                         }
-                        val videos = videoResources.value
-                        val stateful = StatefulView(video)
-                        videos?.remove(stateful)
-                        videoResources.value = videos
+
+                        videoResources.value = list
 
                         if (!TextUtils.isEmpty(searchKey.value)) { // 更新搜索视频列表
-                            val list = videoResources.value
                             val filter = list?.filter {
                                 return@filter it.obj.downloadFileName.contains(searchKey.value ?: "")
                             }
                             filterVideos.value = filter
                         }
                     } else {
+                        isLoading.postValue(OneTimeEvent(false))
                         ToastUtils.showShort("删除失败")
                         logd("删除视频资源失败")
                     }
                 }, {
+                    isLoading.postValue(OneTimeEvent(false))
                     logPrint2File(it,"VideoManageViewModel#deleteVideo")
                     logd("删除视频资源接口出错")
                 })

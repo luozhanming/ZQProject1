@@ -9,9 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.storage.StorageVolume
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -148,7 +145,7 @@ class VideoResourceListFragment : BaseFragment<FragmentVideoResourceListBinding>
                 override fun onDelete(data: StatefulView<RecordFilesInfo.RecordFile>?) {
                     val dialog = DeleteVideoDialog(getString(R.string.tip_delete_video), {
                         logd("删除")
-                        mVideoManageViewModel.deleteVideo(data?.obj!!)
+                        mVideoManageViewModel.deleteVideo(listOf(data?.obj!!))
                     })
                     dialog.show(childFragmentManager, "")
                 }

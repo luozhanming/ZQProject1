@@ -12,27 +12,25 @@ import android.os.storage.StorageVolume
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import cn.com.ava.base.ui.BaseFragment
 import cn.com.ava.common.extension.autoCleared
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.RecordFilesInfo
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.FragmentManageResourcesBinding
+import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.videoResource.adapter.ManageResourceItemAdapter
+import cn.com.ava.zqproject.ui.videoResource.dialog.DeleteVideoDialog
 import cn.com.ava.zqproject.ui.videoResource.dialog.SelectDiskDialog
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.usb.UsbHelper
 import cn.com.ava.zqproject.vo.StatefulView
-import cn.com.ava.zqproject.vo.VideoResource
 import com.blankj.utilcode.util.ToastUtils
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.util.concurrent.ConcurrentMap
 
-class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
+class ManageResourcesFragment : BaseLoadingFragment<FragmentManageResourcesBinding>() {
+    // 一次最多可选删除50条
+    val MAX_DELETE_COUNT = 50
 
     private val mVideoManageViewModel by activityViewModels<VideoManageViewModel>()
 
@@ -130,13 +128,17 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
         // 删除
         mBinding.btnDelete.setOnClickListener {
             if (mVideoManageViewModel.mSelectedVideos.size == 0) {
-                ToastUtils.showShort("请勾选需要删除的视频")
+                ToastUtils.showShort(R.string.tip_select_delete_videos)
                 return@setOnClickListener
             }
-            logd("删除视频: ${mVideoManageViewModel.mSelectedVideos.size}")
-            mVideoManageViewModel.mSelectedVideos.forEach {
-                mVideoManageViewModel.deleteVideo(it)
+            if (mVideoManageViewModel.mSelectedVideos.size > MAX_DELETE_COUNT) {
+                ToastUtils.showShort(R.string.tip_max_delete_videos_count)
+                return@setOnClickListener
             }
+            val dialog = DeleteVideoDialog(getString(R.string.tip_delete_videos), {
+                deleteVideos()
+            })
+            dialog.show(childFragmentManager, "")
         }
 
         if (mManageResourceItemAdapter == null) {
@@ -157,6 +159,28 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
 
         mBinding.rvResourceList.adapter = mManageResourceItemAdapter;
         mBinding.rvResourceList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+    }
+
+    fun deleteVideos() {
+        logd("删除视频: ${mVideoManageViewModel.mSelectedVideos.size}")
+
+        var count = mVideoManageViewModel.mSelectedVideos.size / 5
+        for (i in 0..count) {
+            var lastIndex = (i + 1) * 5
+            if (i == count) { // 最后一页截到最后
+                lastIndex = mVideoManageViewModel.mSelectedVideos.size
+            }
+            // subList不包括lastIndex选项
+            val list = mVideoManageViewModel.mSelectedVideos.subList(i * 5, lastIndex).toList()
+            logd("list.size = ${list.size}")
+            if (list.size > 0) {
+                mVideoManageViewModel.deleteVideo(list)
+            }
+        }
+//        mVideoManageViewModel.deleteVideo(mVideoManageViewModel.mSelectedVideos.toList())
+//        mVideoManageViewModel.mSelectedVideos.forEach {
+//            mVideoManageViewModel.deleteVideo(it)
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -191,6 +215,10 @@ class ManageResourcesFragment : BaseFragment<FragmentManageResourcesBinding>() {
             logd("是否全选, ${isSelectedAll.toString()}")
             mBinding.btnSelectAll.isVisible = !isSelectedAll
             mBinding.btnCancelSelectAll.isVisible = isSelectedAll
+        }
+        mVideoManageViewModel.isLoading.observeOne(viewLifecycleOwner){
+            if(it)showLoading()
+            else hideLoading()
         }
     }
 

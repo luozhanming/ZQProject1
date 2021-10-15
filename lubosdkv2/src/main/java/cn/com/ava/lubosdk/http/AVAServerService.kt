@@ -53,6 +53,10 @@ interface AVAServerService {
     @POST("cgi-bin/plat.cgi")
     fun deleteRecordFile(@FieldMap params: Map<String, String>): Call<ResponseBody>
 
+    @FormUrlEncoded
+    @POST("cgi-bin/plat.cgi")
+    fun deleteMultiFiles(@FieldMap params: Map<String, String>): Call<ResponseBody>
+
     @GET("cgi-bin/plat.cgi")
     fun getFtpUploadStatus(@QueryMap queryMap: Map<String, String>): Call<ResponseBody>
 

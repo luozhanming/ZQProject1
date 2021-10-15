@@ -60,6 +60,9 @@
     <string name="tip_upload_success">已上传完成</string>
     <string name="tip_upload_failed">上传失败</string>
     <string name="tip_delete_video">您确定要删除该视频吗？</string>
+    <string name="tip_delete_videos">您确定要删除已选的视频吗？</string>
+    <string name="tip_select_delete_videos">请勾选需要删除的视频</string>
+    <string name="tip_max_delete_videos_count">单次最大可删除50个文件</string>
 
     <string name="tip">提示</string>
     <string name="cancel">取消</string>
