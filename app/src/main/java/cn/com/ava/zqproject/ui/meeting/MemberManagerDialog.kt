@@ -100,10 +100,11 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
             mMemberManagerViewModel.removeAllMemberToWaiting()
         }
         mBinding.btnAllSilent.setOnClickListener {
-            if(mMemberManagerViewModel.isAllSilent.value==false){
-                mMemberManagerViewModel.silentAllMembers()
-            }else{
+            if(mMemberManagerViewModel.isAllSilent.value == true){
                 mMemberManagerViewModel.cancelAllSilent()
+
+            }else{
+                mMemberManagerViewModel.silentAllMembers()
             }
 
         }
@@ -119,6 +120,7 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
 
     override fun onBindViewModel2Layout(binding: DialogMemeberManagerBinding) {
         binding.masterViewModel = mMasterViewModel
+        binding.memberViewModel = mMemberManagerViewModel
     }
 
     override fun onDestroyView() {

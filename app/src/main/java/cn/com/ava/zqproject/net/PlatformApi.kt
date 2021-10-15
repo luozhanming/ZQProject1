@@ -16,7 +16,7 @@ object PlatformApi : BaseHttpApi() {
 
     private var platformAddr by CommonPreference(CommonPreference.KEY_PLATFORM_ADDR, "")
 
-    //平台token
+    //平台token缓存，用于重启后不需登录
     private var token by CommonPreference(CommonPreference.KEY_PLATFORM_TOKEN, "")
 
     private var platformLogin: PlatformLogin? = null
@@ -58,6 +58,9 @@ object PlatformApi : BaseHttpApi() {
     fun refreshLoginToken(token:String){
         platformLogin?.apply {
             this.token = token
+            this@PlatformApi.token = token
+            val toJson = GsonUtil.toJson(this)
+            CommonPreference.putElement(CommonPreference.KEY_PLATFORM_LATEST_LOGIN,toJson)
         }
     }
 

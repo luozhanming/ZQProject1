@@ -11,10 +11,7 @@ import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.Constant
 import cn.com.ava.lubosdk.entity.LuBoInfo
-import cn.com.ava.lubosdk.manager.GeneralManager
-import cn.com.ava.lubosdk.manager.RecordManager
-import cn.com.ava.lubosdk.manager.WindowLayoutManager
-import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.ComputerModeManager
@@ -269,6 +266,20 @@ class HomeViewModel : BaseViewModel() {
                 }
             },{
                 logPrint2File(it,"HomeViewModel#requestCanCreateMeeting")
+            }))
+    }
+
+
+    fun autoLuboLogin(){
+        mDisposables.add(Observable.interval(3,TimeUnit.MINUTES)
+            .flatMap {
+                LoginManager.newLogin(LoginManager.getLogin()?.username?:"",LoginManager.getLogin()?.password?:"")
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+                logPrint2File(it,"HomeViewModel#autoLuboLogin")
             }))
     }
 

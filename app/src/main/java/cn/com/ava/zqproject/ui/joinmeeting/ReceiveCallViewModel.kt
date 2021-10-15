@@ -62,11 +62,11 @@ class ReceiveCallViewModel:BaseViewModel() {
     val myNickname:MutableLiveData<String> by lazy {
         MutableLiveData<String>().apply {
             val platformLogin = PlatformApi.getPlatformLogin()
-            if(platformLogin?.professionTitleName?.isNotEmpty()==true){
-                value = "${platformLogin?.name}_${platformLogin?.professionTitleName}"
-            }else{
+         //   if(platformLogin?.professionTitleName?.isNotEmpty()==true){
+        //   //     value = "${platformLogin?.name}_${platformLogin?.professionTitleName}"
+         //   }else{
                 value = "${platformLogin?.name}"
-            }
+        //    }
         }
     }
 
@@ -91,7 +91,7 @@ class ReceiveCallViewModel:BaseViewModel() {
     }
 
     fun startFinishCountDown() {
-        mDisposables.add(Observable.timer(3,TimeUnit.SECONDS)
+        mDisposables.add(Observable.timer(3,TimeUnit.MINUTES)
             .subscribeOn(Schedulers.io())
             .subscribe({
                 finishCall.postValue(OneTimeEvent(true))

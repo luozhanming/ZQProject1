@@ -90,12 +90,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 SizeUtils.dp2px(60)
             )
         }
-        //预加载相关
-        mHomeViewModel.preloadWindowAndLayout()
-        //不停刷新token
-        mHomeViewModel.loopRefreshToken()
 
     }
+
+
 
     fun initData() {
         logd("实例化单例")
@@ -139,6 +137,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             Intent(requireContext(), DownloadService::class.java), mServiceConnection,
             Service.BIND_AUTO_CREATE
         )
+
+        //预加载相关
+        mHomeViewModel.preloadWindowAndLayout()
+        //不停刷新token
+        mHomeViewModel.loopRefreshToken()
+        mHomeViewModel.autoLuboLogin()
     }
 
 

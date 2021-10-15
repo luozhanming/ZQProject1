@@ -270,8 +270,8 @@ class MasterViewModel : BaseViewModel() {
             value = 0
             addSource(meetingState) {
                 it.apply {
-                    if (this.requestSpeakMode != value) {
-                        if (requestSpeakMode > 0 && requestSpeakRet.value == 0) {   //申请发言前处理一下保存当前画面
+                    if (this.requestSpeakMode != value) {    //发言模式改变了
+                        if (requestSpeakMode > 0 && value == 0) {   //申请发言前处理一下保存当前画面
                             preRequestSpeakLayout = onVideoWindow.value
                         }
                         postValue(this.requestSpeakMode)
@@ -372,6 +372,7 @@ class MasterViewModel : BaseViewModel() {
                 meetingInfoZq.postValue(it)
                 if(!isModifyTheme){
                     modifyTheme()
+                    isModifyTheme = true
                 }
             }, {
                 logPrint2File(it,"MasterViewModel#startLoopMeetingInfoZQ")
@@ -652,7 +653,6 @@ class MasterViewModel : BaseViewModel() {
                         val begin = DateUtil.toTimeStamp(confStartTime, "yyyy-MM-dd_HH:mm:ss")
                         val now = System.currentTimeMillis()
                         val diff = now - begin
-
                         val toDateString = DateUtil.toHourString(diff)
                         meetingTime.postValue(toDateString)
                     }
@@ -771,6 +771,9 @@ class MasterViewModel : BaseViewModel() {
 
                 override fun onChanged(user: LinkedUser) {
                     logd("onChanged")
+                    if(requestSpeakRet.value?:0>0){   //发言模式不能轮播
+                       return
+                    }
                     setVideoLayout(listOf(user.number))
                 }
 
@@ -784,6 +787,9 @@ class MasterViewModel : BaseViewModel() {
     }
 
 
+    /**
+     * 自动轮播功能点管理
+     * */
     class PatrolManager(val callback: PatrolCallback? = null) {
 
         interface PatrolCallback {
@@ -822,6 +828,7 @@ class MasterViewModel : BaseViewModel() {
             timer?.dispose()
             callback?.onCancel()
         }
+
 
 
     }

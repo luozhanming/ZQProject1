@@ -74,12 +74,24 @@
             android:textColorHint="@color/color_999999"
             android:textSize="19sp"
             android:singleLine="true"
+            android:inputType="@{joinMeetingViewModel.isShowPsw?0x00000001:0x00000081}"
             android:imeOptions="actionNext"
             android:textCursorDrawable="@null"
             android:nextFocusForward="@id/editText8"
             app:layout_constraintBottom_toBottomOf="@+id/view17"
             app:layout_constraintEnd_toEndOf="@+id/view17"
             app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="@+id/view17" />
+
+
+        <CheckBox
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:button="@drawable/btn_psw"
+            android:checked="@={joinMeetingViewModel.isShowPsw}"
+            android:padding="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/et_password"
+            app:layout_constraintEnd_toEndOf="@+id/view17"
             app:layout_constraintTop_toTopOf="@+id/view17" />
 
         <EditText
@@ -92,6 +104,7 @@
             android:singleLine="true"
             android:imeOptions="actionDone"
             android:paddingRight="12dp"
+            android:maxLength="30"
             android:textCursorDrawable="@null"
             android:text="@={joinMeetingViewModel.meetingNickname}"
             android:textColor="@color/color_222222"

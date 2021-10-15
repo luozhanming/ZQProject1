@@ -63,6 +63,9 @@ class ListenerViewModel : BaseViewModel() {
         OneTimeLiveData()
     }
 
+    /**
+     * 当前
+     * */
     val meetingMembers: MutableLiveData<List<LinkedUser>> by lazy {
         MutableLiveData()
     }
@@ -151,7 +154,9 @@ class ListenerViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
-
+    /**
+     * 自己是否在等候室
+     * */
     val isInWaittingRoom:MutableLiveData<Boolean> by lazy {
         MutableLiveData()
     }
@@ -298,6 +303,7 @@ class ListenerViewModel : BaseViewModel() {
     }
 
     fun loadMeetingMember() {
+        //用于获取自己是否在等候室
         mLoopMeetingMemberInfoDisposable = Observable.interval(0,1500,TimeUnit.MILLISECONDS)
             .flatMap {
                 ZQManager.loadMeetingMember()

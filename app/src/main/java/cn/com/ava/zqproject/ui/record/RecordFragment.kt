@@ -24,6 +24,7 @@ import cn.com.ava.zqproject.databinding.FragmentRecordBinding
 import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.MainViewModel
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
+import com.blankj.utilcode.util.ToastUtils
 
 /**
  * 录课界面
@@ -35,6 +36,9 @@ import cn.com.ava.zqproject.ui.common.ConfirmDialog
 class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolder.Callback {
 
     private val mRecordViewModel by viewModels<RecordViewModel>()
+
+    private val mKeyControlViewModel by viewModels<KeyControlViewModel>()
+
 
 
     override fun getLayoutId(): Int = R.layout.fragment_record
@@ -64,9 +68,7 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
 
     override fun initView() {
         initAnim()
-
         mBinding.videoView.holder.addCallback(this)
-
         mBinding.llRecord.setOnClickListener {
             mRecordViewModel.toggleRecord()
         }
@@ -77,11 +79,19 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
             mRecordViewModel.toggleLive()
         }
         mBinding.llComputer.setOnClickListener {
+            if(Constant.TRACK_FULL_AUTO==mRecordViewModel.recordInfo.value?.trackMode){
+                ToastUtils.showShort(getString(R.string.toast_full_track_cannot_use))
+                return@setOnClickListener
+            }
             mRecordViewModel.toggleComputer()
         }
         mBinding.ivComputerMenu.setOnClickListener {
+            if(Constant.TRACK_FULL_AUTO==mRecordViewModel.recordInfo.value?.trackMode){
+                ToastUtils.showShort(getString(R.string.toast_full_track_cannot_use))
+                return@setOnClickListener
+            }
             if (mComputerMenu == null) {
-                mComputerMenu = ComputerModePopupWindow(requireContext()) {
+                mComputerMenu = mComputerMenu?:ComputerModePopupWindow(requireContext()) {
                     //如果当前正在接入电脑并切换模式，画面也会切换
                     mRecordViewModel.changeComputer()
                 }
@@ -105,10 +115,9 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
                 val dialog = KeyControlDialog()
                 dialog?.show(childFragmentManager, "key_control")
             }
-
         }
-        mBinding.llVolume.setOnClickListener {
 
+        mBinding.llVolume.setOnClickListener {
             mVolumeWindow = mVolumeWindow?: VolumePopupWindow(requireContext()){
                 mRecordViewModel.changeVolume(it)
             }
@@ -144,8 +153,8 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
             }else{
                 findNavController().popBackStack()
             }
-
         }
+
         mBinding.rootView.setOnClickListener {
             //如果有弹出菜单，不隐藏
             if (mTrackModeWindow?.isShowing == true) {
@@ -159,8 +168,6 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
         mBinding.bottomBar.setOnClickListener {
 
         }
-
-
         mRecordViewModel.startLoadRecordInfo()
         mRecordViewModel.getVolumeInfo()
 
@@ -252,6 +259,7 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
         }
         mRecordViewModel.recordInfo.observe(viewLifecycleOwner) { info ->
             mTrackModeWindow?.setTrackMode(info.trackMode)
+            mKeyControlViewModel.trackMode = info.trackMode
         }
         mRecordViewModel.isRecording.observe(viewLifecycleOwner) {
             breatheAnim?.apply {
@@ -327,7 +335,6 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
         mBinding.topBar.clearAnimation()
         mBinding.bottomBar.clearAnimation()
         mBinding.ivDot.clearAnimation()
-
     }
 
 

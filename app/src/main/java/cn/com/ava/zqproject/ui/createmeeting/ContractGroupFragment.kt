@@ -30,13 +30,10 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
         return R.layout.fragment_contract_group
     }
 
-
-
     override fun initView() {
         mBinding.refreshLayout.setOnRefreshListener {
             mContractGroupViewModel.getContractGroups()
         }
-        mBinding.refreshLayout.autoRefresh()
         if (mContractGroupAdapter == null) {
             mContractGroupAdapter =
                 ContractGroupItemAdapter(object : ContractGroupItemAdapter.ContractGroupCallback {
@@ -73,6 +70,12 @@ class ContractGroupFragment : BaseFragment<FragmentContractGroupBinding>() {
         mBinding.rvGroup.adapter = mContractGroupAdapter
         mBinding.rvGroup.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mContractGroupViewModel.getContractGroups()
 
     }
 

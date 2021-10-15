@@ -13,7 +13,6 @@ abstract class BaseLoadingFragment<B : ViewDataBinding> : BaseFragment<B>() {
 
     fun showLoading() {
         mLoadingDialog = mLoadingDialog ?: LoadingDialog()
-        logd(childFragmentManager.toString())
         if (mLoadingDialog?.isAdded == false) {
             mLoadingDialog?.show(childFragmentManager, "loading")
         }

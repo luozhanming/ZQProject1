@@ -1,8 +1,11 @@
 package cn.com.ava.common.rxjava
 
+import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.common.util.logd
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
+import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 
 class RetryFunction(val maxRetry: Int = 5) : Function<Observable<Throwable>, ObservableSource<*>> {

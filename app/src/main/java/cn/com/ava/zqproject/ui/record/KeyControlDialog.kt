@@ -17,7 +17,7 @@ import cn.com.ava.zqproject.vo.StatefulView
  * */
 class KeyControlDialog : BaseDialogV2<DialogKeyControlBinding>() {
 
-    private val mKeyControlViewModel by viewModels<KeyControlViewModel>()
+    private val mKeyControlViewModel by viewModels<KeyControlViewModel>({requireParentFragment()})
 
     private var mKeyControlAdapter by autoCleared<CustomKeyAdapter>()
 
@@ -26,8 +26,6 @@ class KeyControlDialog : BaseDialogV2<DialogKeyControlBinding>() {
     }
 
     override fun initView(root: View) {
-
-
         mBinding.rvButton.layoutManager =
             GridLayoutManager(requireContext(), 3, GridLayoutManager.VERTICAL, false)
         mKeyControlAdapter = CustomKeyAdapter(object : CustomKeyAdapter.CustomKeyCallback{
@@ -37,7 +35,6 @@ class KeyControlDialog : BaseDialogV2<DialogKeyControlBinding>() {
 
         })
         mBinding.rvButton.adapter = mKeyControlAdapter
-
         mBinding.btnReset.setOnClickListener {
             dismiss()
             val dialog = KeySettingDialog()
@@ -46,7 +43,6 @@ class KeyControlDialog : BaseDialogV2<DialogKeyControlBinding>() {
         mBinding.ivClose.setOnClickListener {
             dismiss()
         }
-
         mKeyControlViewModel.getCommandButtons()
     }
 

@@ -92,6 +92,12 @@ class LuBoSettingViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+    val isShowLuboPsw:MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>().apply {
+            value = false
+        }
+    }
+
 
     fun loadInitData() {
         val ip = CommonPreference.getElement(CommonPreference.KEY_LUBO_IP, "")

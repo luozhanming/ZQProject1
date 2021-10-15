@@ -75,7 +75,9 @@ class CreateGroupFragment : BaseFragment<FragmentCreateGroupBinding>() {
             mCreateGroupViewModel.getContractUserList(true)
         }
         mBinding.refreshLayout.autoRefresh()
+
     }
+
 
 
     override fun observeVM() {

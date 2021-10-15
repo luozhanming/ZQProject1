@@ -220,4 +220,8 @@
     <string name="upload_set">视频已提交归档</string>
     <string name="toast_other_login_exception">异地登录，账号登出</string>
     <string name="toast_no_need_patrol">当前在线用户不足，无法使用轮播</string>
+
+    <string name="toast_full_track_cannot_use">全自动导播模式下,无法使用该按钮</string>
+    <string name="toast_mid_track_cannot_use">手动导播模式下,才能使用该按钮</string>
+
 </resources>

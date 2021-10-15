@@ -152,7 +152,16 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
 
     override fun onTabSelected(tab: TabLayout.Tab) {
         mBinding.group1.visibility = if (tab.position == 0) View.VISIBLE else View.GONE
-        mBinding.group2.visibility = if (tab.position == 1) View.VISIBLE else View.GONE
+        if(tab.position==1){
+            mBinding.group2.visibility = View.VISIBLE
+            if(mVolumeSceneViewModel.isVolumein5Visible.value == true){
+                mBinding.linearLayout7.visibility = View.VISIBLE
+            }else{
+                mBinding.linearLayout7.visibility = View.GONE
+            }
+        }else{
+            mBinding.group2.visibility = View.GONE
+        }
         mBinding.group3.visibility = if (tab.position == 2) View.VISIBLE else View.GONE
         mVolumeSceneViewModel.tabIndex.value = tab.position
     }

@@ -100,12 +100,10 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             override fun shrinkMore() {
 
             }
-
         })
         mBinding.rvRequestSpeakList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         mBinding.rvRequestSpeakList.adapter = mApplySpeakUserAdapter
-     //   mMasterViewModel.loadApplySpeakUsers()
         mMasterViewModel.startApplySpeakListen()
 
     }
@@ -143,6 +141,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 }
             }
         }
+
         mMasterViewModel.meetingInfoZq.observe(viewLifecycleOwner){
             mMemberManagerViewModel.setWaitingEnable(it.waitingRoomEnable)
         }
@@ -209,12 +208,9 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                 mMemberManagerViewModel.memberMicState.value = it.audioCtrlState
             }
         }
-
         mMasterViewModel.linkUsers.observe(viewLifecycleOwner){
             mMemberManagerViewModel.meetingMember.value = it
         }
-
-
     }
 
     override fun onDestroyView() {
@@ -373,7 +369,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
                         }
                     })
                 }
-
             bottomGoneAnim =
                 TranslateAnimation(0f, 0f, 0f, mBinding.bottomBar.measuredHeight.toFloat()).apply {
                     duration = 200

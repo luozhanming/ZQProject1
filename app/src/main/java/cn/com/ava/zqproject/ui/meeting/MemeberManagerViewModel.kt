@@ -79,13 +79,12 @@ class MemeberManagerViewModel : BaseViewModel() {
     /**
      * 全体是否静音了
      * */
-    val isAllSilent: MediatorLiveData<Boolean> by lazy {
-        MediatorLiveData<Boolean>().apply {
+    val isAllSilent: MediatorLiveData<Boolean>  = MediatorLiveData<Boolean>().apply {
             addSource(memberMicState) {
                 postValue( it.isNotEmpty()&&it.size == onMeetingMembers.value?.size ?: 0)
             }
         }
-    }
+
 
 
     /**

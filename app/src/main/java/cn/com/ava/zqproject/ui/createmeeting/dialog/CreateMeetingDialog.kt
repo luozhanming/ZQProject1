@@ -12,6 +12,7 @@ import android.widget.Switch
 import android.widget.TextView
 import cn.com.ava.base.ui.BaseDialog
 import cn.com.ava.common.util.SizeUtils
+import cn.com.ava.common.widget.CharLengthInputFilter
 import cn.com.ava.common.widget.SpecialCharInputFilter
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.net.PlatformApi
@@ -75,16 +76,17 @@ class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : 
         }
 
         etMeetingTheme?.filters = arrayOf(SpecialCharInputFilter(),InputFilter.LengthFilter(20))
-        etMeetingNickname?.filters = arrayOf(SpecialCharInputFilter(),InputFilter.LengthFilter(20))
+        etMeetingNickname?.filters = arrayOf(SpecialCharInputFilter(),CharLengthInputFilter(36))
         //设置默认
         val platformLogin = PlatformApi.getPlatformLogin()
         platformLogin?.apply {
             etMeetingTheme?.setText( "${name}${getString(R.string.who_launch_meeting)}")
-            if(TextUtils.isEmpty(professionTitleName)){
-                etMeetingNickname?.setText("${name}")
-            }else{
-                etMeetingNickname?.setText("${name}_${professionTitleName}")
-            }
+            etMeetingNickname?.setText("${name}")
+//            if(TextUtils.isEmpty(professionTitleName)){
+//                etMeetingNickname?.setText("${name}")
+//            }else{
+//                etMeetingNickname?.setText("${name}_${professionTitleName}")
+//            }
         }
     }
 

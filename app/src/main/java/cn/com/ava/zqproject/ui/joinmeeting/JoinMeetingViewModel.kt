@@ -26,17 +26,24 @@ class JoinMeetingViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+    val isShowPsw:MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>().apply {
+            value = false
+        }
+    }
+
     /**
      * 入会昵称
      * */
     val meetingNickname: MutableLiveData<String> = MutableLiveData<String>().apply {
         val platformLogin = PlatformApi.getPlatformLogin()
         platformLogin?.apply {
-            value = if (professionTitleName?.isNotEmpty() == true) {
-                "${this.name}_${this.professionTitleName}"
-            } else {
+            value =
+              //  if (professionTitleName?.isNotEmpty() == true) {
+           //     "${this.name}_${this.professionTitleName}"
+         //   } else {
                 "${this.name}"
-            }
+          //  }
         }
     }
 
