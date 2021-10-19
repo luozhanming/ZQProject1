@@ -1,6 +1,8 @@
 package cn.com.ava.lubosdk.query
 
+import android.text.TextUtils
 import cn.com.ava.lubosdk.AVATable
+import cn.com.ava.lubosdk.Cache
 import cn.com.ava.lubosdk.IQuery
 import cn.com.ava.lubosdk.entity.ListWrapper
 import cn.com.ava.lubosdk.entity.QueryResult
@@ -12,6 +14,12 @@ class InteracVolumeChannelQuery(
     override var onResult: (QueryResult) -> Unit,
     override var onError: ((Throwable) -> Unit)? = null
 ) : IQuery<ListWrapper<VolumeChannel>> {
+
+    companion object{
+        const val U2_DEFAULT = "MASTER=0,EXTLINEIN1=0,EXTLINEIN2=0,EXTREMOTE=0,LINEIN1=0,LINEIN2=0,MICIN1=0,MICIN2=0,MICIN3=0,HDMIIN=0"
+        const val U8A_DEFAULT = "MASTER=0,EXTLINEIN1=0,EXTLINEIN2=0,EXTREMOTE=0,LINEIN1=0,LINEIN2=0,MICIN1=0,MICIN2=0,HDMIIN=0"
+        const val U8_DEFAULT = "MASTER=0,LINEIN1=0,LINEIN2=0,MICIN1=0,MICIN2=0"
+    }
 
 
 
@@ -28,7 +36,18 @@ class InteracVolumeChannelQuery(
         set(value) {field = value}
 
     override fun build(split: List<String>): ListWrapper<VolumeChannel> {
-        val extvol_i = split[0]
+        var extvol_i = split[0]
+        if(TextUtils.isEmpty(extvol_i)){
+            val machineModel = Cache.getCache().luBoInfo.machineModel
+            if("u2"==machineModel){
+                extvol_i = U2_DEFAULT
+            }else if("u8a"==machineModel){
+                extvol_i = U8A_DEFAULT
+            }else{
+                extvol_i= U8_DEFAULT
+            }
+
+        }
         val split1 = extvol_i.split(",")
         val channels = arrayListOf<VolumeChannel>()
         split1.forEach {

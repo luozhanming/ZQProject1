@@ -18,7 +18,7 @@ import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
+class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<DialogSelectLayoutBinding>() {
 
     private val mSelectLayoutViewModel by viewModels<SelectLayoutManagerViewModel>()
 
@@ -114,6 +114,7 @@ class SelectLayoutManagerDialog : BaseDialogV2<DialogSelectLayoutBinding>() {
                 mSelectLayoutViewModel.layoutSure()
                 mMasterViewModel.cancelPatrol()
             }
+            onSure?.invoke()
 
         }
         mBinding.rvSelectWhatPatrol.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)

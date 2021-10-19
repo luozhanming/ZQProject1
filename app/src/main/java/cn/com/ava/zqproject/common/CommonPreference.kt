@@ -30,6 +30,9 @@ class CommonPreference<T>(private val keyName: String, private val default: T) {
         //是否已授权
         const val KEY_HAS_AUTH_CODE = "Has_Auth_Code"
 
+        const val KEY_DEFAULT_LAYOUT_INFO = "Dafault_Layout_Info"
+
+
 
         val pref = MMKV.mmkvWithID(SP_COMMON_NAME,MMKV.SINGLE_PROCESS_MODE,AppConfig.MMKV_CRYPT_KEY)
 

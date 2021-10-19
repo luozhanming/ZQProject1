@@ -192,6 +192,20 @@ class ListenerViewModel : BaseViewModel() {
         mLoopMeetingInfoZQDisposable?.dispose()
     }
 
+    fun stopAllLoopDisposable(){
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopListenerInfoDisposable?.dispose()
+        mLoopListenerInfoDisposable = null
+        mLoopCurSceneSources?.dispose()
+        mLoopCurSceneSources = null
+        mLoopMeetingInfoZQDisposable?.dispose()
+        mLoopMeetingInfoZQDisposable = null
+        mLoopMeetingMemberInfoDisposable?.dispose()
+        mLoopMeetingMemberInfoDisposable = null
+        mLoopMeetingStateZQDisposable?.dispose()
+        mLoopMeetingStateZQDisposable = null
+    }
+
 
 
 
@@ -295,14 +309,7 @@ class ListenerViewModel : BaseViewModel() {
     override fun onCleared() {
         super.onCleared()
         isPluginComputer.removeSource(curSceneSources)
-        mLoopListenerInfoDisposable?.dispose()
-        mLoopListenerInfoDisposable = null
-        mLoopCurSceneSources?.dispose()
-        mLoopCurSceneSources = null
-        mLoopMeetingInfoZQDisposable?.dispose()
-        mLoopMeetingInfoZQDisposable = null
-        mLoopMeetingMemberInfoDisposable?.dispose()
-        mLoopMeetingMemberInfoDisposable = null
+
     }
 
     fun loadMeetingMember() {

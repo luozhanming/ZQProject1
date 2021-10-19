@@ -4,10 +4,12 @@ import android.text.TextUtils
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
+import cn.com.ava.common.extension.sameTo
 import cn.com.ava.common.mvvm.OneTimeEvent
 import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
 import cn.com.ava.common.util.DateUtil
+import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.Constant
@@ -16,9 +18,10 @@ import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
+import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.common.ComputerModeManager
-import cn.com.ava.zqproject.common.RecordUploadManager
 import cn.com.ava.zqproject.net.PlatformApi
+import cn.com.ava.zqproject.vo.DefaultLayoutInfo
 import cn.com.ava.zqproject.vo.InteractComputerSource
 import cn.com.ava.zqproject.vo.InteractComputerSources
 import io.reactivex.Observable
@@ -58,7 +61,7 @@ class MasterViewModel : BaseViewModel() {
 
     private var mPatrolManager: PatrolManager? = null
 
-    private var isModifyTheme:Boolean = false
+    private var isModifyTheme: Boolean = false
 
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
@@ -275,7 +278,9 @@ class MasterViewModel : BaseViewModel() {
                             preRequestSpeakLayout = onVideoWindow.value
                         }
                         postValue(this.requestSpeakMode)
+                        defaultLayoutHelper?.updateApplySpeakStatus(requestSpeakMode>0)
                     }
+
                 }
             }
         }
@@ -297,6 +302,9 @@ class MasterViewModel : BaseViewModel() {
     private var lastNonComputerScene: LocalVideoStream? = null
 
 
+    private var defaultLayoutHelper: DefaultLayoutHelper?=null
+
+
     fun startLoadMeetingInfo() {
         isShowLoading.value = OneTimeEvent(true)
         mLoopMeetingInfoDisposable?.dispose()
@@ -314,7 +322,7 @@ class MasterViewModel : BaseViewModel() {
 
             }, {
                 isShowLoading.postValue(OneTimeEvent(false))
-                logPrint2File(it,"MasterViewModel#startLoadMeetingInfo")
+                logPrint2File(it, "MasterViewModel#startLoadMeetingInfo")
             })
     }
 
@@ -322,7 +330,7 @@ class MasterViewModel : BaseViewModel() {
      * 添加最新的录制文件到上传队列
      * */
     private fun loadLatestRecordFile() {
-      showUpload.postValue(OneTimeEvent(true))
+        showUpload.postValue(OneTimeEvent(true))
 //        isShowLoading.postValue(OneTimeEvent(true))
 //        mDisposables.add(VideoResourceManager.getRecordFileList()
 //            .map {
@@ -355,8 +363,9 @@ class MasterViewModel : BaseViewModel() {
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
                 interacInfo.postValue(it)
+                defaultLayoutHelper?.updateCurLayout(it.layout)
             }, {
-                logPrint2File(it,"MasterViewModel#startLoopInteracInfo")
+                logPrint2File(it, "MasterViewModel#startLoopInteracInfo")
             })
     }
 
@@ -370,24 +379,24 @@ class MasterViewModel : BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 meetingInfoZq.postValue(it)
-                if(!isModifyTheme){
+                if (!isModifyTheme) {
                     modifyTheme()
                     isModifyTheme = true
                 }
             }, {
-                logPrint2File(it,"MasterViewModel#startLoopMeetingInfoZQ")
+                logPrint2File(it, "MasterViewModel#startLoopMeetingInfoZQ")
             })
     }
 
     private fun modifyTheme() {
         meetingInfoZq.value?.apply {
             mDisposables.add(
-                RecordManager.setClassInfo(confTheme, PlatformApi.getPlatformLogin()?.name?:"")
+                RecordManager.setClassInfo(confTheme, PlatformApi.getPlatformLogin()?.name ?: "")
                     .subscribeOn(Schedulers.io())
                     .subscribe({
 
-                    },{
-                        logPrint2File(it,"MasterViewModel#modifyTheme")
+                    }, {
+                        logPrint2File(it, "MasterViewModel#modifyTheme")
                     })
             )
 
@@ -403,9 +412,17 @@ class MasterViewModel : BaseViewModel() {
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({
+
                 linkUsers.postValue(it.datas)
+                val onMeetingUsers = it.datas.filter {
+                    it.role != "3" && it.onlineState == 1
+                }
+                if(onMeetingUsers.isNotEmpty()){
+                    defaultLayoutHelper = defaultLayoutHelper?: DefaultLayoutHelper(onMeetingUsers)
+                    defaultLayoutHelper?.updateOnMeetingUser(onMeetingUsers)
+                }
             }, {
-                logPrint2File(it,"MasterViewModel#startLoopLinkUsers")
+                logPrint2File(it, "MasterViewModel#startLoopLinkUsers")
             })
     }
 
@@ -436,19 +453,21 @@ class MasterViewModel : BaseViewModel() {
 //                                        findUser.nickname
 //                                    )
 //                                )
-                                applySpeakUser.add( ApplySpeakUser(
+                                applySpeakUser.add(
+                                    ApplySpeakUser(
                                         numId,
                                         findUser.username,
                                         "",
                                         findUser.nickname
-                                    ))
+                                    )
+                                )
                             }
                         }
                     }
                 }
                 applySpeakUsers.postValue(applySpeakUser)
             }, {
-                logPrint2File(it,"MasterViewModel#startLoopMeetingState")
+                logPrint2File(it, "MasterViewModel#startLoopMeetingState")
             })
     }
 
@@ -466,28 +485,28 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#toggleComputer")
+                    logPrint2File(it, "MasterViewModel#toggleComputer")
                 })
         )
     }
 
     fun overMeeting() {
-        val meetingNo = meetingInfoZq.value?.confId?:""
-        PlatformApi.getService().endMeeting(meetingNo)
+        val meetingNo = meetingInfoZq.value?.confId ?: ""
+        PlatformApi.getService().endMeeting(meetingNo = meetingNo)
             .compose(PlatformApi.applySchedulers())
             .subscribeOn(Schedulers.io())
             .subscribe({
                 it.toString()
-            },{
-                logPrint2File(it,"MasterViewModel#overMeeting1")
+            }, {
+                logPrint2File(it, "MasterViewModel#overMeeting1")
             })
 
-            ZQManager.exitMeeting()
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                }, {
-                    logPrint2File(it,"MasterViewModel#overMeeting2")
-                })
+        ZQManager.exitMeeting()
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+            }, {
+                logPrint2File(it, "MasterViewModel#overMeeting2")
+            })
 
     }
 
@@ -532,8 +551,8 @@ class MasterViewModel : BaseViewModel() {
                             computerIndex,
                             computerWindow.isHasMultiSource,
                             computerWindow.curSourceIndex,
-                            computerWindow.sources?: emptyList(),
-                            computerWindow.sourcesCmd?: emptyList()
+                            computerWindow.sources ?: emptyList(),
+                            computerWindow.sourcesCmd ?: emptyList()
                         )
                         return@map computerSource
                     } else {
@@ -562,7 +581,7 @@ class MasterViewModel : BaseViewModel() {
                         computerSourceList.postValue(sourceList)
                     }
                 }, {
-                    logPrint2File(it,"MasterViewModel#getComputerSourceInfo")
+                    logPrint2File(it, "MasterViewModel#getComputerSourceInfo")
                 })
         )
     }
@@ -572,7 +591,7 @@ class MasterViewModel : BaseViewModel() {
         val curState = meetingInfo.value?.recordState ?: Constant.RECORD_STOP
         var nextState = when (curState) {
             Constant.RECORD_STOP -> 1
-            else ->0
+            else -> 0
         }
         mDisposables.add(
             ZQManager.setRecordState(nextState)
@@ -580,7 +599,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#toggleRecord")
+                    logPrint2File(it, "MasterViewModel#toggleRecord")
                 })
         )
     }
@@ -592,7 +611,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#toggleLive")
+                    logPrint2File(it, "MasterViewModel#toggleLive")
                 })
         )
     }
@@ -614,7 +633,7 @@ class MasterViewModel : BaseViewModel() {
             .subscribe({
                 curSceneSources.postValue(it)
             }, {
-                logPrint2File(it,"MasterViewModel#loopCurVideoSceneSources")
+                logPrint2File(it, "MasterViewModel#loopCurVideoSceneSources")
             })
     }
 
@@ -635,6 +654,8 @@ class MasterViewModel : BaseViewModel() {
         mLoopMeetingStateZQDisposable?.dispose()
         mPatrolManager?.cancel()
         mPatrolManager = null
+        defaultLayoutHelper?.stopDefault()
+        defaultLayoutHelper = null
     }
 
 
@@ -645,7 +666,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#setVideoLayout")
+                    logPrint2File(it, "MasterViewModel#setVideoLayout")
                 })
         )
     }
@@ -667,7 +688,7 @@ class MasterViewModel : BaseViewModel() {
                     }
                 }
             }, {
-                logPrint2File(it,"MasterViewModel#startTimeCount")
+                logPrint2File(it, "MasterViewModel#startTimeCount")
             })
     }
 
@@ -693,7 +714,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it,"MasterViewModel#toggleLocalVolumeAudio")
+                        logPrint2File(it, "MasterViewModel#toggleLocalVolumeAudio")
                     })
             )
         }
@@ -709,7 +730,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#setRequestSpeakMode")
+                    logPrint2File(it, "MasterViewModel#setRequestSpeakMode")
                 })
         )
     }
@@ -744,7 +765,7 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"MasterViewModel#agreeRequestSpeak")
+                    logPrint2File(it, "MasterViewModel#agreeRequestSpeak")
                 })
         )
     }
@@ -760,7 +781,7 @@ class MasterViewModel : BaseViewModel() {
                     .subscribe({
 
                     }, {
-                        logPrint2File(it,"MasterViewModel#toggleLockMeeting")
+                        logPrint2File(it, "MasterViewModel#toggleLockMeeting")
                     })
             )
         }
@@ -780,8 +801,8 @@ class MasterViewModel : BaseViewModel() {
 
                 override fun onChanged(user: LinkedUser) {
                     logd("onChanged")
-                    if(requestSpeakRet.value?:0>0){   //发言模式不能轮播
-                       return
+                    if (requestSpeakRet.value ?: 0 > 0) {   //发言模式不能轮播
+                        return
                     }
                     setVideoLayout(listOf(user.number))
                 }
@@ -793,6 +814,10 @@ class MasterViewModel : BaseViewModel() {
 
     fun cancelPatrol() {
         mPatrolManager?.cancel()
+    }
+
+    fun stopDefaultLayout() {
+        defaultLayoutHelper?.stopDefault()
     }
 
 
@@ -821,7 +846,7 @@ class MasterViewModel : BaseViewModel() {
             timer?.dispose()
             patrolUsers.clear()
             patrolUsers.addAll(users)
-            timer = Observable.interval(0,period, TimeUnit.SECONDS)
+            timer = Observable.interval(0, period, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     val size = patrolUsers.size
@@ -829,7 +854,7 @@ class MasterViewModel : BaseViewModel() {
                     callback?.onChanged(patrolUsers[curPos])
                     curPos++
                 }, {
-                    logPrint2File(it,"MasterViewModel#begin")
+                    logPrint2File(it, "MasterViewModel#begin")
                 })
         }
 
@@ -837,9 +862,239 @@ class MasterViewModel : BaseViewModel() {
             timer?.dispose()
             callback?.onCancel()
         }
+    }
 
 
+    class DefaultLayoutHelper(var list: List<LinkedUser>?=null) {
 
+        companion object {
+            const val PATROL_INTERVAL = 4L
+        }
+
+        private val defaultLayoutInfo: DefaultLayoutInfo
+
+        private var workerDisposable: Disposable? = null
+
+        private var onMeetingUsers: MutableList<LinkedUser> = arrayListOf()
+
+        private var curLayout: MutableList<Int> = arrayListOf()
+
+        private var patrolDisposable: Disposable? = null
+
+        private var patrolLoopDisposable: Disposable? = null
+
+        /*是否在发言*/
+        private var isSpeakMode:Boolean = false
+
+        /**
+         * 轮播队列
+         * */
+        private val patrolQueue: MutableList<LinkedUser> by lazy {
+            mutableListOf()
+        }
+
+        private var curPatrolIndex: Int = 0
+
+
+        init {
+            val json = CommonPreference.getElement(CommonPreference.KEY_DEFAULT_LAYOUT_INFO, "")
+            defaultLayoutInfo = GsonUtil.fromJson(json, DefaultLayoutInfo::class.java)
+            onMeetingUsers.addAll(list?: emptyList())
+            //设置默认布局
+            setInitLayout()
+            saveInfo()
+        }
+
+        private fun saveInfo() {
+            val toJson = GsonUtil.toJson(defaultLayoutInfo)
+            CommonPreference.putElement(CommonPreference.KEY_DEFAULT_LAYOUT_INFO, toJson)
+        }
+
+
+        fun updateOnMeetingUser(users: List<LinkedUser>) {
+            onMeetingUsers.addAll(users)
+        }
+
+        fun updateCurLayout(layouts: List<Int>) {
+            curLayout.clear()
+            curLayout.addAll(layouts)
+        }
+
+        fun updateApplySpeakStatus(mode:Boolean){
+            isSpeakMode = mode
+        }
+
+        private fun setInitLayout() {
+            val contractUsers = defaultLayoutInfo.contractUsers  //没有主讲
+            var size = contractUsers.size + 1
+            if (defaultLayoutInfo.hasLayoutInitDefault) {   //已经初设了默认布局，但听讲没完全加进来
+                if (defaultLayoutInfo.isInDefaultLayout) {  //已经在默认布局
+                    if (size <= 8) {
+                        startLayoutLess8Worker()
+                    } else {  //轮播
+                        startGreater8Worker()
+                    }
+                }
+                return
+            }
+
+            if (size in 1..8) {
+                if (size == 5) size = 6
+                if (size == 7) size = 8
+                //少于8个默认布局
+                ZQManager.setVideoLayout(size, arrayListOf<Int>().apply {
+                    for (i in 0 until size) {
+                        if (i == 0) add(1)
+                        else add(-1)
+                    }
+                }).subscribeOn(Schedulers.io())
+                    .subscribe({
+                        if (it) {
+                            defaultLayoutInfo.hasLayoutInitDefault = true
+                            saveInfo()
+                            startLayoutLess8Worker()
+                        }
+                    }, {
+                        logPrint2File(it, "DefaultLayoutHelper#setInitLayout1")
+                    })
+            } else if (size > 8) {  //启动轮播
+                startGreater8Worker()
+            }
+        }
+
+        private fun startGreater8Worker() {
+            patrolDisposable?.dispose()
+            if (!defaultLayoutInfo.isInDefaultLayout) return
+            this@DefaultLayoutHelper.logd("startGreater8Worker")
+            patrolQueue.clear()
+            patrolQueue.add(onMeetingUsers[0])  //默认添加主讲进队列
+            //用于添加队列
+            patrolDisposable = Observable.interval(0, 2, TimeUnit.SECONDS)
+                .flatMap {
+                    val userIds = defaultLayoutInfo.contractUsers.map { it.userId }
+                    return@flatMap PlatformApi.getService().getUserRsAcctList(userIds = userIds)
+                        .compose(PlatformApi.applySchedulers())
+                }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    if (it.success) {
+                        val user = it.data
+                        user.forEach { ruser ->
+                            if (ruser.rsAcct?.isNotEmpty() == true && ruser.status == 1) {   //人平台在线
+                                val user =
+                                    onMeetingUsers.firstOrNull { it.username == ruser.rsAcct ?: "" }
+                                if (user != null) {
+                                    if (user !in patrolQueue) {
+                                        patrolQueue.add(user)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    logPrint2File(it, "DefaultLayoutHelper#startGreater8Worker1")
+                })
+
+            patrolLoopDisposable = Observable.interval(PATROL_INTERVAL, TimeUnit.SECONDS)
+                .subscribe({
+                    if (patrolQueue.size>1&&!isSpeakMode) {
+                        val patrolUser = patrolQueue[curPatrolIndex % patrolQueue.size]
+                        ZQManager.setVideoLayout(1, listOf(patrolUser.number))
+                            .subscribeOn(Schedulers.io())
+                            .subscribe({
+
+                            }, {
+                                logPrint2File(it, "DefaultLayoutHelper#startGreater8Worker3")
+                            })
+                        curPatrolIndex++
+                    }
+                }, {
+                    logPrint2File(it, "DefaultLayoutHelper#startGreater8Worker2")
+                })
+
+        }
+
+        /**
+         * 开始少于8的自动布局
+         * */
+        fun startLayoutLess8Worker() {
+            //TODO 优化建议：优化当所有平台与会都在画面上时结束自动布局
+            workerDisposable?.dispose()
+            if (!defaultLayoutInfo.isInDefaultLayout) return
+            workerDisposable = Observable.interval(2, 2, TimeUnit.SECONDS)
+                .flatMap {
+                    val userIds = defaultLayoutInfo.contractUsers.map { it.userId }
+                    return@flatMap PlatformApi.getService().getUserRsAcctList(userIds = userIds)
+                        .compose(PlatformApi.applySchedulers())
+                }.subscribeOn(Schedulers.io())
+                .subscribe({
+                    this@DefaultLayoutHelper.logd("startLayoutLess8Worker loop")
+                    if (it.success) {
+                        val user = it.data
+                        val newLayout = arrayListOf<Int>()
+                        newLayout.addAll(curLayout)
+                        this@DefaultLayoutHelper.logd("newLayout:${newLayout.toString()}")
+                        //     var isAllSet = true
+                        user.forEach { ruser ->
+                            if (ruser.rsAcct?.isNotEmpty() == true && ruser.status == 1) {   //人平台在线
+                                val user =
+                                    onMeetingUsers.firstOrNull { it.username == ruser.rsAcct ?: "" }
+                                if (user != null) {   //找到了LinkedUser
+                                    val layouts = curLayout.subList(1, curLayout.size)
+                                    //查看当前布局是否有自己的number，是表示已在画面，不是不在画面
+                                    if (user.number !in layouts) {  //不在画面里
+                                        val index = curLayout.indexOfFirst { it == -1 }
+                                        this@DefaultLayoutHelper.logd("index:$index ,number:${user.number}")
+                                        //添加到索引最小的空位置
+                                        if (index > -1) {   //有空位
+                                            newLayout.removeAt(index)
+                                            newLayout.add(index, user.number)
+                                        } else {  //没有空位,停止
+                                            stopDefault()
+                                        }
+//                                        if(isAllSet){
+//                                            isAllSet = false
+//                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //全部完成
+                        val winCount = newLayout[0]
+                        val users = newLayout.subList(1, newLayout.size)
+                        if (!newLayout.sameTo(curLayout)) {
+                            ZQManager.setVideoLayout(winCount, users)
+                                .subscribeOn(Schedulers.io())
+                                .subscribe({
+                                    logd("setVideoLayout success")
+                                }, {
+                                    logPrint2File(it, "DefaultLayoutHelper#startWorker2")
+                                })
+                        }
+//                        if(isAllSet){
+//                            stopDefault()
+//                        }
+                    }
+                }, {
+                    logPrint2File(it, "DefaultLayoutHelper#startWorker1")
+                })
+        }
+
+
+        fun startPatrol() {
+            patrolDisposable?.dispose()
+        }
+
+        /**
+         * 停止自动布局
+         * */
+        fun stopDefault() {
+            workerDisposable?.dispose()
+            patrolDisposable?.dispose()
+            patrolLoopDisposable?.dispose()
+            defaultLayoutInfo.isInDefaultLayout = false
+            saveInfo()
+        }
     }
 
 

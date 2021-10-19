@@ -156,7 +156,6 @@
                 android:padding="5dp"
                 android:layout_marginLeft="12dp"
                 android:background="@drawable/bg_text_button_2"
-
                 android:src="@drawable/btn_up_down"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/ll_volume_scene"

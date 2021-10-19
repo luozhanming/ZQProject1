@@ -60,7 +60,12 @@ class ReceiveCallFragment : BaseLoadingFragment<FragmentReceiveCallingBinding>()
             if(it)showLoading() else hideLoading()
         }
         mReceiveCallViewModel.joinSuccess.observeOne(viewLifecycleOwner){
-            findNavController().popBackStack()
+            if(it){
+                findNavController().popBackStack()
+            }else{
+                ToastUtils.showShort(getString(R.string.join_failed))
+            }
+
         }
         mReceiveCallViewModel.finishCall.observeOne(viewLifecycleOwner){
             findNavController().popBackStack()

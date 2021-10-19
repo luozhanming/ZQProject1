@@ -243,6 +243,9 @@ object ZQManager {
         streamCount: Int,
         preLayout: List<Int>
     ): Observable<Boolean> {
+        if(preLayout.isEmpty()||0==streamCount){
+            return Observable.empty()
+        }
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {

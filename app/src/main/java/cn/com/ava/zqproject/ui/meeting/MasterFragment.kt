@@ -273,7 +273,9 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             mMasterViewModel.toggleLive()
         }
         mBinding.llSceneLayout.setOnClickListener {
-            val dialog = SelectLayoutManagerDialog()
+            val dialog = SelectLayoutManagerDialog{
+                mMasterViewModel.stopDefaultLayout()
+            }
             dialog.show(childFragmentManager, "select_layout")
         }
         mBinding.llMemberManager.setOnClickListener {

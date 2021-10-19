@@ -2,8 +2,6 @@ package cn.com.ava.zqproject.ui.home
 
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
-import cn.com.ava.common.http.ResponseThrowable
-import cn.com.ava.common.http.ServerException
 import cn.com.ava.common.mvvm.OneTimeEvent
 import cn.com.ava.common.mvvm.OneTimeLiveData
 import cn.com.ava.common.rxjava.RetryFunction
@@ -54,7 +52,7 @@ class HomeViewModel : BaseViewModel() {
         OneTimeLiveData()
     }
 
-    val isLoading:OneTimeLiveData<Boolean> by lazy {
+    val isLoading: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
@@ -65,28 +63,27 @@ class HomeViewModel : BaseViewModel() {
         OneTimeLiveData()
     }
 
-    val backToLogin:OneTimeLiveData<Boolean> by lazy {
+    val backToLogin: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
 
-    val goCreateMeeting:OneTimeLiveData<Boolean> by lazy {
+    val goCreateMeeting: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
-    val goJoinMeeting:OneTimeLiveData<Boolean> by lazy {
+    val goJoinMeeting: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
 
     private var mLoadLuboInfoDisposable: Disposable? = null
-    private var mSendHeartBeatDisposable: Disposable? = null
     private var mLoopMeetingInfoZQDisposable: Disposable? = null
     private var mLoopMeetingInvitationDisposable: Disposable? = null
 
 
     fun startloadLuboInfo() {
         mLoadLuboInfoDisposable?.dispose()
-        mLoadLuboInfoDisposable = Observable.interval(0,5, TimeUnit.SECONDS)
+        mLoadLuboInfoDisposable = Observable.interval(0, 5, TimeUnit.SECONDS)
             .flatMap {
                 GeneralManager.getLuboInfo()
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
@@ -94,7 +91,7 @@ class HomeViewModel : BaseViewModel() {
             .subscribe({
                 luboInfo.postValue(it)
             }, {
-                logPrint2File(it,"HomeViewModel#startloadLuboInfo")
+                logPrint2File(it, "HomeViewModel#startloadLuboInfo")
             })
     }
 
@@ -120,7 +117,7 @@ class HomeViewModel : BaseViewModel() {
                 }
 
             }, {
-                logPrint2File(it,"HomeViewModel#startLoopMeetingInvitation")
+                logPrint2File(it, "HomeViewModel#startLoopMeetingInvitation")
             })
     }
 
@@ -134,20 +131,21 @@ class HomeViewModel : BaseViewModel() {
      * */
     fun startHeartBeat() {
         mDisposables.add(Observable.interval(
-            0, 20, TimeUnit.SECONDS)
-            .flatMap {
-                PlatformApi.getService().heartBeat(rsAcct = LoginManager.getLogin()?.rserverInfo?.usr?:"")
+            0, 20, TimeUnit.SECONDS
+        ).flatMap {
+                PlatformApi.getService()
+                    .heartBeat(rsAcct = LoginManager.getLogin()?.rserverInfo?.usr ?: "")
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
-                if(it.code==10004){
+                if (it.code == 10004) {
                     ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
                     EventBus.getDefault().post(GoLoginEvent())
-                //    backToLogin.postValue(OneTimeEvent(true))
                 }
             }, {
-                logPrint2File(it,"HomeViewModel#startHeartBeat")
+                logPrint2File(it, "HomeViewModel#startHeartBeat")
                 //发送心跳错误
-            }))
+            })
+        )
     }
 
 
@@ -158,7 +156,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"HomeViewModel#preloadWindowAndLayout1")
+                    logPrint2File(it, "HomeViewModel#preloadWindowAndLayout1")
                 })
         )
         mDisposables.add(
@@ -167,7 +165,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
 
                 }, {
-                    logPrint2File(it,"HomeViewModel#preloadWindowAndLayout2")
+                    logPrint2File(it, "HomeViewModel#preloadWindowAndLayout2")
                 })
         )
         ComputerModeManager.getComputerIndex()
@@ -183,7 +181,7 @@ class HomeViewModel : BaseViewModel() {
                 .subscribe({
                     PlatformApi.logout()
                 }, {
-                    logPrint2File(it,"HomeViewModel#logout")
+                    logPrint2File(it, "HomeViewModel#logout")
                 })
         )
     }
@@ -192,8 +190,7 @@ class HomeViewModel : BaseViewModel() {
      * 轮询token跟新
      * */
     fun loopRefreshToken() {
-        mDisposables.add(
-            Observable.interval(0, 1, TimeUnit.MINUTES)
+        mDisposables.add(Observable.interval(0, 1, TimeUnit.MINUTES)
                 .flatMap {
                     PlatformApi.getService().refreshToken()
                         .compose(PlatformApi.applySchedulers())
@@ -202,7 +199,7 @@ class HomeViewModel : BaseViewModel() {
                     PlatformApi.refreshLoginToken(it.data)
                     logd(it.toString())
                 }, {
-                    logPrint2File(it,"HomeViewModel#loopRefreshToken")
+                    logPrint2File(it, "HomeViewModel#loopRefreshToken")
                 })
         )
     }
@@ -212,16 +209,16 @@ class HomeViewModel : BaseViewModel() {
         mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 ZQManager.loadMeetingInfo()
-                    .flatMap {info->
-                        if(info.confMode=="cloudCtrlMode"){
-                         return@flatMap   ZQManager.loadMeetingMember()
+                    .flatMap { info ->
+                        if (info.confMode == "cloudCtrlMode") {
+                            return@flatMap ZQManager.loadMeetingMember()
                                 .map {
-                                    if(it.localRole!=4){
+                                    if (it.localRole != 4) {
                                         info.confMode = "classMode"
                                     }
                                     return@map info
                                 }
-                        }else{
+                        } else {
                             return@flatMap Observable.just(info)
                         }
                     }
@@ -230,7 +227,7 @@ class HomeViewModel : BaseViewModel() {
             .subscribe({
                 meetingInfoZq.postValue(OneTimeEvent(it))
             }, {
-                logPrint2File(it,"HomeViewModel#startLoopMeetingInfoZQ")
+                logPrint2File(it, "HomeViewModel#startLoopMeetingInfoZQ")
             })
     }
 
@@ -243,36 +240,41 @@ class HomeViewModel : BaseViewModel() {
     /**
      * 请求是否能去互动   0创建会议  1加入会议
      * */
-    fun requestCanCreateMeeting(createOrJoin:Int) {
+    fun requestCanCreateMeeting(createOrJoin: Int) {
         mDisposables.add(RecordManager.getRecordInfo()
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if(it.isLiving||it.recordState!=Constant.RECORD_STOP){
+                if (it.isLiving || it.recordState != Constant.RECORD_STOP) {
                     ToastUtils.showShort(getResources().getString(R.string.toast_cannot_go_create_meeting))
-                }else{
-                    if(createOrJoin==0){
+                } else {
+                    if (createOrJoin == 0) {
                         goCreateMeeting.postValue(OneTimeEvent(true))
-                    }else{
+                    } else {
                         goJoinMeeting.postValue(OneTimeEvent(true))
                     }
                 }
-            },{
-                logPrint2File(it,"HomeViewModel#requestCanCreateMeeting")
-            }))
+            }, {
+                logPrint2File(it, "HomeViewModel#requestCanCreateMeeting")
+            })
+        )
     }
 
 
-    fun autoLuboLogin(){
-        mDisposables.add(Observable.interval(3,TimeUnit.MINUTES)
+    fun autoLuboLogin() {
+        mDisposables.add(Observable.interval(3, TimeUnit.MINUTES)
             .flatMap {
-                LoginManager.newLogin(LoginManager.getLogin()?.username?:"",LoginManager.getLogin()?.password?:"")
+                LoginManager.newLogin(
+                    LoginManager.getLogin()?.username ?: "",
+                    LoginManager.getLogin()?.password ?: ""
+                )
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-            },{
-                logPrint2File(it,"HomeViewModel#autoLuboLogin")
-            }))
+            }, {
+                logPrint2File(it, "HomeViewModel#autoLuboLogin")
+            })
+        )
     }
 
 

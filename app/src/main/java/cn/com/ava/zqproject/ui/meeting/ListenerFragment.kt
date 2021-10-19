@@ -98,11 +98,21 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
             )
         }
 
-        mListenerViewModel.loopCurVideoSceneSources()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
         mListenerViewModel.startLoopMeetingInfoZQ()
+        mListenerViewModel.loopCurVideoSceneSources()
         mListenerViewModel.loadMeetingMember()
         mListenerViewModel.startTimeCount()
         mListenerViewModel.startLoopMeetingState()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mListenerViewModel.stopAllLoopDisposable()
     }
 
     override fun observeVM() {

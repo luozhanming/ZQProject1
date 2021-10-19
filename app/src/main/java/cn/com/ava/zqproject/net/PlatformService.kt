@@ -165,4 +165,9 @@ interface PlatformService {
         @Field("meetingNo") meetingNo: String = ""
     ): Observable<PlatformResponse<Any>>
 
+
+    @GET("/{path}")
+    fun getUserRsAcctList(@Path("path",encoded = true) path:String?=PlatformApiManager.getApiPath(PlatformApiManager.PATH_USER_RSACCTLIST),
+                          @Query("userId") userIds:List<String>):Observable<PlatformResponse<List<PlatUser2Rserver>>>
+
 }

@@ -95,12 +95,15 @@ public class LinkedUser implements Comparable<Integer>,QueryResult {
     @Override
     public String toString() {
         return "LinkedUser{" +
-                "number=" + number +
+                "userId='" + userId + '\'' +
+                ", number=" + number +
                 ", username='" + username + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", shortNumer='" + shortNumer + '\'' +
                 ", onlineState=" + onlineState +
                 ", isOnVideo=" + isOnVideo +
+                ", sessionId='" + sessionId + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 

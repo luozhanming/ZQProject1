@@ -1,16 +1,20 @@
 package cn.com.ava.zqproject.ui.createmeeting
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.mvvm.OneTimeEvent
 import cn.com.ava.common.mvvm.OneTimeLiveData
+import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.ContractGroup
 import cn.com.ava.zqproject.vo.ContractUser
+import cn.com.ava.zqproject.vo.DefaultLayoutInfo
 import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -38,6 +42,8 @@ class CreateMeetingViewModel : BaseViewModel() {
     val isLoading:OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
+
+    private var meetingNo:String=""
 
 
     fun addOrDelSelectedUser(user: ContractUser): Boolean {
@@ -112,6 +118,7 @@ class CreateMeetingViewModel : BaseViewModel() {
                 if (it) {
                     ZQManager.loadMeetingInfo()   //加载会议信息
                         .flatMap {
+                            meetingNo = it.confId
                             return@flatMap PlatformApi.getService().createMeeting(  //回传平台
                                 initiator = nickname,
                                 meetingTitle = theme,
@@ -140,7 +147,11 @@ class CreateMeetingViewModel : BaseViewModel() {
                 isLoading.postValue(OneTimeEvent(false))
                 ToastUtils.showShort(getResources().getString(R.string.create_meeting_success))
                 goMeeting.postValue(OneTimeEvent(true))
-                //创建成功
+                //创建成功,保存默认布局信息
+                val selectedUsers = selectedUser.value?: emptyList()
+                val defaultLayoutInfo = DefaultLayoutInfo(meetingNo, false,true, selectedUsers)
+                val toJson = GsonUtil.toJson(defaultLayoutInfo)
+                CommonPreference.putElement(CommonPreference.KEY_DEFAULT_LAYOUT_INFO,toJson)
             }, {
                 isLoading.postValue(OneTimeEvent(false))
                 ToastUtils.showShort(getResources().getString(R.string.create_meeting_failed))
