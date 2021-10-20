@@ -5,8 +5,10 @@ import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.entity.ListWrapper
 import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.zq.control.*
+import cn.com.ava.lubosdk.zq.entity.MeetingAudioParam
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
+import cn.com.ava.lubosdk.zq.query.MeetingAudioParamQuery
 import cn.com.ava.lubosdk.zq.query.MeetingInfoQuery
 import cn.com.ava.lubosdk.zq.query.MeetingMemberQuery
 import cn.com.ava.lubosdk.zq.query.MeetingStateInfoQuery
@@ -411,6 +413,24 @@ object ZQManager {
                     )
                 }
                 emitter.onNext(isSuccess)
+            }
+        }
+    }
+
+    /**
+     * 加载会议音频
+     * */
+    fun loadMeetingAudioParam():Observable<MeetingAudioParam>{
+        return Observable.create { emitter ->
+            runBlocking {
+                val result = suspendCoroutine<MeetingAudioParam> {
+                    AVAHttpEngine.requestSPQuery(
+                        MeetingAudioParamQuery(
+                            onResult = { result -> it.resumeWith(Result.success(result as MeetingAudioParam)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(result)
             }
         }
     }

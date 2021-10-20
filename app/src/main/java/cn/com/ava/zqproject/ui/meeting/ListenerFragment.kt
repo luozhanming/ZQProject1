@@ -108,6 +108,7 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
         mListenerViewModel.loadMeetingMember()
         mListenerViewModel.startTimeCount()
         mListenerViewModel.startLoopMeetingState()
+    //    mListenerViewModel.startLoopMeetingAudioParam()
     }
 
     override fun onStop() {

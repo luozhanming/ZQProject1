@@ -204,9 +204,10 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
             if(it.cameraCtrlState?.sameTo( mMemberManagerViewModel.memberCamState.value)==false){
                 mMemberManagerViewModel.memberCamState.value = it.cameraCtrlState
             }
-            if(it.audioCtrlState?.sameTo( mMemberManagerViewModel.memberMicState.value)==false){
+//            mMemberManagerViewModel.logd("audioCtrlState:${it.audioCtrlState}   memberMicState:${mMemberManagerViewModel.memberMicState.value}"   )
+        //    if(it.audioCtrlState?.sameTo( mMemberManagerViewModel.memberMicState.value)==false){
                 mMemberManagerViewModel.memberMicState.value = it.audioCtrlState
-            }
+          //  }
         }
         mMasterViewModel.linkUsers.observe(viewLifecycleOwner){
             mMemberManagerViewModel.meetingMember.value = it

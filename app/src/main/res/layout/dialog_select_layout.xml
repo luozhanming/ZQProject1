@@ -304,6 +304,8 @@
                     android:background="@drawable/bg_edittext_1"
                     android:hint="1~3600"
                     android:singleLine="true"
+                    android:digits="0123456789"
+                    android:inputType="number"
                     android:textCursorDrawable="@null"
                     android:text="@={selectLayoutViewModel.patrolPeriod}"
                     android:paddingLeft="12dp"

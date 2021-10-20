@@ -4,6 +4,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.R

@@ -1,5 +1,7 @@
 package cn.com.ava.lubosdk.entity;
 
+import java.util.Objects;
+
 /**
  * 音量通道信息
  */
@@ -86,4 +88,21 @@ public class VolumeChannel {
     public void setAdapteVolumeLevel(int adapteVolumeLevel) {
         this.adapteVolumeLevel = adapteVolumeLevel;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VolumeChannel that = (VolumeChannel) o;
+        return volumnLevel == that.volumnLevel &&
+                isSilent == that.isSilent &&
+                enable == that.enable &&
+                canAmp == that.canAmp &&
+                min == that.min &&
+                max == that.max &&
+                adapteVolumeLevel == that.adapteVolumeLevel &&
+                Objects.equals(channelName, that.channelName);
+    }
+
+
 }

@@ -49,7 +49,6 @@ class RecentCallFragment : BaseFragment<FragmentRecentCallBinding>() {
                 })
         }
         mBinding.rvContractUser.adapter = mContractUserItemAdapter
-
         mBinding.rvContractUser.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 

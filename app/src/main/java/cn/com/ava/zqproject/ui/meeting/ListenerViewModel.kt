@@ -17,6 +17,7 @@ import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.manager.InteracManager
 import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.lubosdk.manager.ZQManager
+import cn.com.ava.lubosdk.zq.entity.MeetingAudioParam
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.lubosdk.zq.entity.MeetingStateInfoZQ
 import cn.com.ava.lubosdk.zq.query.MeetingMemberQuery
@@ -57,6 +58,8 @@ class ListenerViewModel : BaseViewModel() {
     private var mTimeCountDisposable: Disposable? = null
 
     private var mLoopMeetingStateZQDisposable:Disposable? = null
+
+    private var mLoopMeetingAudioDisposable:Disposable?=null
 
 
     val isShowLoading: OneTimeLiveData<Boolean> by lazy {
@@ -162,6 +165,11 @@ class ListenerViewModel : BaseViewModel() {
     }
 
 
+    val meetingAudioParam:MutableLiveData<MeetingAudioParam> by lazy {
+        MutableLiveData()
+    }
+
+
     /**
      * 上次不是电脑的画面，用于恢复
      * */
@@ -188,9 +196,25 @@ class ListenerViewModel : BaseViewModel() {
             })
     }
 
-    fun stopLoopMeetingInfoZQ() {
-        mLoopMeetingInfoZQDisposable?.dispose()
+    fun startLoopMeetingAudioParam(){
+        mLoopMeetingAudioDisposable?.dispose()
+        mLoopMeetingAudioDisposable = Observable.interval(1500,TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingAudioParam()
+                    .doOnError {
+                        logPrint2File(it,"ListenerViewModel#startLoopMeetingAudioParam")
+                    }
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                meetingAudioParam.postValue(it)
+            }, {
+
+                logPrint2File(it,"ListenerViewModel#startLoopMeetingAudioParam")
+            })
     }
+
+
 
     fun stopAllLoopDisposable(){
         mLoopMeetingInfoZQDisposable?.dispose()
@@ -204,6 +228,8 @@ class ListenerViewModel : BaseViewModel() {
         mLoopMeetingMemberInfoDisposable = null
         mLoopMeetingStateZQDisposable?.dispose()
         mLoopMeetingStateZQDisposable = null
+//        mLoopMeetingAudioDisposable?.dispose()
+//        mLoopMeetingAudioDisposable = null
     }
 
 

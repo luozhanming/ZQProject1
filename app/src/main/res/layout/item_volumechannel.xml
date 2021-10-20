@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="volumechannel"
+            type="cn.com.ava.lubosdk.entity.VolumeChannel" />
+    </data>
+
+
+<LinearLayout
+    android:id="@+id/linearLayout3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:layout_marginTop="13dp"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:id="@+id/cb_silent2"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:background="@drawable/bg_text_button_1"
+        android:padding="5dp"
+        android:selected="@{!volumechannel.silent}"
+        android:src="@drawable/checkbox_1" />
+
+    <TextView
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:text="@{volumechannel.channelName}"
+        android:textColor="@color/color_222222"
+        android:textSize="20sp" />
+
+    <SeekBar
+        android:id="@+id/sb_audio2"
+        android:layout_width="312dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:enabled="@{!volumechannel.isSilent()}"
+        android:max="@{volumechannel.max}"
+        android:progress="@{volumechannel.adapteVolumeLevel}"
+        android:progressTint="@color/color_318EF8"
+        android:splitTrack="false"
+        android:thumb="@mipmap/ic_seekbar_thumb" />
+
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18dp"
+        android:text='@{(int)((float)volumechannel.adapteVolumeLevel/volumechannel.max*100)+"%"}'
+        android:textColor="@color/color_666666"
+        android:textSize="16sp" />
+
+</LinearLayout>
+
+
+
+</layout>

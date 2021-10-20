@@ -104,6 +104,7 @@ object LoginManager {
                             })
                     )
                 }
+
                 Log.d(TAG, "loginEx: getLogin ${login.toString()}")
                 if(login.isLoginSuccess&&!login.isSleep){
                     val luboInfo = suspendCoroutine<LuBoInfo> {
@@ -117,7 +118,10 @@ object LoginManager {
                     }
                     mLogin = login
                     mLogin?.rserverInfo = luboInfo.stun
+                }else if(login.isLoginSuccess){
+                    mLogin = login
                 }
+
                 emitter.onNext(mLogin?:login)
 
             }

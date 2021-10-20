@@ -15,7 +15,7 @@ import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.extension.toServerException
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
-import com.blankj.utilcode.util.EncryptUtils
+import cn.com.ava.zqproject.ui.meeting.VolumeSceneDialog
 import com.blankj.utilcode.util.RegexUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
@@ -92,7 +92,7 @@ class LuBoSettingViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
-    val isShowLuboPsw:MutableLiveData<Boolean> by lazy {
+    val isShowLuboPsw: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>().apply {
             value = false
         }
@@ -158,11 +158,11 @@ class LuBoSettingViewModel : BaseViewModel() {
                                     )
                                 )
                                 saveLuboAccount()
-                                if (TextUtils.isEmpty(platformAddr)) {
-                                    goPlatformSetting.postValue(true)
-                                } else {  // 跳到主页
-                                    goPlatformLogin.postValue(true)
-                                }
+//                                if (TextUtils.isEmpty(platformAddr)) {
+//                                    goPlatformSetting.postValue(true)
+//                                } else {  // 跳到主页
+//                                    goPlatformLogin.postValue(true)
+//                                }
                             }
                         } else {// 失败弹出提示并跳到录播设置页面
                             logd("录播登录失败..")
@@ -175,7 +175,7 @@ class LuBoSettingViewModel : BaseViewModel() {
                     }, {
                         showLoading.postValue(OneTimeEvent(false))
                         logd("录播登录失败..")
-                        logPrint2File(it,"LuboSettingViewModel#login")
+                        logPrint2File(it, "LuboSettingViewModel#login")
                         toastMsg.postValue(
                             OneTimeEvent(
                                 Utils.getApp().getString(R.string.toast_lubo_login_failed)
@@ -221,9 +221,9 @@ class LuBoSettingViewModel : BaseViewModel() {
 
                 }, {
                     showLoading.postValue(OneTimeEvent(false))
-                    logPrint2File(it,"LuboSettingViewModel#loadPlatformInterface")
+                    logPrint2File(it, "LuboSettingViewModel#loadPlatformInterface")
                     it.toServerException()?.apply {
-                        toastMsg.postValue(OneTimeEvent(message?:""))
+                        toastMsg.postValue(OneTimeEvent(message ?: ""))
                     } ?: toastMsg.postValue(
                         OneTimeEvent(
                             Utils.getApp().getString(R.string.toast_platform_link_failed)

@@ -24,6 +24,15 @@ class VolumeSceneViewModel : BaseViewModel() {
         MutableLiveData()
     }
 
+
+    val audioOutChannels: MutableLiveData<List<VolumeChannel>> by lazy {
+        MutableLiveData()
+    }
+
+    val audioInChannels: MutableLiveData<List<VolumeChannel>> by lazy {
+        MutableLiveData()
+    }
+
     /**
      * 是否有Mic3
      * */
@@ -62,13 +71,12 @@ class VolumeSceneViewModel : BaseViewModel() {
                 )
                 info
             }.subscribeOn(Schedulers.io())
-
                 .subscribe({
                     if (it.curOutputIndex < 0 || it.curOutputIndex > it.camCount)
                         it.curOutputIndex = 0
                     camPreviewInfo.postValue(it)
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VolumeSceneViewModel#loadCamPreviewInfo")
                 })
         )
     }
@@ -77,19 +85,28 @@ class VolumeSceneViewModel : BaseViewModel() {
         mDisposables.add(
             InteracManager.getInteracVolumeChannels()
                 .subscribeOn(Schedulers.io())
-                .subscribe({
+                .subscribe({list->
                     val filter = mutableListOf<VolumeChannel>()
-                    val array =
-                        arrayOf("MASTER", "LINEIN1", "LINEIN2", "MICIN1", "MICIN2", "MICIN3")
-                    filter.addAll(it.filter {
-                        it.channelName in array
-                    })
+                    val inArray =
+                        arrayOf("LINEIN1", "LINEIN2", "MICIN1", "MICIN2", "MICIN3")
+                    val outArray = arrayOf("MASTER", "EXTLINEIN1", "EXTLINEIN2")
+                    val outChannels = arrayListOf<VolumeChannel>()
+                    val inChannels = arrayListOf<VolumeChannel>()
+                    list.forEach {
+                        if (it.channelName in inArray) {
+                            inChannels.add(it)
+                        }else if(it.channelName in outArray){
+                            outChannels.add(it)
+                        }
+                    }
+                    audioOutChannels.postValue(outChannels)
+                    audioInChannels.postValue(inChannels)
                     if (filter.size < 6) {   //没有MICIN3
                         filter.add(VolumeChannel())
                     }
                     volumeChannels.postValue(filter)
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VolumeSceneViewModel#loadVolumeChannels")
                 })
         )
     }
@@ -101,7 +118,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribe({
                     loadVolumeChannels()
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VolumeSceneViewModel#setAudioLevel")
                 })
         )
     }
@@ -113,7 +130,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribe({
                     loadCamPreviewInfo()
                 }, {
-                    logPrint2File(it)
+                    logPrint2File(it,"VolumeSceneViewModel#postMainStream")
                 })
         )
     }

@@ -175,7 +175,7 @@ public class SliceVideoView extends ViewGroup implements View.OnDragListener, Ge
      * @param count 分片数量
      */
     public void changeSliceCount(int count) {
-        if (count == sliceCount)
+        if (count == sliceCount||count==5||count==7||count>8)
             return;
         sliceCount = count;
         sliceRectFs.clear();

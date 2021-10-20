@@ -13,12 +13,11 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.databinding.DialogSelectLayoutBinding
 import cn.com.ava.zqproject.ui.meeting.adapter.AutoPatrolMemberAdapter
 import cn.com.ava.zqproject.ui.meeting.adapter.SelectLayoutSignalAdapter
-import cn.com.ava.zqproject.vo.LayoutSignalSelect
 import cn.com.ava.zqproject.vo.StatefulView
 import com.blankj.utilcode.util.ToastUtils
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<DialogSelectLayoutBinding>() {
+class SelectLayoutManagerDialog(val onSure: (() -> Unit)? = null) :
+    BaseDialogV2<DialogSelectLayoutBinding>() {
 
     private val mSelectLayoutViewModel by viewModels<SelectLayoutManagerViewModel>()
 
@@ -28,9 +27,7 @@ class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<Dial
 
     private var mAutoPatrolMemberAdapter by autoCleared<AutoPatrolMemberAdapter>()
 
-    private val mMasterViewModel by viewModels<MasterViewModel>({requireParentFragment()})
-
-
+    private val mMasterViewModel by viewModels<MasterViewModel>({ requireParentFragment() })
 
 
     override fun getWindowOptions(): WindowOptions {
@@ -75,7 +72,7 @@ class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<Dial
         mBinding.btnNextStep.setOnClickListener {
             val selectLayout = mSelectLayoutViewModel.layoutSelect.value!!
             if (selectLayout == SelectLayoutManagerViewModel.LAYOUT_AUTO) {
-                if(mSelectLayoutViewModel.linkUsers.value?.size?:0<=1){  //不足一个无法是使用轮播
+                if (mSelectLayoutViewModel.linkUsers.value?.size ?: 0 <= 1) {  //不足一个无法是使用轮播
                     ToastUtils.showShort(getString(R.string.toast_no_need_patrol))
                     return@setOnClickListener
                 }
@@ -89,35 +86,44 @@ class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<Dial
         }
         mBinding.rvLayoutSignal.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        mSelectLayoutSignalAdapter = SelectLayoutSignalAdapter{index,view->
+        mSelectLayoutSignalAdapter = SelectLayoutSignalAdapter { index, view ->
             // 在View下弹出选择框
-            mSelectSignalPopupWindow?.showAsDropDown(index,view,0,0)
+            mSelectSignalPopupWindow?.showAsDropDown(index, view, 0, 0)
         }
         mBinding.rvLayoutSignal.adapter = mSelectLayoutSignalAdapter
 
-        mSelectSignalPopupWindow = mSelectSignalPopupWindow?: SignalSelectPopupWindow(requireContext()){i,user->
-            mSelectLayoutViewModel.selectSignal(i,user)
-            mSelectSignalPopupWindow?.dismiss()
-        }
+        mSelectSignalPopupWindow =
+            mSelectSignalPopupWindow ?: SignalSelectPopupWindow(requireContext()) { i, user ->
+                mSelectLayoutViewModel.selectSignal(i, user)
+                mSelectSignalPopupWindow?.dismiss()
+            }
         mBinding.btnSure.setOnClickListener {
-            val layoutMode = mSelectLayoutViewModel.layoutSelect.value?:-1
-            val period = mSelectLayoutViewModel.patrolPeriod.value?:"10"
-            if(layoutMode==SelectLayoutManagerViewModel.LAYOUT_AUTO){
-             //   mSelectLayoutViewModel.patrolSure(mAutoPatrolMemberAdapter?.getSelectedUser()?: emptyList())
-                if(mAutoPatrolMemberAdapter?.getSelectedUser()?.isEmpty()==true){
-                    ToastUtils.showShort("请先选择需要轮播的成员")
+            val layoutMode = mSelectLayoutViewModel.layoutSelect.value ?: -1
+            val period = mSelectLayoutViewModel.patrolPeriod.value ?: "10"
+            if (layoutMode == SelectLayoutManagerViewModel.LAYOUT_AUTO) {
+                //   mSelectLayoutViewModel.patrolSure(mAutoPatrolMemberAdapter?.getSelectedUser()?: emptyList())
+                if (period.toInt() < 1 || period.toInt() > 3600) {
+                    ToastUtils.showShort("请输入合理的轮播间隔")
                     return@setOnClickListener
                 }
-                mMasterViewModel.beginPatrol(mAutoPatrolMemberAdapter?.getSelectedUser(),period.toInt())
+                if (mAutoPatrolMemberAdapter?.getSelectedUser()?.size ?: 0 < 2) {
+                    ToastUtils.showShort("请选择大于2个需要轮播的成员")
+                    return@setOnClickListener
+                }
+                mMasterViewModel.beginPatrol(
+                    mAutoPatrolMemberAdapter?.getSelectedUser(),
+                    period.toInt()
+                )
                 dismiss()
-            }else{
+            } else {
                 mSelectLayoutViewModel.layoutSure()
                 mMasterViewModel.cancelPatrol()
             }
             onSure?.invoke()
 
         }
-        mBinding.rvSelectWhatPatrol.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+        mBinding.rvSelectWhatPatrol.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         mAutoPatrolMemberAdapter = AutoPatrolMemberAdapter()
         mBinding.rvSelectWhatPatrol.adapter = mAutoPatrolMemberAdapter
         mSelectLayoutViewModel.getInteracMemberInfo()
@@ -135,13 +141,13 @@ class SelectLayoutManagerDialog(val onSure:(()->Unit)?=null) : BaseDialogV2<Dial
         mSelectLayoutViewModel.layoutSignals.observe(this) {
             mSelectLayoutSignalAdapter?.setDatas(it)
         }
-        mSelectLayoutViewModel.unSelectSignals.observe(this){
+        mSelectLayoutViewModel.unSelectSignals.observe(this) {
             mSelectSignalPopupWindow?.setDatas(it)
         }
-        mSelectLayoutViewModel.layoutSure.observeOne(this){
+        mSelectLayoutViewModel.layoutSure.observeOne(this) {
             dismiss()
         }
-        mSelectLayoutViewModel.linkUsers.observe(this){
+        mSelectLayoutViewModel.linkUsers.observe(this) {
             val statefuls = arrayListOf<StatefulView<LinkedUser>>()
             it.forEach {
                 statefuls.add(StatefulView(it))

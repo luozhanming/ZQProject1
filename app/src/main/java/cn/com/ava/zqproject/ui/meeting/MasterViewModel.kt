@@ -359,8 +359,9 @@ class MasterViewModel : BaseViewModel() {
         mLoopInteracInfoDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
             .flatMap {
                 InteracManager.getInteracInfo()
-                    .subscribeOn(Schedulers.io())
-            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+
+            } .subscribeOn(Schedulers.io())
+            .retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribe({
                 interacInfo.postValue(it)
                 defaultLayoutHelper?.updateCurLayout(it.layout)
@@ -895,6 +896,8 @@ class MasterViewModel : BaseViewModel() {
 
         private var curPatrolIndex: Int = 0
 
+        private var isHandleCurLaout = false
+
 
         init {
             val json = CommonPreference.getElement(CommonPreference.KEY_DEFAULT_LAYOUT_INFO, "")
@@ -916,8 +919,10 @@ class MasterViewModel : BaseViewModel() {
         }
 
         fun updateCurLayout(layouts: List<Int>) {
-            curLayout.clear()
-            curLayout.addAll(layouts)
+            if(!isHandleCurLaout){
+                curLayout.clear()
+                curLayout.addAll(layouts)
+            }
         }
 
         fun updateApplySpeakStatus(mode:Boolean){
@@ -1020,8 +1025,9 @@ class MasterViewModel : BaseViewModel() {
             //TODO 优化建议：优化当所有平台与会都在画面上时结束自动布局
             workerDisposable?.dispose()
             if (!defaultLayoutInfo.isInDefaultLayout) return
-            workerDisposable = Observable.interval(2, 2, TimeUnit.SECONDS)
+            workerDisposable = Observable.intervalRange(0,360,3, 5, TimeUnit.SECONDS)
                 .flatMap {
+
                     val userIds = defaultLayoutInfo.contractUsers.map { it.userId }
                     return@flatMap PlatformApi.getService().getUserRsAcctList(userIds = userIds)
                         .compose(PlatformApi.applySchedulers())
@@ -1029,11 +1035,11 @@ class MasterViewModel : BaseViewModel() {
                 .subscribe({
                     this@DefaultLayoutHelper.logd("startLayoutLess8Worker loop")
                     if (it.success) {
+                        isHandleCurLaout = true
                         val user = it.data
                         val newLayout = arrayListOf<Int>()
                         newLayout.addAll(curLayout)
                         this@DefaultLayoutHelper.logd("newLayout:${newLayout.toString()}")
-                        //     var isAllSet = true
                         user.forEach { ruser ->
                             if (ruser.rsAcct?.isNotEmpty() == true && ruser.status == 1) {   //人平台在线
                                 val user =
@@ -1051,18 +1057,17 @@ class MasterViewModel : BaseViewModel() {
                                         } else {  //没有空位,停止
                                             stopDefault()
                                         }
-//                                        if(isAllSet){
-//                                            isAllSet = false
-//                                        }
                                     }
                                 }
                             }
                         }
 
                         //全部完成
-                        val winCount = newLayout[0]
+                        var winCount = newLayout[0]
                         val users = newLayout.subList(1, newLayout.size)
                         if (!newLayout.sameTo(curLayout)) {
+                            if (winCount == 5) winCount = 6
+                            if (winCount == 7) winCount = 8
                             ZQManager.setVideoLayout(winCount, users)
                                 .subscribeOn(Schedulers.io())
                                 .subscribe({
@@ -1074,8 +1079,10 @@ class MasterViewModel : BaseViewModel() {
 //                        if(isAllSet){
 //                            stopDefault()
 //                        }
+                        isHandleCurLaout = false
                     }
                 }, {
+                    isHandleCurLaout = false
                     logPrint2File(it, "DefaultLayoutHelper#startWorker1")
                 })
         }

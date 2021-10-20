@@ -1,5 +1,6 @@
 package cn.com.ava.lubosdk.zq.control
 
+import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.IControl
 import cn.com.ava.lubosdk.manager.LoginManager
@@ -19,17 +20,22 @@ class SetMeetingVideoLayoutControlZQControl(
 
     override fun getControlParams(): LinkedHashMap<String, String> {
         return linkedMapOf<String,String>().apply {
-            this["action"] = "9"
-            this["user"] = LoginManager.getLogin()?.username?:""
-            this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"").lowercase()
-            this["command"] = "1"
-            val userString = StringBuffer()
-            preLayout.forEachIndexed {i,it->
-                userString.append("_${it}")
+            try {
+                this["action"] = "9"
+                this["user"] = LoginManager.getLogin()?.username?:""
+                this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"").lowercase()
+                this["command"] = "1"
+                val userString = StringBuffer()
+                preLayout.forEachIndexed {i,it->
+                    userString.append("_${it}")
+                }
+                val data = "videoBlender_CloudCtrlModeLayout_D${streamCount}${userString}"
+                logd("data = ${data}")
+                this["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(data)
+            }catch (e:Exception){
+                logPrint2File(e,"SetMeetingVideoLayoutControlZQControl#getControlParams")
             }
-            val data = "videoBlender_CloudCtrlModeLayout_D${streamCount}${userString}"
-            logd("data = ${data}")
-            this["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(data)
+
         }
     }
 

@@ -90,8 +90,6 @@ class LuBoSettingFragment : BaseLoadingFragment<FragmentLuboSettingBinding>() {
                 }
             }
         }
-
-
     }
 
     override fun initView() {
