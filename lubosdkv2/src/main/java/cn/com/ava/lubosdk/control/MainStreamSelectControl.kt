@@ -1,6 +1,7 @@
 package cn.com.ava.lubosdk.control
 
 import cn.com.ava.lubosdk.IControl
+import cn.com.ava.lubosdk.KeyInvalidException
 import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.util.EncryptUtil
 

@@ -19,11 +19,14 @@ import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.RecordUploadManager
 import cn.com.ava.zqproject.databinding.FragmentHomeBinding
 import cn.com.ava.zqproject.eventbus.GoLoginEvent
+import cn.com.ava.zqproject.eventbus.LuboPingFailedEvent
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
+import cn.com.ava.zqproject.ui.setting.LuBoSettingFragment
 import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.videoResource.service.VideoSingleton
+import com.blankj.utilcode.util.ToastUtils
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -38,6 +41,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private var mServiceConnection: ServiceConnection? = null
 
     private var mDownloadBinder by autoCleared<DownloadService.DownloadBinder>()
+
+    private var mPopupMenu by autoCleared<SettingPopupMenu>()
 
 
     override fun getLayoutId(): Int = R.layout.fragment_home
@@ -60,7 +65,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         mBinding.ivSetting.setOnClickListener {
-            val popupMenu = SettingPopupMenu(requireContext()) {
+            mPopupMenu = mPopupMenu?:SettingPopupMenu(requireContext()) {
                 when (it) {
                     SettingPopupMenu.ITEM_INFO -> {
                         val dialog = InfoUpgradeDialog()
@@ -81,7 +86,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                 }
             }
-            popupMenu.showAtLocation(
+            mPopupMenu?.showAtLocation(
                 mBinding.ivSetting,
                 Gravity.RIGHT or Gravity.TOP,
                 -SizeUtils.dp2px(32),
@@ -118,6 +123,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
        // mHomeViewModel.stopLoadLuboInfo()
         mHomeViewModel.stopLoopMeetingInfoZQ()
         mHomeViewModel.stopLoopMeetingInvitation()
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,6 +150,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mHomeViewModel.loopRefreshToken()
         mHomeViewModel.autoLuboLogin()
         mHomeViewModel.startHeartBeat()
+        mHomeViewModel.startPingServer()
     }
 
 
@@ -197,6 +204,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         mHomeViewModel.goJoinMeeting.observeOne(viewLifecycleOwner){
             findNavController().navigate(R.id.action_homeFragment_to_joinMeetingFragment)
         }
+        mHomeViewModel.goPlatSetting.observeOne(viewLifecycleOwner){
+            findNavController().navigate(R.id.action_back_to_lubo_setting,Bundle().apply {
+                putInt(LuBoSettingFragment.EXTRA_KEY_TAB_INDEX,1)
+            })
+            ToastUtils.showShort(getString(R.string.toast_net_platform_error))
+
+        }
     }
 
     override fun onBackPressed(): Boolean {
@@ -204,9 +218,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
 
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun goLogin(event:GoLoginEvent){
         findNavController().navigate(R.id.action_back_to_login)
+    }
+
+    /**
+     * 录播Key失效时处理
+     * */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun goKeyInvalid(event:cn.com.ava.lubosdk.eventbus.KeyInvalidEvent){
+        findNavController().navigate(R.id.action_back_to_lubo_setting)
+        LoginManager.logout()
+        ToastUtils.showShort(getString(R.string.toast_lubo_key_invalid))
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onLuboNetError(event:LuboPingFailedEvent){
+        findNavController().navigate(R.id.action_back_to_lubo_setting)
+        ToastUtils.showShort(getString(R.string.toast_net_lubo_error))
     }
 
 }

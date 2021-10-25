@@ -77,7 +77,7 @@ class SelectLayoutManagerDialog(val onSure: (() -> Unit)? = null) :
                     return@setOnClickListener
                 }
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_2
-            } else {
+            } else if(selectLayout!=-1){
                 mSelectLayoutViewModel.step.value = SelectLayoutManagerViewModel.STEP_2_1
             }
         }

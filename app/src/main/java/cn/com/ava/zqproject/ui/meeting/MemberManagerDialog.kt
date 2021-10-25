@@ -22,7 +22,7 @@ import com.google.android.material.tabs.TabLayout
 class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
     TabLayout.OnTabSelectedListener {
 
-    private val mMemberManagerViewModel by viewModels<MemeberManagerViewModel>({ requireParentFragment() })
+    private val mMemberManagerViewModel by viewModels<MemberManagerViewModel>({ requireParentFragment() })
 
     private val mMasterViewModel by viewModels<MasterViewModel>({requireParentFragment()})
 
@@ -113,6 +113,16 @@ class MemberManagerDialog : BaseDialogV2<DialogMemeberManagerBinding>(),
         }
 
     }
+//
+//    override fun onStart() {
+//        super.onStart()
+//        mMemberManagerViewModel.startLoopMuteMeetingAudio()
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        mMemberManagerViewModel.stopLoopMuteMeetingAudio()
+//    }
 
     override fun getLayoutId(): Int {
         return R.layout.dialog_memeber_manager

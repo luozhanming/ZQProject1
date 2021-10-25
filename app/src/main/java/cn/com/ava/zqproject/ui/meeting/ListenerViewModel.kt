@@ -94,6 +94,12 @@ class ListenerViewModel : BaseViewModel() {
         }
     }
 
+    val canRequestSpeak:MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>().apply {
+            value = true
+        }
+    }
+
     /**
      * 电脑索引
      * */
@@ -170,6 +176,9 @@ class ListenerViewModel : BaseViewModel() {
     }
 
 
+    private var localNumId = -1
+
+
     /**
      * 上次不是电脑的画面，用于恢复
      * */
@@ -209,7 +218,6 @@ class ListenerViewModel : BaseViewModel() {
             .subscribe({
                 meetingAudioParam.postValue(it)
             }, {
-
                 logPrint2File(it,"ListenerViewModel#startLoopMeetingAudioParam")
             })
     }
@@ -246,8 +254,9 @@ class ListenerViewModel : BaseViewModel() {
 //                        }
 //                        it
 //                    }
-                    .subscribeOn(Schedulers.io())
-            }.subscribe({
+            }.retryWhen(RetryFunction(Int.MAX_VALUE))
+            .subscribeOn(Schedulers.io())
+            .subscribe({
                 curSceneSources.postValue(it)
             }, {
                 logPrint2File(it,"ListenerViewModel#loopCurVideoSceneSources")
@@ -347,6 +356,7 @@ class ListenerViewModel : BaseViewModel() {
             .subscribe({
                 meetingMembers.postValue(it.datas)
                 isInWaittingRoom.postValue(it.localRole==3)
+                localNumId = it.localNumberId
             }, {
                 logPrint2File(it,"ListenerViewModel#loadMeetingMember")
             })
@@ -429,6 +439,7 @@ class ListenerViewModel : BaseViewModel() {
             .subscribe({
                 meetingState.postValue(it)
                 //处理申请发言的列表数据源
+                canRequestSpeak.postValue(it.requestSpeakMode==0)
             }, {
                 logPrint2File(it,"ListenerViewModel#startLoopMeetingState")
             })

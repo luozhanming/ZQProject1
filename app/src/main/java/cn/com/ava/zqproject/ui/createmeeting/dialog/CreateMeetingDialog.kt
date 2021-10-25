@@ -51,7 +51,7 @@ class CreateMeetingDialog(val callback: ((String, String, Boolean) -> Unit)?) : 
             SizeUtils.dp2px(590),
             ViewGroup.LayoutParams.WRAP_CONTENT,
             Gravity.CENTER,
-            true
+            false
         )
     }
 

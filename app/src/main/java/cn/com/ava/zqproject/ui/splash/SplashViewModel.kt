@@ -13,6 +13,7 @@ import cn.com.ava.lubosdk.manager.LoginManager
 import cn.com.ava.lubosdk.manager.PowerManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.common.CommonPreference
+import cn.com.ava.zqproject.common.LogFileOuput
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.vo.PlatformLogin
@@ -63,42 +64,57 @@ class SplashViewModel : BaseViewModel() {
 
 
     fun login() {
+        LogFileOuput.write("SplashViewModel#1")
         //从SP中获取上次成功登录的录播用户名密码
         val ip: String = CommonPreference.getElement(CommonPreference.KEY_LUBO_IP, "")
         val port: String = CommonPreference.getElement(CommonPreference.KEY_LUBO_PORT, "")
+        LogFileOuput.write("SplashViewModel#2")
         if (RegexUtils.isIP(ip) && TextUtils.isDigitsOnly(port)) {
             LuBoSDK.init(ip, port, true)
+            LogFileOuput.write("SplashViewModel#3")
         } else {// 跳到录播设置界面
             goWhere.postValue(OneTimeEvent(WHERE_LUBO_SETTING))
+            LogFileOuput.write("SplashViewModel#4")
             return
         }
         val username: String = CommonPreference.getElement(CommonPreference.KEY_LUBO_USERNAME, "")
         val password: String = CommonPreference.getElement(CommonPreference.KEY_LUBO_PASSWORD, "")
         val platformAddr: String =
             CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")
+        LogFileOuput.write("SplashViewModel#5")
         if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
             // 跳到录播设置界面
             goWhere.value = OneTimeEvent(WHERE_LUBO_SETTING)
+            LogFileOuput.write("SplashViewModel#6")
             return
         } else {  //尝试登录
+            LogFileOuput.write("SplashViewModel#7")
             mDisposables.add(
                 LoginManager.newLogin(username, password)
                     .timeout(2000,TimeUnit.MILLISECONDS)   //2秒得不到结果就抛出一床
                     .subscribeOn(Schedulers.io())
                     .subscribe({ login ->
+                        LogFileOuput.write("SplashViewModel#8")
+
                         if (login.isLoginSuccess) {
+                            LogFileOuput.write("SplashViewModel#9")
                             if (login.isSleep) {  // 休眠弹出唤醒窗口
+                                LogFileOuput.write("SplashViewModel#10")
                                 logd("录播休眠中..")
                                 isShowWakeUp.postValue(isShowWakeUp.value?.plus(1))
                             } else {   // 成功登录，跳到平台窗口
                                 logd("录播登录成功..")
+                                LogFileOuput.write("SplashViewModel#11")
                                 if (TextUtils.isEmpty(platformAddr)) {
+                                    LogFileOuput.write("SplashViewModel#12")
                                     goWhere.postValue(OneTimeEvent(WHERE_PLATFORM_SETTING))
                                 } else {
+                                    LogFileOuput.write("SplashViewModel#13")
                                     loadCanEnterHome()
                                 }
                             }
                         } else {// 失败弹出提示并跳到录播设置页面
+                            LogFileOuput.write("SplashViewModel#14")
                             logd("录播登录失败..")
                             goWhere.postValue(OneTimeEvent(WHERE_LUBO_SETTING))
                         }
@@ -106,6 +122,7 @@ class SplashViewModel : BaseViewModel() {
                         logd("录播登录失败..")
                         logPrint2File(it,"SplashViewModel#login")
                         goWhere.postValue(OneTimeEvent(WHERE_LUBO_SETTING))
+                        LogFileOuput.write("SplashViewModel#15")
                     })
             )
         }
@@ -119,6 +136,7 @@ class SplashViewModel : BaseViewModel() {
         logd("loadCanEnterHome")
 
         val platformUrl = CommonPreference.getElement(CommonPreference.KEY_PLATFORM_ADDR, "")
+        LogFileOuput.write("SplashViewModel#16")
         //1.调用平台接口页面看是否能够连接平台
         //2.如果能够连接跳到平台登录，如果不能跳到平台设置页面
         mDisposables.add(
@@ -128,9 +146,13 @@ class SplashViewModel : BaseViewModel() {
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({ response ->
+                    LogFileOuput.write("SplashViewModel#17")
+
                     PlatformApiManager.setApiPath(response.data)
                     checkCanGoHomeDirect()
                 }, {
+                    LogFileOuput.write("SplashViewModel#18")
+
                     logd("平台连接失败..")
                     ToastUtils.showShort(
                         Utils.getApp().getString(R.string.toast_platform_link_failed)
@@ -143,6 +165,8 @@ class SplashViewModel : BaseViewModel() {
     }
 
     private fun checkCanGoHomeDirect() {
+        LogFileOuput.write("SplashViewModel#19")
+
         val latestLoginStr =
             CommonPreference.getElement(CommonPreference.KEY_PLATFORM_LATEST_LOGIN, "")
         if (TextUtils.isEmpty(latestLoginStr)) {
@@ -150,6 +174,7 @@ class SplashViewModel : BaseViewModel() {
             return
         }
         val latestLogin = GsonUtil.fromJson(latestLoginStr, PlatformLogin::class.java)
+        LogFileOuput.write("SplashViewModel#20")
         mDisposables.add(
             PlatformApi.getService().refreshToken(
                token= latestLogin.token
@@ -158,13 +183,17 @@ class SplashViewModel : BaseViewModel() {
                 .compose(PlatformApi.applySchedulers())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
+                    LogFileOuput.write("SplashViewModel#21")
+
                     if (it.success) {
                         //直接登录
                         latestLogin.token = it.data
                         PlatformApi.login(latestLogin)
                         goWhere.postValue(OneTimeEvent(WHERE_GO_HOME))
+                        LogFileOuput.write("SplashViewModel#22")
                     }
                 }, {
+                    LogFileOuput.write("SplashViewModel#23")
                     logPrint2File(it,"SplashViewModel#checkCanGoHomeDirect")
                     goWhere.postValue(OneTimeEvent(WHERE_PLATFORM_LOGIN))
                 })

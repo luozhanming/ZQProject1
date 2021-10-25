@@ -24,7 +24,7 @@ class SetRequestSpeakModeControl(
             this["user"] = LoginManager.getLogin()?.username?:""
             this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"").lowercase()
             this["command"] = "1"
-            val data = "confFunc_RequestSpeakMode_numberId=${numberId}"
+            val data = "confFunc_RequestSpeakAloneMode_numberId=${numberId}"
             logd("data = ${data}")
             this["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(data)
         }

@@ -4,16 +4,17 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.util.logPrint2File
-import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.entity.LinkedUser
 import cn.com.ava.lubosdk.manager.ZQManager
 import cn.com.ava.zqproject.R
 import cn.com.ava.zqproject.vo.MeetingMember
 import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
-class MemeberManagerViewModel : BaseViewModel() {
+class MemberManagerViewModel : BaseViewModel() {
 
 
     private var waitingRoom: Boolean = false
@@ -47,7 +48,7 @@ class MemeberManagerViewModel : BaseViewModel() {
             addSource(meetingMember) {
                 val listeners = it.filter { user ->
                     //等候室并且在线
-                    user.role == "3"&& user.onlineState == 1
+                    user.role == "3" && user.onlineState == 1
                 }
                 value = listeners
             }
@@ -82,10 +83,19 @@ class MemeberManagerViewModel : BaseViewModel() {
      * */
     val isAllSilent: MediatorLiveData<Boolean>  = MediatorLiveData<Boolean>().apply {
             addSource(memberMicState) {
-                postValue( it.isNotEmpty()&&it.size == onMeetingMembers.value?.size ?: 0)
+                val onMeetings = onMeetingMembers.value?: emptyList()
+                var isAllInMute = false
+                if(onMeetings.isNotEmpty()){
+                    isAllInMute = onMeetings.all { member->
+                        member.user.number in it
+                    }
+                }
+                postValue( isAllInMute)
             }
         }
 
+
+    private var mLoopAudioParamDisposable: Disposable? = null
 
 
     /**
@@ -272,6 +282,24 @@ class MemeberManagerViewModel : BaseViewModel() {
                 ToastUtils.showShort(getResources().getString(R.string.set_failed))
             })
         )
+    }
+
+    fun startLoopMuteMeetingAudio() {
+        mLoopAudioParamDisposable?.dispose()
+        mLoopAudioParamDisposable = Observable.interval(1000,TimeUnit.MILLISECONDS)
+            .flatMap {
+                ZQManager.loadMeetingAudioParam()
+            }.subscribeOn(Schedulers.io())
+            .subscribe({
+                isAllSilent.postValue("1"==it.muteStatus)
+            },{
+                logPrint2File(it,"MemberManagerViewModel#startLoopMuteMeetingAudio")
+            })
+    }
+
+    fun stopLoopMuteMeetingAudio(){
+        mLoopAudioParamDisposable?.dispose()
+        mLoopAudioParamDisposable?.dispose()
     }
 
     fun setWaitingEnable(waitingRoomEnable: Boolean) {

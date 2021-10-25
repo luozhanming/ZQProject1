@@ -5,6 +5,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -108,12 +109,21 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
         mListenerViewModel.loadMeetingMember()
         mListenerViewModel.startTimeCount()
         mListenerViewModel.startLoopMeetingState()
+        if(mBinding.videoView.parent==null){
+            mBinding.videoContainer.addView(mBinding.videoView,
+                FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        }
     //    mListenerViewModel.startLoopMeetingAudioParam()
     }
 
     override fun onStop() {
         super.onStop()
         mListenerViewModel.stopAllLoopDisposable()
+        mMeetingInfoWindow?.dismiss()
+        mComputerSourceWindow?.dismiss()
+        if(mBinding.videoView.parent!=null){
+            mBinding.videoContainer.removeView(mBinding.videoView)
+        }
     }
 
     override fun observeVM() {
@@ -247,6 +257,7 @@ class ListenerFragment : BaseLoadingFragment<FragmentListenerBinding>(), Surface
     override fun onBackPressed(): Boolean {
         return true
     }
+
 
 
 }

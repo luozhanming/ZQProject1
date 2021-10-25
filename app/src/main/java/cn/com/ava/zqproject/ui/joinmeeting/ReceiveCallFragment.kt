@@ -42,7 +42,7 @@ class ReceiveCallFragment : BaseLoadingFragment<FragmentReceiveCallingBinding>()
 
     override fun bindListener() {
         mBinding.btnCancel.setOnClickListener {
-            mReceiveCallViewModel.step.value = 1
+            findNavController().popBackStack()
         }
         mBinding.btnReject.setOnClickListener {
             findNavController().popBackStack()

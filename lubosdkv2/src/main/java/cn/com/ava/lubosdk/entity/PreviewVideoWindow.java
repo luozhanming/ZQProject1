@@ -35,6 +35,8 @@ public class PreviewVideoWindow {
     private boolean isCurMain;
     private boolean isCurSub;
 
+    private String rawName;
+
 
     public int getIndex() {
         return index;
@@ -149,6 +151,15 @@ public class PreviewVideoWindow {
         isCurSub = curSub;
     }
 
+
+    public String getRawName() {
+        return rawName;
+    }
+
+    public void setRawName(String rawName) {
+        this.rawName = rawName;
+    }
+
     @Override
     public String toString() {
         return "PreviewVideoWindow{" +
@@ -166,6 +177,7 @@ public class PreviewVideoWindow {
                 ", isMatting=" + isMatting +
                 ", isCurMain=" + isCurMain +
                 ", isCurSub=" + isCurSub +
+                ", rawName='" + rawName + '\'' +
                 '}';
     }
 }

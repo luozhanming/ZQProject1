@@ -188,6 +188,7 @@ class VolumeSceneDialog : BaseDialogV2<DialogVolumeSceneBinding>(), TabLayout.On
         mVolumeSceneViewModel.camPreviewInfo.observe(this) {
             //post用于让previewWidget在完全显示才执行，影响setCamPreviewInfo的正确显示
             mBinding.previewWidget.post {
+
                 mBinding.previewWidget.setCamPreviewInfo(it)
             }
         }

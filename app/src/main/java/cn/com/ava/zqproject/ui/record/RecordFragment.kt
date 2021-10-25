@@ -6,6 +6,7 @@ import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -64,6 +65,18 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
     private var breatheAnim by autoCleared<Animation>()
 
     private var mTrackModeWindow by autoCleared<TrackModeWindow>()
+
+
+    override fun onStart() {
+        super.onStart()
+        if(mBinding.videoView.parent==null){
+            mBinding.videoContainer.addView(mBinding.videoView,
+                FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        }
+    }
+
+
+
 
 
     override fun initView() {
@@ -235,6 +248,16 @@ class RecordFragment : BaseLoadingFragment<FragmentRecordBinding>(),SurfaceHolde
         }
 
 
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        mComputerMenu?.dismiss()
+        mVolumeWindow?.dismiss()
+        if(mBinding.videoView.parent!=null){
+            mBinding.videoContainer.removeView(mBinding.videoView)
+        }
     }
 
     override fun onBindViewModel2Layout(binding: FragmentRecordBinding) {

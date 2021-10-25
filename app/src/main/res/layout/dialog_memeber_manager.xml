@@ -142,7 +142,7 @@
 
         <variable
             name="memberViewModel"
-            type="cn.com.ava.zqproject.ui.meeting.MemeberManagerViewModel" />
+            type="cn.com.ava.zqproject.ui.meeting.MemberManagerViewModel" />
     </data>
 
 </layout>

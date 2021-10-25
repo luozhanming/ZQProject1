@@ -515,4 +515,20 @@ object GeneralManager {
     }
 
 
+    fun getRawString(array:Array<Int>):Observable<List<String>>{
+        return Observable.create {
+            runBlocking {
+                val result = suspendCoroutine<ListWrapper<String>> {
+                    AVAHttpEngine.addQueryCommand(RawQuery(
+                        array,
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<String>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
+                    ))
+                }
+                it.onNext(result.datas)
+            }
+        }
+    }
+
+
 }

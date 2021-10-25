@@ -140,7 +140,6 @@ public class SliceVideoView extends ViewGroup implements View.OnDragListener, Ge
     public SliceVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
-        setOnDragListener(this);
         detector = new GestureDetector(getContext(), this);
     }
 
@@ -395,6 +394,11 @@ public class SliceVideoView extends ViewGroup implements View.OnDragListener, Ge
 
     public void setOnLabelDropListener(OnVideoCallback listener) {
         this.mListener = listener;
+        if(listener==null){
+            setOnDragListener(null);
+        }else{
+            setOnDragListener(this);
+        }
     }
 
     private int locateWhereRect(float x, float y) {

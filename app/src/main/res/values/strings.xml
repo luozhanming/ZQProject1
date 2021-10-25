@@ -192,7 +192,8 @@
     <string name="no_signal">无信号</string>
     <string name="exit_speak_mode">退出发言模式</string>
     <string name="join_failed">加入失败</string>
-
+    <string name="toast_net_lubo_error">连接录播主机出现异常</string>
+    <string name="toast_net_platform_error">连接用户系统出现异常</string>
     <string name="set_meeting_layout_failed">切换布局失败</string>
 
     <string name="who_launch_meeting">发起的会议</string>
@@ -226,5 +227,6 @@
 
     <string name="toast_full_track_cannot_use">全自动导播模式下,无法使用该按钮</string>
     <string name="toast_mid_track_cannot_use">手动导播模式下,才能使用该按钮</string>
+    <string name="toast_lubo_key_invalid">当前连接录播主机用户失效，请重新连接</string>
 
 </resources>

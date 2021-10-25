@@ -291,6 +291,7 @@ class PreviewWindowInfoQuery(
             for ((_, value) in entries2) {
                 hasMulti = value.size > 1
             }
+            window.rawName = windowNamec
             if (windowNamec.contains(":") || map.size > 1 || hasMulti) {   //如果含有：，表示有多个源
                 //计算sourceIndex
                 var windowName = ""

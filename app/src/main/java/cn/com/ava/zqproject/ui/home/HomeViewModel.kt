@@ -12,11 +12,14 @@ import cn.com.ava.lubosdk.entity.LuBoInfo
 import cn.com.ava.lubosdk.manager.*
 import cn.com.ava.lubosdk.zq.entity.MeetingInfoZQ
 import cn.com.ava.zqproject.R
+import cn.com.ava.zqproject.common.CommonPreference
 import cn.com.ava.zqproject.common.ComputerModeManager
 import cn.com.ava.zqproject.eventbus.GoLoginEvent
+import cn.com.ava.zqproject.eventbus.LuboPingFailedEvent
 import cn.com.ava.zqproject.net.PlatformApi
 import cn.com.ava.zqproject.vo.InvitationInfo
 import cn.com.ava.zqproject.vo.PlatformLogin
+import com.blankj.utilcode.util.NetworkUtils
 import com.blankj.utilcode.util.ToastUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -41,8 +44,8 @@ class HomeViewModel : BaseViewModel() {
         }
     }
 
-    val logout: MutableLiveData<Boolean> by lazy {
-        MutableLiveData()
+    val goPlatSetting: OneTimeLiveData<Boolean> by lazy {
+        OneTimeLiveData()
     }
 
     /**
@@ -75,6 +78,17 @@ class HomeViewModel : BaseViewModel() {
     val goJoinMeeting: OneTimeLiveData<Boolean> by lazy {
         OneTimeLiveData()
     }
+
+    /**
+     * ping平台失败次数
+     * */
+    private var mPingFailedPlatformServer = 0
+
+    /**
+     * ping录播失败次数
+     * */
+    private var mPingFailedLuboServerCount = 0
+
 
     private var mLoadLuboInfoDisposable: Disposable? = null
     private var mLoopMeetingInfoZQDisposable: Disposable? = null
@@ -130,21 +144,22 @@ class HomeViewModel : BaseViewModel() {
      * 开始发送心跳
      * */
     fun startHeartBeat() {
-        mDisposables.add(Observable.interval(
-            0, 20, TimeUnit.SECONDS
-        ).flatMap {
+        mDisposables.add(
+            Observable.interval(
+                0, 20, TimeUnit.SECONDS
+            ).flatMap {
                 PlatformApi.getService()
                     .heartBeat(rsAcct = LoginManager.getLogin()?.rserverInfo?.usr ?: "")
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
-            .subscribe({
-                if (it.code == 10004) {
-                    ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
-                    EventBus.getDefault().post(GoLoginEvent())
-                }
-            }, {
-                logPrint2File(it, "HomeViewModel#startHeartBeat")
-                //发送心跳错误
-            })
+                .subscribe({
+                    if (it.code == 10004) {
+                        ToastUtils.showShort(getResources().getString(R.string.toast_other_login_exception))
+                        //由于可能不在此Home界面上，用VM收不到
+                        EventBus.getDefault().post(GoLoginEvent())
+                    }
+                }, {
+                    logPrint2File(it, "HomeViewModel#startHeartBeat")
+                })
         )
     }
 
@@ -190,7 +205,8 @@ class HomeViewModel : BaseViewModel() {
      * 轮询token跟新
      * */
     fun loopRefreshToken() {
-        mDisposables.add(Observable.interval(0, 1, TimeUnit.MINUTES)
+        mDisposables.add(
+            Observable.interval(0, 1, TimeUnit.MINUTES)
                 .flatMap {
                     PlatformApi.getService().refreshToken()
                         .compose(PlatformApi.applySchedulers())
@@ -206,7 +222,7 @@ class HomeViewModel : BaseViewModel() {
 
     fun startLoopMeetingInfoZQ() {
         mLoopMeetingInfoZQDisposable?.dispose()
-        mLoopMeetingInfoZQDisposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
+        mLoopMeetingInfoZQDisposable = Observable.interval(1500, TimeUnit.MILLISECONDS)
             .flatMap {
                 ZQManager.loadMeetingInfo()
                     .flatMap { info ->
@@ -238,43 +254,112 @@ class HomeViewModel : BaseViewModel() {
     }
 
     /**
+     * Ping测试
+     * */
+    fun startPingServer() {
+        mDisposables.add(Observable.interval(30, 30, TimeUnit.SECONDS)
+            .observeOn(Schedulers.io())
+            .subscribe({
+                val luboPingResult = NetworkUtils.isAvailableByPing(
+                    "${
+                        CommonPreference.getElement(
+                            CommonPreference.KEY_LUBO_IP,
+                            ""
+                        )
+                    }"
+                )
+                var platformAddr = CommonPreference.getElement(
+                    CommonPreference.KEY_PLATFORM_ADDR,
+                    ""
+                )
+                if(platformAddr.contains("http://")){
+                    platformAddr =  platformAddr.replace("http://","")
+                }else if(platformAddr.contains("https://")){
+                    platformAddr =  platformAddr.replace("https://","")
+                }
+                val platformPingResult = NetworkUtils.isAvailableByPing(
+                    platformAddr
+                )
+
+                this@HomeViewModel.logd("luboPingResult:${luboPingResult},platformPing:${platformPingResult}")
+                if (luboPingResult) {
+                    mPingFailedLuboServerCount = 0
+                } else {
+                    mPingFailedLuboServerCount++
+                }
+                if (platformPingResult) {
+                    mPingFailedPlatformServer = 0
+                } else {
+                    mPingFailedPlatformServer++
+                }
+                if (mPingFailedLuboServerCount > 6) {
+                    //录播不通了,跳回录播设置
+                    LoginManager.logout()
+                    mPingFailedLuboServerCount = 0
+                    EventBus.getDefault().post(LuboPingFailedEvent())
+                    if(mPingFailedPlatformServer>6){
+                        PlatformApi.logout()
+                    }
+                    return@subscribe
+                }
+
+                if (mPingFailedPlatformServer > 6) {
+                    PlatformApi.logout()
+                    mPingFailedPlatformServer = 0
+                    goPlatSetting.postValue(OneTimeEvent(true))
+                }
+
+
+            }, {
+                logPrint2File(it, "HomeViewModel#startPingServer")
+            })
+        )
+    }
+
+    /**
      * 请求是否能去互动   0创建会议  1加入会议
      * */
     fun requestCanCreateMeeting(createOrJoin: Int) {
-        mDisposables.add(RecordManager.getRecordInfo()
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                if (it.isLiving || it.recordState != Constant.RECORD_STOP) {
-                    ToastUtils.showShort(getResources().getString(R.string.toast_cannot_go_create_meeting))
-                } else {
-                    if (createOrJoin == 0) {
-                        goCreateMeeting.postValue(OneTimeEvent(true))
+        mDisposables.add(
+            RecordManager.getRecordInfo()
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    if (it.isLiving || it.recordState != Constant.RECORD_STOP) {
+                        ToastUtils.showShort(getResources().getString(R.string.toast_cannot_go_create_meeting))
                     } else {
-                        goJoinMeeting.postValue(OneTimeEvent(true))
+                        if (createOrJoin == 0) {
+                            goCreateMeeting.postValue(OneTimeEvent(true))
+                        } else {
+                            goJoinMeeting.postValue(OneTimeEvent(true))
+                        }
                     }
-                }
-            }, {
-                logPrint2File(it, "HomeViewModel#requestCanCreateMeeting")
-            })
+                }, {
+                    logPrint2File(it, "HomeViewModel#requestCanCreateMeeting")
+                })
         )
     }
 
 
     fun autoLuboLogin() {
-        mDisposables.add(Observable.interval(3, TimeUnit.MINUTES)
-            .flatMap {
-                LoginManager.newLogin(
-                    LoginManager.getLogin()?.username ?: "",
-                    LoginManager.getLogin()?.password ?: ""
-                )
-            }.retryWhen(RetryFunction(Int.MAX_VALUE))
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-
-            }, {
-                logPrint2File(it, "HomeViewModel#autoLuboLogin")
-            })
-        )
+//        mDisposables.add(
+//            Observable.interval(3, TimeUnit.MINUTES)
+//                .flatMap {
+//                    LoginManager.newLogin(
+//                        LoginManager.getLogin()?.username ?: "",
+//                        LoginManager.getLogin()?.password ?: ""
+//                    )
+//                }.retryWhen(RetryFunction(Int.MAX_VALUE))
+//                .subscribeOn(Schedulers.io())
+//                .subscribe({
+//                    if(it.isLoginSuccess&&!it.isSleep){
+//
+//                    }else{
+//
+//                    }
+//                }, {
+//                    logPrint2File(it, "HomeViewModel#autoLuboLogin")
+//                })
+//        )
     }
 
 

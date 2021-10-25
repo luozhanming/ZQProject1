@@ -121,8 +121,7 @@ object LoginManager {
                 }else if(login.isLoginSuccess){
                     mLogin = login
                 }
-
-                emitter.onNext(mLogin?:login)
+                emitter.onNext(login)
 
             }
         }

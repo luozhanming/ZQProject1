@@ -24,7 +24,7 @@ class MeetingStateInfoQuery(
         split.forEach {
             val split1 = it.split("=")
             when (split1[0]) {
-                "requestSpeakStatus" -> {
+                "requestSpeakAloneStatus" -> {
                     if (split1.size > 1&&split1[1].isNotEmpty()) {
                         val list = arrayListOf<Int>()
                         val split2 = split1[1].split(",")
@@ -38,11 +38,11 @@ class MeetingStateInfoQuery(
                         info.requestSpeakStatus = emptyList()
                     }
                 }
-                "requestSpeakRetStatus" -> {
+                "requestSpeakAloneRetStatus" -> {
                     info.requestSpeakRetStatus =
                         if (split1[1].isDigitsOnly()) split1[1].toInt() else 0
                 }
-                "requestSpeakMode" -> {
+                "requestSpeakAloneMode" -> {
                     info.requestSpeakMode = if (split1[1].isDigitsOnly()) split1[1].toInt() else 0
                 }
                 "lockConference" -> info.lockConference = "1" == split1[1]

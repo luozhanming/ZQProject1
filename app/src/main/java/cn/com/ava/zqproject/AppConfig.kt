@@ -22,10 +22,15 @@ object AppConfig {
     //U盘默认下载路径
     val USB_DEFAULT_DOWNLOAD_PATH = "/AVADownload"
 
+
+    val PATH_FILE_LOG = "${EXTERNAL_FILE_DIR}/log"
+
     //MMKV保存路径
     val MMKV_PATH = "${Utils.getApp().filesDir.absolutePath}/mmkv"
     //MMKV密钥
     const val MMKV_CRYPT_KEY = "AVA_ZQ"
+
+
 
     const val WIDTH_APP_DESIGN = 400
 

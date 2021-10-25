@@ -11,15 +11,22 @@
     >
 
 
-        <SurfaceView
-            android:id="@+id/video_view"
+
+        <FrameLayout
+            android:id="@+id/video_container"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="h,16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+            <SurfaceView
+                android:id="@+id/video_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/topBar"
@@ -47,8 +54,9 @@
 
             <ImageView
                 android:id="@+id/iv_record_info"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:padding="7dp"
                 android:src="@mipmap/ic_info"
                 app:layout_constraintBottom_toBottomOf="@+id/textView18"
                 app:layout_constraintStart_toEndOf="@+id/textView18"
@@ -105,7 +113,7 @@
             android:background="@color/color_black_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/video_view">
+            app:layout_constraintStart_toStartOf="@+id/video_container">
 
 
             <ImageView

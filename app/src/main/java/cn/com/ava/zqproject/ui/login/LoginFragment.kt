@@ -1,5 +1,6 @@
 package cn.com.ava.zqproject.ui.login
 
+import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
@@ -16,6 +17,7 @@ import cn.com.ava.zqproject.net.PlatformApiManager
 import cn.com.ava.zqproject.ui.common.power.PowerDialog
 import cn.com.ava.zqproject.ui.common.power.PowerViewModel
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.KeyboardUtils
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
@@ -95,20 +97,30 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
         WebViewUtil.destroy(mWebView)
+
     }
 
     override fun onStart() {
         super.onStart()
         mWebView.addJavascriptInterface(mLoginViewModel, "androidObj")
+        KeyboardUtils.registerSoftInputChangedListener(requireActivity()){
+            mBinding.webViewContainer.translationY = -it.toFloat()/2
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mWebView.removeJavascriptInterface("androidObj")
+        KeyboardUtils.unregisterSoftInputChangedListener(requireActivity().window)
     }
 
 }

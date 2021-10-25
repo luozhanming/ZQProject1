@@ -16,6 +16,7 @@
         android:singleLine="true"
         android:maxLength="20"
         android:textCursorDrawable="@null"
+
         android:imeOptions="actionNext"
         android:nextFocusForward="@id/et_meeting_nickname"
         android:hint="@string/input_meeting_theme"

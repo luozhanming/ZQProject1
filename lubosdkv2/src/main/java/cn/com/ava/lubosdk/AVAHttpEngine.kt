@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.util.Log
 import cn.com.ava.lubosdk.entity.Login
 import cn.com.ava.lubosdk.entity.QueryResult
+import cn.com.ava.lubosdk.eventbus.KeyInvalidEvent
 import cn.com.ava.lubosdk.http.AVAServerService
 import cn.com.ava.lubosdk.http.Config
 import cn.com.ava.lubosdk.manager.LoginManager
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.flow
 import okhttp3.*
 import okhttp3.EventListener
 import okhttp3.logging.HttpLoggingInterceptor
+import org.greenrobot.eventbus.EventBus
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -250,6 +252,7 @@ object AVAHttpEngine {
                     val body = response.body()?.string()?.trim() ?: ""
                     //检查录播key权限
                     if (checkKeyInvalid(body)) {
+                        EventBus.getDefault().post(KeyInvalidEvent())
                         resultOnMain(resultOnMain) {
                             control.onError?.invoke(KeyInvalidException())
                         }

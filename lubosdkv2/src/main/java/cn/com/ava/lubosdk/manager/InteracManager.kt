@@ -35,18 +35,18 @@ object InteracManager {
      * @param asswitch
      */
     fun setInteracCloudSetting(
-            netparam: String, protocol: String, code: String,
-            asswitch: String,
-            enableCloud: Boolean
+        netparam: String, protocol: String, code: String,
+        asswitch: String,
+        enableCloud: Boolean
     ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            SetInteracSettingControl(
-                                    netparam, protocol, code, asswitch, enableCloud,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        SetInteracSettingControl(
+                            netparam, protocol, code, asswitch, enableCloud,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -63,12 +63,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<InteracSetting> {
                     AVAHttpEngine.addQueryCommand(InteracSettingQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as InteracSetting))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as InteracSetting))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -85,12 +85,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<LastInteracSetting> {
                     AVAHttpEngine.addQueryCommand(LastInteracSettingQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as LastInteracSetting))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as LastInteracSetting))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -106,12 +106,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<MeetingInfo> {
                     AVAHttpEngine.addQueryCommand(MeetingInfoQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as MeetingInfo))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as MeetingInfo))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -127,12 +127,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<TsInteracSource> {
                     AVAHttpEngine.addQueryCommand(HDMISourceSelectQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as TsInteracSource))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as TsInteracSource))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -146,10 +146,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            ShareDocSIPH323Control(
-                                    isShare,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        ShareDocSIPH323Control(
+                            isShare,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -166,6 +166,23 @@ object InteracManager {
             windowIndex = videoIndex
         })
 
+    }
+
+    fun postMainStreamV2(videoIndex: Int): Observable<Boolean> {
+        return Observable.create { emitter ->
+            runBlocking {
+                val isSuccess = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        NewMainStreamSelectControl(
+                            videoIndex,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+
+                    )
+                }
+                emitter.onNext(isSuccess)
+            }
+        }
     }
 
 
@@ -186,11 +203,11 @@ object InteracManager {
      * @param limit     每页限制
      */
     fun getMeetingUser(
-            pageIndex: Int,
-            limit: Int
+        pageIndex: Int,
+        limit: Int
     ): Observable<Pager<MeetingUser>> {
         val params: MutableMap<String, String> =
-                LinkedHashMap()
+            LinkedHashMap()
         params["key"] = LoginManager.getLogin()?.key ?: ""
         params["limit"] = limit.toString() + ""
         params["pageIndex"] = "" + pageIndex
@@ -210,14 +227,14 @@ object InteracManager {
      */
     fun getAllMeetingUser(): Observable<Pager<MeetingUser>> {
         return getMeetingUser(1, 1)
-                .flatMap { pager ->
-                    val total = pager.total.toInt()
-                    var pageCount: Int = total / PAGE_SIZE
-                    if (total % InteracManager.PAGE_SIZE != 0) pageCount++
-                    return@flatMap Observable.range(1, pageCount)
-                }.flatMap { page ->
-                    return@flatMap getMeetingUser(page, InteracManager.PAGE_SIZE)
-                }
+            .flatMap { pager ->
+                val total = pager.total.toInt()
+                var pageCount: Int = total / PAGE_SIZE
+                if (total % InteracManager.PAGE_SIZE != 0) pageCount++
+                return@flatMap Observable.range(1, pageCount)
+            }.flatMap { page ->
+                return@flatMap getMeetingUser(page, InteracManager.PAGE_SIZE)
+            }
     }
 
 
@@ -233,10 +250,10 @@ object InteracManager {
      * @param users      连接用户数组（短号、用户名、内置云格式)
      */
     fun createMeeting(
-            theme: String, password: String, codeMode: String,
-            cofType: String, streamMode: String, maxShow: Int,
-            users: Array<String>,
-            isInternalCloud: Boolean
+        theme: String, password: String, codeMode: String,
+        cofType: String, streamMode: String, maxShow: Int,
+        users: Array<String>,
+        isInternalCloud: Boolean
     ): Observable<Boolean> {
         val cofTypeAdapt = when (cofType) {
             "AXM" -> "teachMode"
@@ -246,12 +263,12 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            NewCreateMeetingControl(
-                                    theme, password,
-                                    codeMode, cofTypeAdapt,
-                                    streamMode, isInternalCloud, users,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        NewCreateMeetingControl(
+                            theme, password,
+                            codeMode, cofTypeAdapt,
+                            streamMode, isInternalCloud, users,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -268,12 +285,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<Boolean>> {
                     AVAHttpEngine.addQueryCommand(CanCreateMeetingQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -290,8 +307,8 @@ object InteracManager {
             runBlocking {
                 val result = suspendCoroutine<ListWrapper<LastCallResult.LastCallUser>> {
                     AVAHttpEngine.requestSPQuery(RecentCallUserQuery(
-                            onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<LastCallResult.LastCallUser>)) },
-                            onError = { throwable -> it.resumeWithException(throwable) }
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<LastCallResult.LastCallUser>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
                     ))
                 }
                 emitter.onNext(result.datas)
@@ -309,8 +326,8 @@ object InteracManager {
             runBlocking {
                 val result = suspendCoroutine<ListWrapper<LastCallResult.LastCallUser>> {
                     AVAHttpEngine.requestSPQuery(LastCallUserQuery(
-                            onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<LastCallResult.LastCallUser>)) },
-                            onError = { throwable -> it.resumeWithException(throwable) }
+                        onResult = { queryResult -> it.resumeWith(Result.success(queryResult as ListWrapper<LastCallResult.LastCallUser>)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
                     ))
                 }
                 emitter.onNext(result.datas)
@@ -325,19 +342,19 @@ object InteracManager {
      */
     fun getRecentAndLastCallUser(): Observable<List<LastCallResult.LastCallUser>> {
         return Observable.zip<List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>>(
-                getLastCallUser().subscribeOn(Schedulers.io()),
-                getRecentCallUser().subscribeOn(Schedulers.io()),
-                BiFunction<List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>> { lastCallUsers, lastCallUsers2 ->
-                    for (lastCallUser in lastCallUsers) {
-                        if (lastCallUsers2.contains(lastCallUser)) {
-                            val i = lastCallUsers2.indexOf(lastCallUser)
-                            lastCallUsers2[i].isLastCall = true
-                        }
+            getLastCallUser().subscribeOn(Schedulers.io()),
+            getRecentCallUser().subscribeOn(Schedulers.io()),
+            BiFunction<List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>, List<LastCallResult.LastCallUser>> { lastCallUsers, lastCallUsers2 ->
+                for (lastCallUser in lastCallUsers) {
+                    if (lastCallUsers2.contains(lastCallUser)) {
+                        val i = lastCallUsers2.indexOf(lastCallUser)
+                        lastCallUsers2[i].isLastCall = true
                     }
-                    lastCallUsers2
-                }).doOnNext { list: List<LastCallResult.LastCallUser> ->
+                }
+                lastCallUsers2
+            }).doOnNext { list: List<LastCallResult.LastCallUser> ->
             Collections.sort<LastCallResult.LastCallUser>(
-                    list
+                list
             ) { o1: LastCallResult.LastCallUser, o2: LastCallResult.LastCallUser ->
                 if (o1.isSelected() && !o2.isSelected()) {
                     return@sort -1
@@ -353,7 +370,7 @@ object InteracManager {
                         lastCallTime2 = "$lastCallTime2 00:00:00"
                     }
                     val format: DateFormat =
-                            SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                        SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     var parse1: Date? = null
                     var parse2: Date? = null
                     try {
@@ -379,12 +396,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<Boolean>> {
                     AVAHttpEngine.addQueryCommand(InnerCloudQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -401,12 +418,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<Boolean>> {
                     AVAHttpEngine.addQueryCommand(IsEncodeJoinMeetingPswQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -423,15 +440,19 @@ object InteracManager {
      * @param type      AVA/SIP/H323  AVA密码长度必须为6位  SIP?H323会议密码只能输入 0-9 A-D *#
      * @param mode      TCP/UDP   除了SIP，其他只能选TCP
      */
-    fun joinMeeting(meetingId: String, password: String,
-                    type: String, mode: String): Observable<Boolean> {
+    fun joinMeeting(
+        meetingId: String, password: String,
+        type: String, mode: String
+    ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<Boolean> {
-                    AVAHttpEngine.requestControl(JoinMeetingControl(meetingId, password, type, mode,
+                    AVAHttpEngine.requestControl(
+                        JoinMeetingControl(meetingId, password, type, mode,
                             onResult = { b -> it.resumeWith(Result.success(b)) },
                             onError = { throwable -> it.resumeWithException(throwable) }),
-                    isEncode = true)
+                        isEncode = true
+                    )
 
                 }
                 emitter.onNext(result)
@@ -449,12 +470,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<InteracTeacherModeInfo> {
                     AVAHttpEngine.addQueryCommand(InteracTeacherModeInfoQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as InteracTeacherModeInfo))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as InteracTeacherModeInfo))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -471,8 +492,8 @@ object InteracManager {
             runBlocking {
                 val result = suspendCoroutine<InteraInfo> {
                     AVAHttpEngine.requestSPQuery(InteracMemberInfoQuery(
-                            onResult = { queryResult -> it.resumeWith(Result.success(it as InteraInfo)) },
-                            onError = { throwable -> it.resumeWithException(throwable) }
+                        onResult = { queryResult -> it.resumeWith(Result.success(it as InteraInfo)) },
+                        onError = { throwable -> it.resumeWithException(throwable) }
                     ))
                 }
                 emitter.onNext(result)
@@ -490,10 +511,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            RedialUserControl(
-                                    user.username,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        RedialUserControl(
+                            user.username,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -510,9 +531,9 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            NewExitInteractionControl(
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        NewExitInteractionControl(
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -529,9 +550,9 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            OneKeyReconnectControl(
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        OneKeyReconnectControl(
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -548,12 +569,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<ListWrapper<InteracVideoSource>> {
                     AVAHttpEngine.addQueryCommand(InteracVideoSourcesQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as ListWrapper<InteracVideoSource>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as ListWrapper<InteracVideoSource>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.datas)
@@ -570,12 +591,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<Boolean>> {
                     AVAHttpEngine.addQueryCommand(IsSipInteractionQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<Boolean>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -592,12 +613,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<ListWrapper<TsInteracSource>> {
                     AVAHttpEngine.addQueryCommand(TsInteracSourceQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as ListWrapper<TsInteracSource>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as ListWrapper<TsInteracSource>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.datas)
@@ -611,18 +632,18 @@ object InteracManager {
      * 选择互动视频源
      */
     fun selectTSSource(
-            tSelect: Int,
-            sSelect: Int
+        tSelect: Int,
+        sSelect: Int
     ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            TeachModeVideoSelectControl(
-                                    tSelect,
-                                    sSelect,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        TeachModeVideoSelectControl(
+                            tSelect,
+                            sSelect,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -639,11 +660,11 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            SelectHDMISourceControl(
-                                    hdmisource,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) }
-                            )
+                        SelectHDMISourceControl(
+                            hdmisource,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) }
+                        )
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -665,10 +686,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            TeachModeLayoutControl(
-                                    windows,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        TeachModeLayoutControl(
+                            windows,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -688,18 +709,18 @@ object InteracManager {
      * @param preLayout   以前的布局（内容为互动成员号)
      */
     fun setVideoLayout(
-            streamCount: Int,
-            preLayout: List<Int>
+        streamCount: Int,
+        preLayout: List<Int>
     ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            SetMeetingVideoLayoutControl(
-                                    streamCount,
-                                    preLayout,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        SetMeetingVideoLayoutControl(
+                            streamCount,
+                            preLayout,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -715,25 +736,25 @@ object InteracManager {
      * @param stream 流
      */
     fun setCurStream(
-            isMain: Boolean,
-            stream: LocalVideoStream
+        isMain: Boolean,
+        stream: LocalVideoStream
     ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            if (isMain) {
-                                MainStreamSelectControl(
-                                        stream.windowIndex,
-                                        onResult = { b -> it.resumeWith(Result.success(b)) },
-                                        onError = { throwable -> it.resumeWithException(throwable) })
-                            } else {
-                                SubStreamSelectControl(
-                                        stream.windowIndex,
-                                        onResult = { b -> it.resumeWith(Result.success(b)) },
-                                        onError = { throwable -> it.resumeWithException(throwable) })
+                        if (isMain) {
+                            MainStreamSelectControl(
+                                stream.windowIndex,
+                                onResult = { b -> it.resumeWith(Result.success(b)) },
+                                onError = { throwable -> it.resumeWithException(throwable) })
+                        } else {
+                            SubStreamSelectControl(
+                                stream.windowIndex,
+                                onResult = { b -> it.resumeWith(Result.success(b)) },
+                                onError = { throwable -> it.resumeWithException(throwable) })
 
-                            }
+                        }
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -753,13 +774,13 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<ListWrapper<LocalVideoStream>> {
                     AVAHttpEngine.addQueryCommand(LocalVideoStreamQuery(
-                            isMain,
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as ListWrapper<LocalVideoStream>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        isMain,
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as ListWrapper<LocalVideoStream>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.datas)
@@ -776,12 +797,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<InteraInfo> {
                     AVAHttpEngine.requestSPQuery(InteracMemberInfoQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as InteraInfo))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as InteraInfo))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -801,9 +822,9 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            ApplySpeakControl(
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        ApplySpeakControl(
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -820,9 +841,9 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            ShareDocControl(
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        ShareDocControl(
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -839,12 +860,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<String>> {
                     AVAHttpEngine.addQueryCommand(MyInteractionNameQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<String>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<String>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -861,12 +882,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<SimpleWrapper<Int>> {
                     AVAHttpEngine.addQueryCommand(MyInteractionNumberQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as SimpleWrapper<Int>))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as SimpleWrapper<Int>))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info.value)
@@ -883,12 +904,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<ListenerInfo> {
                     AVAHttpEngine.addQueryCommand(ListenerInfoQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as ListenerInfo))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as ListenerInfo))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -901,16 +922,16 @@ object InteracManager {
      * 新版一键呼叫接口
      */
     fun oneKeyCallNew(
-            username: String,
-            password: String
+        username: String,
+        password: String
     ): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            OneKeyCallControl(
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        OneKeyCallControl(
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -927,10 +948,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            DisconnectUserControl(
-                                    username,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        DisconnectUserControl(
+                            username,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -944,7 +965,7 @@ object InteracManager {
      */
     fun kickOutUser(username: String): Observable<Boolean> {
         return Observable.timer(2000, TimeUnit.MILLISECONDS)
-                .flatMap { disconnectUser(username) }
+            .flatMap { disconnectUser(username) }
     }
 
 
@@ -963,10 +984,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            RemoteVideoControl(
-                                    rid, vid,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        RemoteVideoControl(
+                            rid, vid,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -982,12 +1003,12 @@ object InteracManager {
             runBlocking {
                 val info = suspendCoroutine<RemoteVideoEnable> {
                     AVAHttpEngine.addQueryCommand(RemoteVideoEnableQuery(
-                            onResult = { queryResult ->
-                                it.resumeWith(Result.success(queryResult as RemoteVideoEnable))
-                            },
-                            onError = { throwable ->
-                                it.resumeWithException(throwable)
-                            }
+                        onResult = { queryResult ->
+                            it.resumeWith(Result.success(queryResult as RemoteVideoEnable))
+                        },
+                        onError = { throwable ->
+                            it.resumeWithException(throwable)
+                        }
                     ))
                 }
                 emitter.onNext(info)
@@ -999,20 +1020,36 @@ object InteracManager {
     /**
      * sip互动推送
      */
-    fun sipPush(sip: String, courseId: String, csTitle: String, startTime: String,
-                endTime: String, csTeacher: String, isTeacher: Boolean,
-                ridCount: Int, rids: List<String>, rNames: List<String>): Observable<NetResult> {
+    fun sipPush(
+        sip: String, courseId: String, csTitle: String, startTime: String,
+        endTime: String, csTeacher: String, isTeacher: Boolean,
+        ridCount: Int, rids: List<String>, rNames: List<String>
+    ): Observable<NetResult> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            SipPushControl(
-                                    sip, courseId, csTitle, startTime, endTime, csTeacher, isTeacher, ridCount, rids, rNames,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        SipPushControl(
+                            sip,
+                            courseId,
+                            csTitle,
+                            startTime,
+                            endTime,
+                            csTeacher,
+                            isTeacher,
+                            ridCount,
+                            rids,
+                            rNames,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
-                emitter.onNext(NetResult(if (isSuccess) 0 else -1, if (isSuccess) "success" else "failed"))
+                emitter.onNext(
+                    NetResult(
+                        if (isSuccess) 0 else -1,
+                        if (isSuccess) "success" else "failed"
+                    )
+                )
             }
         }
     }
@@ -1026,10 +1063,10 @@ object InteracManager {
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                            KP8PControl(
-                                    key,
-                                    onResult = { b -> it.resumeWith(Result.success(b)) },
-                                    onError = { throwable -> it.resumeWithException(throwable) })
+                        KP8PControl(
+                            key,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
                     )
                 }
                 emitter.onNext(isSuccess)
@@ -1042,7 +1079,7 @@ object InteracManager {
     /**
      * 获取互动模式下音频通道信息
      * */
-    fun getInteracVolumeChannels():Observable<List<VolumeChannel>>{
+    fun getInteracVolumeChannels(): Observable<List<VolumeChannel>> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<ListWrapper<VolumeChannel>> {
@@ -1059,7 +1096,7 @@ object InteracManager {
     /**
      * 设置互动音频
      * */
-    fun setInteracVolumeChannels(channelName:String,channelLevel:Int):Observable<Boolean>{
+    fun setInteracVolumeChannels(channelName: String, channelLevel: Int): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<ListWrapper<String>> {
@@ -1073,7 +1110,7 @@ object InteracManager {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
                         InteracVolumeControl(
-                            channelName,channelLevel,raw,
+                            channelName, channelLevel, raw,
                             onResult = { b -> it.resumeWith(Result.success(b)) },
                             onError = { throwable -> it.resumeWithException(throwable) })
                     )
@@ -1087,7 +1124,7 @@ object InteracManager {
     /**
      * 设置录课音频
      **/
-    fun setRecordVolumeChannels(channelName:String,channelLevel:Int):Observable<Boolean>{
+    fun setRecordVolumeChannels(channelName: String, channelLevel: Int): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<ListWrapper<String>> {
@@ -1101,7 +1138,7 @@ object InteracManager {
                 val isSuccess = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
                         RecordVolumeControl(
-                            channelName,channelLevel,raw,
+                            channelName, channelLevel, raw,
                             onResult = { b -> it.resumeWith(Result.success(b)) },
                             onError = { throwable -> it.resumeWithException(throwable) })
                     )
@@ -1110,8 +1147,6 @@ object InteracManager {
             }
         }
     }
-
-
 
 
 }

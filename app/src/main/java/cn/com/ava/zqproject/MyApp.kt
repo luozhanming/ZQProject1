@@ -3,12 +3,15 @@ package cn.com.ava.zqproject
 import android.app.Application
 import cn.com.ava.common.util.LoggerUtil
 import cn.com.ava.common.util.logd
+import cn.com.ava.lubosdk.KeyInvalidException
 import cn.com.ava.zqproject.common.CommonPreference
+import cn.com.ava.zqproject.eventbus.KeyInvalidEvent
 import com.blankj.utilcode.util.AppUtils
 import com.tencent.mmkv.MMKV
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.functions.Consumer
 import io.reactivex.plugins.RxJavaPlugins
+import org.greenrobot.eventbus.EventBus
 import xcrash.XCrash
 import java.io.IOException
 
@@ -41,8 +44,13 @@ class MyApp : Application() {
         MMKV.initialize(this, AppConfig.MMKV_PATH)
         RxJavaPlugins.setErrorHandler(Consumer { e ->
             var e = e
+            if(e is KeyInvalidException){
+                e = e.cause
+                EventBus.getDefault().post(KeyInvalidEvent())
+            }
             if (e is UndeliverableException) {
                 e = e.cause
+                return@Consumer
             }
             if (e is IOException) {
                 // fine, irrelevant network problem or API that throws on cancellation

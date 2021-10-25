@@ -1,8 +1,6 @@
 package cn.com.ava.lubosdk.manager
 
 import cn.com.ava.lubosdk.AVAHttpEngine
-import cn.com.ava.lubosdk.entity.LinkedUser
-import cn.com.ava.lubosdk.entity.ListWrapper
 import cn.com.ava.lubosdk.entity.zq.MeetingMemberInfo
 import cn.com.ava.lubosdk.zq.control.*
 import cn.com.ava.lubosdk.zq.entity.MeetingAudioParam
@@ -138,18 +136,18 @@ object ZQManager {
     }
 
 
-
     /**
      * 听课/旁听角色切换
      * @param users 用户名数组
      * @param goToWaiting 去等候室
      * */
-    fun memberGoToWaiting(users:Array<String>,goToWaiting:Boolean):Observable<Boolean>{
+    fun memberGoToWaiting(users: Array<String>, goToWaiting: Boolean): Observable<Boolean> {
         return Observable.create<Boolean> { emitter ->
             runBlocking {
                 val result = suspendCoroutine<Boolean> {
                     AVAHttpEngine.requestControl(
-                        MeetingMemberWaitingControl(users,if(goToWaiting)"viewer" else "listener",
+                        MeetingMemberWaitingControl(users,
+                            if (goToWaiting) "viewer" else "listener",
                             onResult = { result -> it.resumeWith(Result.success(result)) },
                             onError = { throwable -> it.resumeWithException(throwable) })
                     )
@@ -162,7 +160,7 @@ object ZQManager {
     /**
      * 移除角色
      * */
-    fun deleteMeetingMember(username:String):Observable<Boolean>{
+    fun deleteMeetingMember(username: String): Observable<Boolean> {
         return Observable.create<Boolean> { emitter ->
             runBlocking {
                 val result = suspendCoroutine<Boolean> {
@@ -180,7 +178,7 @@ object ZQManager {
     /**
      * 加载会议信息
      * */
-    fun loadMeetingInfo():Observable<MeetingInfoZQ>{
+    fun loadMeetingInfo(): Observable<MeetingInfoZQ> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<MeetingInfoZQ> {
@@ -199,7 +197,7 @@ object ZQManager {
     /**
      * 加载会议成员
      * */
-    fun loadMeetingMember():Observable<MeetingMemberInfo>{
+    fun loadMeetingMember(): Observable<MeetingMemberInfo> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<MeetingMemberInfo> {
@@ -215,11 +213,10 @@ object ZQManager {
     }
 
 
-
     /**
      * 会议特殊状态
      * */
-    fun loadMeetingState():Observable<MeetingStateInfoZQ>{
+    fun loadMeetingState(): Observable<MeetingStateInfoZQ> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<MeetingStateInfoZQ> {
@@ -245,7 +242,7 @@ object ZQManager {
         streamCount: Int,
         preLayout: List<Int>
     ): Observable<Boolean> {
-        if(preLayout.isEmpty()||0==streamCount){
+        if (preLayout.isEmpty() || 0 == streamCount) {
             return Observable.empty()
         }
         return Observable.create { emitter ->
@@ -263,10 +260,11 @@ object ZQManager {
             }
         }
     }
+
     /**
      * 锁定会议
      * */
-    fun lockMeeting(isLock:Boolean):Observable<Boolean>{
+    fun lockMeeting(isLock: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -285,7 +283,7 @@ object ZQManager {
     /**
      * 关闭本地输出视频
      * */
-    fun setLocalCam(isClose:Boolean):Observable<Boolean>{
+    fun setLocalCam(isClose: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -304,7 +302,7 @@ object ZQManager {
     /**
      * 设置本地输出音频
      * */
-    fun setLocalAudio(isClose: Boolean):Observable<Boolean>{
+    fun setLocalAudio(isClose: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -319,10 +317,11 @@ object ZQManager {
             }
         }
     }
+
     /**
      * 设置远程摄像头输出
      * */
-    fun setRemoteCam(num:Int,isClose: Boolean):Observable<Boolean>{
+    fun setRemoteCam(num: Int, isClose: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -343,7 +342,7 @@ object ZQManager {
     /**
      * 设置远程音频输出
      * */
-    fun setRemoteAudio(num:Int,isClose: Boolean):Observable<Boolean>{
+    fun setRemoteAudio(num: Int, isClose: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -361,12 +360,10 @@ object ZQManager {
     }
 
 
-
-
     /**
      * 设置发言模式
      * */
-    fun setRequestSpeakMode(numberId:Int):Observable<Boolean>{
+    fun setRequestSpeakMode(numberId: Int): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -383,7 +380,7 @@ object ZQManager {
     }
 
 
-    fun setRequestSpeakRet(numberId: Int,agree:Boolean):Observable<Boolean>{
+    fun setRequestSpeakRet(numberId: Int, agree: Boolean): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -401,7 +398,7 @@ object ZQManager {
     }
 
 
-    fun setRecordState(control:Int):Observable<Boolean>{
+    fun setRecordState(control: Int): Observable<Boolean> {
         return Observable.create { emitter ->
             runBlocking {
                 val isSuccess = suspendCoroutine<Boolean> {
@@ -420,7 +417,7 @@ object ZQManager {
     /**
      * 加载会议音频
      * */
-    fun loadMeetingAudioParam():Observable<MeetingAudioParam>{
+    fun loadMeetingAudioParam(): Observable<MeetingAudioParam> {
         return Observable.create { emitter ->
             runBlocking {
                 val result = suspendCoroutine<MeetingAudioParam> {
@@ -436,12 +433,24 @@ object ZQManager {
     }
 
 
-
-    
-
-
-
-
+    /**
+     * 全场静音
+     * */
+    fun meetingMuteAll(mute: Boolean): Observable<Boolean> {
+        return Observable.create { emitter ->
+            runBlocking {
+                val isSuccess = suspendCoroutine<Boolean> {
+                    AVAHttpEngine.requestControl(
+                        MeetingMuteAllControl(
+                            mute,
+                            onResult = { b -> it.resumeWith(Result.success(b)) },
+                            onError = { throwable -> it.resumeWithException(throwable) })
+                    )
+                }
+                emitter.onNext(isSuccess)
+            }
+        }
+    }
 
 
 }

@@ -4,10 +4,14 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import cn.com.ava.base.ui.BaseViewModel
 import cn.com.ava.common.util.logPrint2File
+import cn.com.ava.lubosdk.AVATable
 import cn.com.ava.lubosdk.Cache
 import cn.com.ava.lubosdk.entity.VolumeChannel
+import cn.com.ava.lubosdk.manager.GeneralManager
 import cn.com.ava.lubosdk.manager.InteracManager
+import cn.com.ava.lubosdk.manager.WindowLayoutManager
 import cn.com.ava.zqproject.vo.CamPreviewInfo
+import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
 class VolumeSceneViewModel : BaseViewModel() {
@@ -52,50 +56,83 @@ class VolumeSceneViewModel : BaseViewModel() {
 
 
     fun loadCamPreviewInfo() {
-        mDisposables.add(
-            InteracManager.getSceneStream(true).map {
-                val windows = Cache.getCache().windowsCache
+        mDisposables.add(Observable.zip(WindowLayoutManager.getPreviewWindowInfo(),
+            GeneralManager.getRawString(
+                arrayOf(AVATable.SEM_INTERAMAINSTREAM)
+            ),
+            { windows, raw ->
+                var curOutput = 0
+                if (raw.isNotEmpty()) {
+                    curOutput = raw[0].toInt()
+                }
                 val cams = windows.filter {
                     it.isPtz
                 }
-                val curOutput = it.firstOrNull { it.isMainOutput }
                 cams.forEach {
-                    it.isCurrentOutput = it.index == curOutput?.windowIndex ?: -1
+                    it.isCurrentOutput = it.index == curOutput
                 }
                 val info = CamPreviewInfo(
                     if (windows.size <= 6) 1 else 2,
                     if (windows.size <= 6) windows.size else 5,
                     cams.size,
                     cams,
-                    curOutput?.windowIndex ?: -1
+                    curOutput
                 )
-                info
-            }.subscribeOn(Schedulers.io())
-                .subscribe({
-                    if (it.curOutputIndex < 0 || it.curOutputIndex > it.camCount)
-                        it.curOutputIndex = 0
-                    camPreviewInfo.postValue(it)
-                }, {
-                    logPrint2File(it,"VolumeSceneViewModel#loadCamPreviewInfo")
-                })
+                if (info.curOutputIndex < 0 || info.curOutputIndex > info.camCount)
+                    info.curOutputIndex = 0
+                camPreviewInfo.postValue(info)
+                return@zip true
+            }).subscribeOn(Schedulers.io())
+            .subscribe({
+
+            }, {
+                logPrint2File(it,"VolumeSceneViewModel#loadCamPreviewInfo")
+            })
         )
+//        mDisposables.add(
+//            InteracManager.getSceneStream(true).map {
+//                val windows = Cache.getCache().windowsCache
+//                val cams = windows.filter {
+//                    it.isPtz
+//                }
+//                val curOutput = it.firstOrNull { it.isMainOutput }
+//                cams.forEach {
+//                    it.isCurrentOutput = it.index == curOutput?.windowIndex ?: -1
+//                }
+//                val info = CamPreviewInfo(
+//                    if (windows.size <= 6) 1 else 2,
+//                    if (windows.size <= 6) windows.size else 5,
+//                    cams.size,
+//                    cams,
+//                    curOutput?.windowIndex ?: -1
+//                )
+//                info
+//            }.subscribeOn(Schedulers.io())
+//                .subscribe({
+//                    if (it.curOutputIndex < 0 || it.curOutputIndex > it.camCount)
+//                        it.curOutputIndex = 0
+//                    camPreviewInfo.postValue(it)
+//                }, {
+//                    logPrint2File(it, "VolumeSceneViewModel#loadCamPreviewInfo")
+//                })
+//        )
     }
 
     fun loadVolumeChannels() {
         mDisposables.add(
             InteracManager.getInteracVolumeChannels()
                 .subscribeOn(Schedulers.io())
-                .subscribe({list->
+                .subscribe({ list ->
                     val filter = mutableListOf<VolumeChannel>()
                     val inArray =
-                        arrayOf("LINEIN1", "LINEIN2", "MICIN1", "MICIN2", "MICIN3")
-                    val outArray = arrayOf("MASTER", "EXTLINEIN1", "EXTLINEIN2")
+                        arrayOf("LINEIN1", "LINEIN2", "MICIN1", "MICIN2", "MICIN3", "HDMIIN")
+                    val outArray = arrayOf("MASTER", "EXTLINEIN1", "EXTLINEIN2", "EXTREMOTE")
                     val outChannels = arrayListOf<VolumeChannel>()
                     val inChannels = arrayListOf<VolumeChannel>()
                     list.forEach {
                         if (it.channelName in inArray) {
                             inChannels.add(it)
-                        }else if(it.channelName in outArray){
+                        } else if (it.channelName in outArray) {
                             outChannels.add(it)
                         }
                     }
@@ -106,7 +143,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                     }
                     volumeChannels.postValue(filter)
                 }, {
-                    logPrint2File(it,"VolumeSceneViewModel#loadVolumeChannels")
+                    logPrint2File(it, "VolumeSceneViewModel#loadVolumeChannels")
                 })
         )
     }
@@ -118,7 +155,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribe({
                     loadVolumeChannels()
                 }, {
-                    logPrint2File(it,"VolumeSceneViewModel#setAudioLevel")
+                    logPrint2File(it, "VolumeSceneViewModel#setAudioLevel")
                 })
         )
     }
@@ -130,7 +167,7 @@ class VolumeSceneViewModel : BaseViewModel() {
                 .subscribe({
                     loadCamPreviewInfo()
                 }, {
-                    logPrint2File(it,"VolumeSceneViewModel#postMainStream")
+                    logPrint2File(it, "VolumeSceneViewModel#postMainStream")
                 })
         )
     }

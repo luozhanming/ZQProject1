@@ -185,7 +185,7 @@
             android:background="@drawable/bg_text_button_1"
             android:gravity="center"
             android:text="@string/next_step"
-            android:enabled="@{selectLayoutViewModel.layoutSelect!=null}"
+            android:enabled="@{selectLayoutViewModel.layoutSelect!=-1}"
             android:textColor="@drawable/selector_text_color_2"
             android:textSize="19sp"
             app:layout_constraintBottom_toBottomOf="@+id/btn_cancel"

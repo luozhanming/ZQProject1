@@ -24,7 +24,7 @@ class AgreeSpeakerControl(
             this["user"] = LoginManager.getLogin()?.username?:""
             this["pswd"]= EncryptUtil.encryptMD5ToString(LoginManager.getLogin()?.password?:"").lowercase()
             this["command"] = "1"
-            val data = "confFunc_requestSpeakRet_numberId=${number},state=${if(agree)1 else 0}"
+            val data = "confFunc_requestSpeakAloneRet_numberId=${number},state=${if(agree)1 else 0}"
             logd("data = ${data}")
             this["data"] = URLHexEncodeDecodeUtil.stringToHexEncode(data)
         }

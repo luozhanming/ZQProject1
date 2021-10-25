@@ -22,4 +22,9 @@ abstract class BaseLoadingFragment<B : ViewDataBinding> : BaseFragment<B>() {
         if (mLoadingDialog?.parentFragment == null) return
         mLoadingDialog?.dismiss()
     }
+
+    override fun onDestroyView() {
+        hideLoading()
+        super.onDestroyView()
+    }
 }

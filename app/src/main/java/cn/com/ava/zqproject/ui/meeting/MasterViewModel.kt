@@ -13,6 +13,7 @@ import cn.com.ava.common.util.GsonUtil
 import cn.com.ava.common.util.logPrint2File
 import cn.com.ava.common.util.logd
 import cn.com.ava.lubosdk.Constant
+import cn.com.ava.lubosdk.KeyInvalidException
 import cn.com.ava.lubosdk.entity.*
 import cn.com.ava.lubosdk.entity.zq.ApplySpeakUser
 import cn.com.ava.lubosdk.manager.*
@@ -78,11 +79,10 @@ class MasterViewModel : BaseViewModel() {
     /**
      * 控制栏隐藏
      * */
-    val isControlVisible: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>().apply {
+    val isControlVisible: MutableLiveData<Boolean> = MutableLiveData<Boolean>().apply {
             value = true
         }
-    }
+
 
 
     /**
@@ -273,14 +273,16 @@ class MasterViewModel : BaseViewModel() {
             value = 0
             addSource(meetingState) {
                 it.apply {
+                    defaultLayoutHelper?.updateApplySpeakStatus(requestSpeakMode>0)
                     if (this.requestSpeakMode != value) {    //发言模式改变了
                         if (requestSpeakMode > 0 && value == 0) {   //申请发言前处理一下保存当前画面
                             preRequestSpeakLayout = onVideoWindow.value
                         }
                         postValue(this.requestSpeakMode)
-                        defaultLayoutHelper?.updateApplySpeakStatus(requestSpeakMode>0)
+                        if(this.requestSpeakMode>0){
+                            isControlVisible.postValue(false)
+                        }
                     }
-
                 }
             }
         }
@@ -435,7 +437,6 @@ class MasterViewModel : BaseViewModel() {
             }.retryWhen(RetryFunction(Int.MAX_VALUE))
             .subscribeOn(Schedulers.io())
             .subscribe({
-
                 meetingState.postValue(it)
                 //处理申请发言的列表数据源
                 val applySpeakUser = arrayListOf<ApplySpeakUser>()
@@ -919,10 +920,10 @@ class MasterViewModel : BaseViewModel() {
         }
 
         fun updateCurLayout(layouts: List<Int>) {
-            if(!isHandleCurLaout){
-                curLayout.clear()
-                curLayout.addAll(layouts)
-            }
+//            if(!isHandleCurLaout){
+//                curLayout.clear()
+//                curLayout.addAll(layouts)
+//            }
         }
 
         fun updateApplySpeakStatus(mode:Boolean){
@@ -1027,7 +1028,11 @@ class MasterViewModel : BaseViewModel() {
             if (!defaultLayoutInfo.isInDefaultLayout) return
             workerDisposable = Observable.intervalRange(0,360,3, 5, TimeUnit.SECONDS)
                 .flatMap {
-
+                    InteracManager.getInteracInfo()
+                }
+                .flatMap {
+                    curLayout = it.layout
+                    this@DefaultLayoutHelper.logd("curLayout:${curLayout}")
                     val userIds = defaultLayoutInfo.contractUsers.map { it.userId }
                     return@flatMap PlatformApi.getService().getUserRsAcctList(userIds = userIds)
                         .compose(PlatformApi.applySchedulers())

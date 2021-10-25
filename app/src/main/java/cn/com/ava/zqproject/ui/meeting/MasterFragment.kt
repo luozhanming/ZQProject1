@@ -1,15 +1,9 @@
 package cn.com.ava.zqproject.ui.meeting
 
-import android.app.Service
 import android.content.ClipData
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
 import android.graphics.RectF
 import android.os.Build
-import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.View
@@ -17,6 +11,7 @@ import android.view.View.DragShadowBuilder
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.widget.FrameLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,7 +32,6 @@ import cn.com.ava.zqproject.ui.BaseLoadingFragment
 import cn.com.ava.zqproject.ui.common.ConfirmDialog
 import cn.com.ava.zqproject.ui.common.recordupload.RecordUploadDialog
 import cn.com.ava.zqproject.ui.meeting.adapter.ApplySpeakUserAdapter
-import cn.com.ava.zqproject.ui.videoResource.service.DownloadService
 import cn.com.ava.zqproject.ui.widget.SliceVideoView
 import com.blankj.utilcode.util.ToastUtils
 
@@ -48,7 +42,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
     private val mMasterViewModel by viewModels<MasterViewModel>()
 
-    private val mMemberManagerViewModel by viewModels<MemeberManagerViewModel>()
+    private val mMemberManagerViewModel by viewModels<MemberManagerViewModel>()
 
     private var mExitMeetingDialog by autoCleared<ConfirmDialog>()
     private var mVideoPlayer by autoCleared<IjkVideoPlayer>()
@@ -80,7 +74,6 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
     override fun initView() {
         initAnim()
-        bindListener()
         mMasterViewModel.startLoadMeetingInfo()
         mMasterViewModel.loopCurVideoSceneSources()
         mMasterViewModel.startLoopInteracInfo()
@@ -111,11 +104,19 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
     override fun onStart() {
         super.onStart()
         mMasterViewModel.startTimeCount()
+        if(mBinding.videoView.parent==null){
+            mBinding.videoContainer.addView(mBinding.videoView,FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT))
+        }
     }
 
     override fun onStop() {
         super.onStop()
         mMasterViewModel.stopTimeCount()
+        mMeetingInfoWindow?.dismiss()
+        mComputerSourceWindow?.dismiss()
+        if(mBinding.videoView.parent!=null){
+            mBinding.videoContainer.removeView(mBinding.videoView)
+        }
     }
 
 
@@ -212,11 +213,13 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mMasterViewModel.linkUsers.observe(viewLifecycleOwner){
             mMemberManagerViewModel.meetingMember.value = it
         }
+
     }
 
     override fun onDestroyView() {
         //需要置空才能回调相关方法
         mBinding.rvRequestSpeakList.adapter = null
+        mBinding.videoTopView.setOnLabelDropListener(null)
         super.onDestroyView()
     }
 
@@ -229,7 +232,7 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
         mBinding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
-        mBinding.root.setOnClickListener {
+        mBinding.rootView.setOnClickListener {
             mMasterViewModel.isControlVisible.value =
                 mMasterViewModel.isControlVisible.value?.not() ?: true
         }
@@ -338,6 +341,8 @@ class MasterFragment : BaseLoadingFragment<FragmentMasterBinding>(), SurfaceHold
 
         })
     }
+
+
 
 
     private fun initAnim() {
